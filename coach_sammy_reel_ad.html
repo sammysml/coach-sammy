@@ -1,0 +1,455 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coach Laid Sammy — Client Reel</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,700;1,9..144,300&family=Inter:wght@800;900&family=Anton&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Inter',-apple-system,sans-serif;color:#fff}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+.frame{position:relative;background:#000;overflow:hidden}
+@media(min-aspect-ratio:9/16){.frame{aspect-ratio:9/16;height:100vh;width:auto;max-width:500px}}
+@media(max-aspect-ratio:9/16){.frame{aspect-ratio:9/16;width:100vw;height:auto}}
+
+.lang-row{position:absolute;top:18px;right:14px;display:flex;gap:5px;z-index:100}
+.lb{background:rgba(0,0,0,0.5);border:0.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-size:9px;font-weight:700;padding:4px 8px;border-radius:12px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:1.5px;backdrop-filter:blur(8px)}
+.lb.on{border-color:#C9A84C;color:#C9A84C;background:rgba(201,168,76,0.1)}
+
+/* Scenes */
+.scene{position:absolute;inset:0;opacity:0;transition:opacity .35s ease}
+.scene.active{opacity:1}
+
+/* Grain + vignette */
+.grain{position:absolute;inset:0;opacity:0.06;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:overlay;pointer-events:none;z-index:50}
+.vig{position:absolute;inset:0;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.5) 100%);pointer-events:none;z-index:49}
+
+/* Shaky cam effect */
+@keyframes shake{0%,100%{transform:translate(0,0)}25%{transform:translate(1px,-1px)}50%{transform:translate(-1px,1px)}75%{transform:translate(1px,1px)}}
+
+/* OVERLAY TEXT — bold all-caps */
+.overlay-text{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;z-index:80;pointer-events:none}
+.ot-word{font-family:'Anton','Inter',sans-serif;font-weight:900;font-size:clamp(80px,22vw,140px);color:#fff;text-transform:uppercase;letter-spacing:-2px;line-height:1;text-shadow:0 0 40px rgba(0,0,0,0.8);opacity:0;transform:scale(0.7)}
+.scene.active .ot-word{animation:wordPop .8s cubic-bezier(.34,1.56,.64,1) forwards}
+@keyframes wordPop{0%{opacity:0;transform:scale(0.5) translateY(20px)}40%{opacity:1;transform:scale(1.05) translateY(0)}60%{transform:scale(0.98)}100%{opacity:1;transform:scale(1)}}
+
+/* Each scene shows the app screen behind, slightly angled/rotated for that "filmed from phone" vibe */
+.app-frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;overflow:hidden}
+.phone-bg{width:88%;max-width:380px;background:#000;border-radius:38px;padding:14px;box-shadow:0 30px 80px rgba(0,0,0,0.6),0 0 0 2px rgba(255,255,255,0.04);transform:perspective(800px) rotateX(2deg) rotateY(-1deg) scale(1);animation:shake 6s infinite}
+.phone-screen{background:#000;border-radius:26px;overflow:hidden;aspect-ratio:9/19;padding:12px 14px;position:relative}
+
+/* Light ambient — like filming in a room */
+@keyframes ambient{0%,100%{background:radial-gradient(circle at 30% 20%,rgba(201,168,76,0.04) 0%,transparent 50%)}50%{background:radial-gradient(circle at 70% 80%,rgba(201,168,76,0.06) 0%,transparent 50%)}}
+.ambient{position:absolute;inset:0;animation:ambient 8s ease-in-out infinite;pointer-events:none;z-index:48}
+
+/* SCENE 1 — CHECK-IN */
+.cs-status-bar{display:flex;justify-content:space-between;align-items:center;font-size:9px;color:rgba(255,255,255,0.5);margin-bottom:14px}
+.cs-greeting{font-family:'Fraunces',serif;font-style:italic;font-size:24px;color:#fff;margin-bottom:2px}
+.cs-greeting em{color:#C9A84C}
+.cs-date{font-size:9px;color:rgba(201,168,76,0.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:18px}
+.cs-card{background:rgba(255,255,255,0.03);border:0.5px solid rgba(201,168,76,0.2);border-radius:14px;padding:14px;margin-bottom:10px}
+.cs-card-label{font-size:8px;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.cs-card-title{font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:#fff;margin-bottom:10px}
+.cs-weight{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.cs-w-val{font-family:'Fraunces',serif;font-style:italic;font-size:32px;color:#C9A84C}
+.cs-w-unit{font-size:11px;color:rgba(255,255,255,0.4)}
+.cs-toggle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.02);border-radius:10px;padding:9px 11px;margin-bottom:6px}
+.cs-toggle-lbl{font-size:10px;color:rgba(255,255,255,0.75)}
+.cs-toggle{width:30px;height:17px;border-radius:9px;background:#C9A84C;position:relative}
+.cs-toggle::after{content:'';position:absolute;right:2px;top:2px;width:13px;height:13px;border-radius:50%;background:#000}
+.cs-toggle.off{background:rgba(255,255,255,0.08)}
+.cs-toggle.off::after{left:2px;right:auto;background:rgba(255,255,255,0.3)}
+.cs-btn{width:100%;background:#C9A84C;border:none;color:#000;padding:10px;border-radius:10px;font-size:10px;font-weight:800;margin-top:8px;font-family:'Inter',sans-serif}
+.cs-streak{display:flex;align-items:center;justify-content:center;gap:6px;margin-top:10px;font-size:9px;color:rgba(255,255,255,0.3)}
+.cs-streak b{color:#C9A84C}
+@keyframes toggleOn{0%{transform:translateX(-13px);background:rgba(255,255,255,0.3)}100%{transform:translateX(0);background:#000}}
+.scene.active .cs-toggle::after{animation:toggleOn .4s ease 1s forwards}
+.scene.active .cs-toggle{animation:toggleBgOn .4s ease 1s forwards}
+@keyframes toggleBgOn{0%{background:rgba(255,255,255,0.08)}100%{background:#C9A84C}}
+
+/* SCENE 2 — FOOD TRACKER */
+.ft-title{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:#fff;margin-bottom:12px}
+.ft-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:6px;margin-bottom:12px}
+.ft-macro{background:rgba(255,255,255,0.03);border-radius:8px;padding:8px 4px;text-align:center}
+.ft-mval{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:#C9A84C;line-height:1}
+.ft-mlbl{font-size:7px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:1px;margin-top:3px}
+.ft-bar{height:3px;background:rgba(255,255,255,0.05);border-radius:2px;margin-bottom:14px;overflow:hidden}
+.ft-bar-fill{height:100%;background:linear-gradient(90deg,#C9A84C,#e3c074);border-radius:2px;width:0}
+.scene.active .ft-bar-fill{animation:barGrow 2.2s ease .3s forwards}
+@keyframes barGrow{to{width:78%}}
+.ft-search{display:flex;align-items:center;gap:7px;background:rgba(255,255,255,0.04);border:0.5px solid rgba(201,168,76,0.2);border-radius:10px;padding:9px 12px;margin-bottom:8px}
+.ft-q{font-size:11px;color:rgba(255,255,255,0.8)}
+.ft-cursor{display:inline-block;width:1px;height:11px;background:#C9A84C;margin-left:2px;animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.ft-result{background:rgba(201,168,76,0.04);border:0.5px solid rgba(201,168,76,0.3);border-radius:10px;padding:10px 12px;opacity:0;transform:translateY(8px)}
+.scene.active .ft-result{animation:fadeUp .5s ease 1.5s forwards}
+.ft-rname{font-size:11px;font-weight:700;color:#fff;margin-bottom:3px}
+.ft-rmacros{font-size:9px;color:rgba(255,255,255,0.4)}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+/* SCENE 3 — WEIGHT GRAPH */
+.wg-title{font-size:9px;color:rgba(201,168,76,0.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px}
+.wg-row{display:flex;align-items:baseline;gap:10px;margin-bottom:16px}
+.wg-start{font-family:'Fraunces',serif;font-style:italic;font-size:18px;color:rgba(255,255,255,0.3);text-decoration:line-through}
+.wg-arrow{color:rgba(255,255,255,0.2)}
+.wg-end{font-family:'Fraunces',serif;font-style:italic;font-size:38px;color:#fff}
+.wg-delta{display:inline-block;background:rgba(74,222,128,0.12);color:#4ade80;font-size:11px;font-weight:800;padding:3px 8px;border-radius:6px;margin-left:8px}
+.wg-chart{height:140px;position:relative;margin-bottom:16px}
+.wg-line{stroke-dasharray:400;stroke-dashoffset:400}
+.scene.active .wg-line{animation:drawLine 2s ease .5s forwards}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+.wg-dot{opacity:0}
+.scene.active .wg-dot{animation:fadeIn .3s ease 2.3s forwards}
+@keyframes fadeIn{to{opacity:1}}
+.wg-weeks{display:flex;justify-content:space-between;font-size:8px;color:rgba(255,255,255,0.25);letter-spacing:1px}
+
+/* SCENE 4 — TRAINING / PR */
+.tr-title{font-family:'Fraunces',serif;font-style:italic;font-size:16px;color:#fff;margin-bottom:10px}
+.tr-exercise{background:rgba(255,255,255,0.03);border:0.5px solid rgba(201,168,76,0.18);border-radius:12px;padding:12px;margin-bottom:8px}
+.tr-ex-name{font-size:11px;font-weight:700;color:#fff;margin-bottom:8px;display:flex;justify-content:space-between;align-items:center}
+.tr-pr-tag{display:inline-flex;align-items:center;background:#C9A84C;color:#000;font-size:7px;padding:2px 6px;border-radius:4px;letter-spacing:1px;font-weight:900;opacity:0}
+.scene.active .tr-pr-tag{animation:tagPop .6s cubic-bezier(.34,1.56,.64,1) 1.2s forwards}
+@keyframes tagPop{0%{opacity:0;transform:scale(0.3)}60%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+.tr-sets{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.tr-set{background:rgba(255,255,255,0.02);border-radius:6px;padding:8px 6px;text-align:center;opacity:0;transform:translateY(8px)}
+.scene.active .tr-set:nth-child(1){animation:fadeUp .4s ease .4s forwards}
+.scene.active .tr-set:nth-child(2){animation:fadeUp .4s ease .65s forwards}
+.scene.active .tr-set:nth-child(3){animation:fadeUp .4s ease .9s forwards}
+.tr-set-w{font-family:'Fraunces',serif;font-style:italic;font-size:16px;color:#C9A84C;line-height:1}
+.tr-set-r{font-size:8px;color:rgba(255,255,255,0.3);margin-top:3px}
+.tr-set.pr{border:0.5px solid rgba(201,168,76,0.4)}
+
+/* SCENE 5 — PROGRESS / STREAK */
+.pg-greeting{font-family:'Fraunces',serif;font-style:italic;font-size:22px;color:#fff;margin-bottom:14px;text-align:center}
+.pg-streak-box{background:linear-gradient(135deg,rgba(201,168,76,0.12),rgba(201,168,76,0.02));border:0.5px solid rgba(201,168,76,0.3);border-radius:14px;padding:18px;text-align:center;margin-bottom:14px}
+.pg-streak-num{font-family:'Fraunces',serif;font-style:italic;font-size:54px;color:#C9A84C;line-height:1;opacity:0}
+.scene.active .pg-streak-num{animation:numCount .8s cubic-bezier(.34,1.56,.64,1) .3s forwards}
+@keyframes numCount{0%{opacity:0;transform:scale(0.5)}60%{opacity:1;transform:scale(1.1)}100%{opacity:1;transform:scale(1)}}
+.pg-streak-lbl{font-size:9px;color:rgba(255,255,255,0.5);letter-spacing:3px;text-transform:uppercase;margin-top:4px}
+.pg-milestones{display:flex;flex-wrap:wrap;gap:5px;justify-content:center}
+.pg-milestone{background:rgba(255,255,255,0.04);border:0.5px solid rgba(201,168,76,0.2);border-radius:14px;padding:5px 10px;font-size:9px;color:rgba(201,168,76,0.85);font-weight:600;opacity:0}
+.scene.active .pg-milestone:nth-child(1){animation:fadeUp .4s ease .6s forwards}
+.scene.active .pg-milestone:nth-child(2){animation:fadeUp .4s ease .8s forwards}
+.scene.active .pg-milestone:nth-child(3){animation:fadeUp .4s ease 1s forwards}
+.scene.active .pg-milestone:nth-child(4){animation:fadeUp .4s ease 1.2s forwards}
+
+/* SCENE 6 — TRANSFORMATION */
+.tf-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:20px;background:#000}
+.tf-eyebrow{font-size:10px;letter-spacing:5px;color:rgba(201,168,76,0.6);text-transform:uppercase;margin-bottom:20px;opacity:0;font-weight:700}
+.scene.active .tf-eyebrow{animation:fadeUp .5s ease .1s forwards}
+.tf-h{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(40px,11vw,60px);color:#fff;line-height:1.05;text-align:center;margin-bottom:22px;opacity:0}
+.tf-h em{color:#C9A84C;display:block}
+.scene.active .tf-h{animation:fadeUp 1s cubic-bezier(.4,0,.2,1) .3s forwards}
+.tf-stats{display:flex;gap:24px;margin-bottom:32px;opacity:0}
+.scene.active .tf-stats{animation:fadeIn .5s ease .9s forwards}
+.tf-stat{text-align:center}
+.tf-stat-num{font-family:'Fraunces',serif;font-style:italic;font-size:30px;color:#C9A84C;line-height:1}
+.tf-stat-lbl{font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;margin-top:4px}
+.tf-cta{background:#C9A84C;color:#000;border:none;padding:14px 32px;border-radius:32px;font-size:12px;font-weight:800;cursor:pointer;letter-spacing:.5px;font-family:'Inter',sans-serif;opacity:0;transform:translateY(10px)}
+.scene.active .tf-cta{animation:fadeUp .6s ease 1.2s forwards}
+.tf-url{font-size:10px;color:rgba(255,255,255,0.2);margin-top:12px;letter-spacing:1px;opacity:0}
+.scene.active .tf-url{animation:fadeIn .5s ease 1.6s forwards}
+
+/* OVERLAY-ONLY SCENES (just the word, no phone) */
+.word-only{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+.word-only .ot-word{color:#fff;font-size:clamp(72px,18vw,120px);max-width:90%;word-break:break-word;text-align:center}
+
+/* RTL */
+[dir="rtl"] .ot-word{direction:rtl}
+
+/* Replay */
+.replay{position:absolute;inset:0;background:rgba(0,0,0,0.75);display:none;align-items:center;justify-content:center;z-index:90}
+.replay.show{display:flex}
+.replay-btn{background:transparent;border:0.5px solid rgba(201,168,76,0.4);color:#C9A84C;padding:14px 32px;border-radius:24px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:2px}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="frame" id="frame">
+  <div class="lang-row">
+    <button class="lb on" onclick="setLang('fr')">FR</button>
+    <button class="lb" onclick="setLang('en')">EN</button>
+    <button class="lb" onclick="setLang('ar')">AR</button>
+  </div>
+
+  <!-- WORD 0 — TRACK -->
+  <div class="scene active" id="sc0">
+    <div class="word-only"><span class="ot-word" id="w0"></span></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- SCENE 1 — CHECK-IN -->
+  <div class="scene" id="sc1">
+    <div class="ambient"></div>
+    <div class="app-frame">
+      <div class="phone-bg">
+        <div class="phone-screen">
+          <div class="cs-status-bar"><span>9:14</span><span>●●● ⚡ 84%</span></div>
+          <div class="cs-greeting">Bonjour, <em id="cs-name">Sammy</em></div>
+          <div class="cs-date" id="cs-date">VENDREDI 8 MAI</div>
+          <div class="cs-card">
+            <div class="cs-card-label" id="cs-label">CHECK-IN DU JOUR</div>
+            <div class="cs-card-title" id="cs-title">Bilan quotidien</div>
+            <div class="cs-weight"><span class="cs-w-val">84.2</span><span class="cs-w-unit">kg</span></div>
+            <div class="cs-toggle-row"><span class="cs-toggle-lbl" id="cs-menu">Menu respecté</span><div class="cs-toggle off"></div></div>
+            <div class="cs-toggle-row"><span class="cs-toggle-lbl" id="cs-train">Entraînement complété</span><div class="cs-toggle"></div></div>
+            <button class="cs-btn" id="cs-btn">Soumettre le check-in</button>
+            <div class="cs-streak"><b>14</b> <span id="cs-streak">jours consécutifs</span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grain"></div><div class="vig"></div>
+  </div>
+
+  <!-- WORD 1 — TRAIN -->
+  <div class="scene" id="sc2">
+    <div class="word-only"><span class="ot-word" id="w1"></span></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- SCENE 2 — FOOD TRACKER -->
+  <div class="scene" id="sc3">
+    <div class="ambient"></div>
+    <div class="app-frame">
+      <div class="phone-bg">
+        <div class="phone-screen">
+          <div class="cs-status-bar"><span>12:42</span><span>●●● ⚡ 79%</span></div>
+          <div class="ft-title" id="ft-title">Journal alimentaire</div>
+          <div class="ft-macros">
+            <div class="ft-macro"><div class="ft-mval">1640</div><div class="ft-mlbl">KCAL</div></div>
+            <div class="ft-macro"><div class="ft-mval">98g</div><div class="ft-mlbl" id="ft-p">PROT</div></div>
+            <div class="ft-macro"><div class="ft-mval">180g</div><div class="ft-mlbl" id="ft-c">CARB</div></div>
+            <div class="ft-macro"><div class="ft-mval">42g</div><div class="ft-mlbl" id="ft-l">LIP</div></div>
+          </div>
+          <div class="ft-bar"><div class="ft-bar-fill"></div></div>
+          <div class="ft-search"><span class="ft-q" id="ft-q">poulet riz</span><span class="ft-cursor"></span></div>
+          <div class="ft-result">
+            <div class="ft-rname" id="ft-rn">Blanc de poulet (150g)</div>
+            <div class="ft-rmacros" id="ft-rm">165 kcal · 35g prot · 0g carb · 2g lip</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grain"></div><div class="vig"></div>
+  </div>
+
+  <!-- WORD 2 — PROGRESS -->
+  <div class="scene" id="sc4">
+    <div class="word-only"><span class="ot-word" id="w2"></span></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- SCENE 3 — WEIGHT GRAPH -->
+  <div class="scene" id="sc5">
+    <div class="ambient"></div>
+    <div class="app-frame">
+      <div class="phone-bg">
+        <div class="phone-screen">
+          <div class="cs-status-bar"><span>21:30</span><span>●●● ⚡ 62%</span></div>
+          <div class="wg-title" id="wg-title">PROGRESSION POIDS</div>
+          <div class="wg-row">
+            <span class="wg-start">94kg</span>
+            <span class="wg-arrow">→</span>
+            <span class="wg-end">84.8kg</span>
+            <span class="wg-delta">-9.2 kg</span>
+          </div>
+          <div class="wg-chart">
+            <svg viewBox="0 0 280 140" fill="none" xmlns="http://www.w3.org/2000/svg" width="100%" height="100%" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="lineGrad2" x1="0" y1="0" x2="1" y2="0">
+                  <stop offset="0%" stop-color="rgba(201,168,76,0.3)"/>
+                  <stop offset="100%" stop-color="#C9A84C"/>
+                </linearGradient>
+                <linearGradient id="areaGrad2" x1="0" y1="0" x2="0" y2="1">
+                  <stop offset="0%" stop-color="rgba(201,168,76,0.2)"/>
+                  <stop offset="100%" stop-color="rgba(201,168,76,0)"/>
+                </linearGradient>
+              </defs>
+              <path d="M0,20 C30,22 60,30 90,42 C120,54 150,72 180,88 C210,102 240,114 260,120 L260,140 L0,140 Z" fill="url(#areaGrad2)"/>
+              <path class="wg-line" d="M0,20 C30,22 60,30 90,42 C120,54 150,72 180,88 C210,102 240,114 260,120" stroke="url(#lineGrad2)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <circle class="wg-dot" cx="260" cy="120" r="5" fill="#C9A84C"/>
+            </svg>
+          </div>
+          <div class="wg-weeks"><span id="wg-w1">S.1</span><span id="wg-w2">S.4</span><span id="wg-w3">S.8</span><span id="wg-w4">S.12</span></div>
+        </div>
+      </div>
+    </div>
+    <div class="grain"></div><div class="vig"></div>
+  </div>
+
+  <!-- WORD 3 — EVOLVE -->
+  <div class="scene" id="sc6">
+    <div class="word-only"><span class="ot-word" id="w3"></span></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- SCENE 4 — TRAINING / PR -->
+  <div class="scene" id="sc7">
+    <div class="ambient"></div>
+    <div class="app-frame">
+      <div class="phone-bg">
+        <div class="phone-screen">
+          <div class="cs-status-bar"><span>18:20</span><span>●●● ⚡ 71%</span></div>
+          <div class="tr-title" id="tr-title">PUSH — Pecs & Épaules</div>
+          <div class="tr-exercise">
+            <div class="tr-ex-name">Bench Press <span class="tr-pr-tag">PR</span></div>
+            <div class="tr-sets">
+              <div class="tr-set"><div class="tr-set-w">90</div><div class="tr-set-r" id="tr-r1">10 reps</div></div>
+              <div class="tr-set"><div class="tr-set-w">95</div><div class="tr-set-r" id="tr-r2">8 reps</div></div>
+              <div class="tr-set pr"><div class="tr-set-w">100</div><div class="tr-set-r" id="tr-r3">6 reps</div></div>
+            </div>
+          </div>
+          <div class="tr-exercise">
+            <div class="tr-ex-name" id="tr-ex2">Développé incliné</div>
+            <div class="tr-sets">
+              <div class="tr-set"><div class="tr-set-w">60</div><div class="tr-set-r" id="tr-r4">12 reps</div></div>
+              <div class="tr-set"><div class="tr-set-w">65</div><div class="tr-set-r" id="tr-r5">10 reps</div></div>
+              <div class="tr-set"><div class="tr-set-w">70</div><div class="tr-set-r" id="tr-r6">8 reps</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grain"></div><div class="vig"></div>
+  </div>
+
+  <!-- WORD 4 — TRANSFORM -->
+  <div class="scene" id="sc8">
+    <div class="word-only"><span class="ot-word" id="w4"></span></div>
+    <div class="grain"></div>
+  </div>
+
+  <!-- SCENE 5 — PROGRESS / STREAK -->
+  <div class="scene" id="sc9">
+    <div class="ambient"></div>
+    <div class="app-frame">
+      <div class="phone-bg">
+        <div class="phone-screen">
+          <div class="cs-status-bar"><span>7:45</span><span>●●● ⚡ 91%</span></div>
+          <div class="pg-greeting" id="pg-h">Tu es <em style="color:#C9A84C">imparable.</em></div>
+          <div class="pg-streak-box">
+            <div class="pg-streak-num">14</div>
+            <div class="pg-streak-lbl" id="pg-lbl">JOURS CONSÉCUTIFS</div>
+          </div>
+          <div class="pg-milestones">
+            <div class="pg-milestone" id="ms1">✓ Premier check-in</div>
+            <div class="pg-milestone" id="ms2">✓ 7 jours de suite</div>
+            <div class="pg-milestone" id="ms3">✓ -5kg</div>
+            <div class="pg-milestone" id="ms4">✓ 10 séances</div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="grain"></div><div class="vig"></div>
+  </div>
+
+  <!-- SCENE 6 — CTA -->
+  <div class="scene" id="sc10">
+    <div class="tf-wrap">
+      <div class="tf-eyebrow" id="tf-eye">COACH LAID SAMMY</div>
+      <h1 class="tf-h" id="tf-h">L'app qui rend<br><em>la transformation simple.</em></h1>
+      <div class="tf-stats">
+        <div class="tf-stat"><div class="tf-stat-num">+1200</div><div class="tf-stat-lbl" id="tf-l1">clients</div></div>
+        <div class="tf-stat"><div class="tf-stat-num">8</div><div class="tf-stat-lbl" id="tf-l2">ans exp.</div></div>
+        <div class="tf-stat"><div class="tf-stat-num">DZ</div><div class="tf-stat-lbl" id="tf-l3">livraison</div></div>
+      </div>
+      <button class="tf-cta" id="tf-cta" onclick="window.open('https://coachsammyapp.tiiny.site')">Rejoindre maintenant →</button>
+      <div class="tf-url">coachsammyapp.tiiny.site</div>
+    </div>
+    <div class="grain"></div>
+  </div>
+
+  <div class="replay" id="replay">
+    <button class="replay-btn" onclick="start()">↻ REPLAY</button>
+  </div>
+</div>
+</div>
+
+<script>
+const TR={
+  fr:{
+    words:['TRACK','TRAIN','PROGRESS','EVOLVE','TRANSFORM'],
+    cs:{name:'Sammy',date:'VENDREDI 8 MAI',label:'CHECK-IN DU JOUR',title:'Bilan quotidien',menu:'Menu respecté',train:'Entraînement complété',btn:'Soumettre le check-in',streak:'jours consécutifs'},
+    ft:{title:'Journal alimentaire',p:'PROT',c:'CARB',l:'LIP',q:'poulet riz',rn:'Blanc de poulet (150g)',rm:'165 kcal · 35g prot · 0g carb · 2g lip'},
+    wg:{title:'PROGRESSION POIDS',w1:'S.1',w2:'S.4',w3:'S.8',w4:'S.12'},
+    tr:{title:'PUSH — Pecs & Épaules',ex2:'Développé incliné',r:'reps'},
+    pg:{h:'Tu es <em style="color:#C9A84C">imparable.</em>',lbl:'JOURS CONSÉCUTIFS',ms:['✓ Premier check-in','✓ 7 jours de suite','✓ -5kg','✓ 10 séances']},
+    tf:{eye:'COACH LAID SAMMY',h:'L\'app qui rend<br><em>la transformation simple.</em>',l1:'clients',l2:'ans exp.',l3:'livraison',cta:'Rejoindre maintenant →'}
+  },
+  en:{
+    words:['TRACK','TRAIN','PROGRESS','EVOLVE','TRANSFORM'],
+    cs:{name:'Sammy',date:'FRIDAY MAY 8',label:'DAILY CHECK-IN',title:'Daily report',menu:'Menu respected',train:'Training completed',btn:'Submit check-in',streak:'consecutive days'},
+    ft:{title:'Food journal',p:'PROT',c:'CARB',l:'FAT',q:'chicken rice',rn:'Chicken breast (150g)',rm:'165 kcal · 35g prot · 0g carb · 2g fat'},
+    wg:{title:'WEIGHT PROGRESS',w1:'W1',w2:'W4',w3:'W8',w4:'W12'},
+    tr:{title:'PUSH — Chest & Shoulders',ex2:'Incline bench',r:'reps'},
+    pg:{h:'You\'re <em style="color:#C9A84C">unstoppable.</em>',lbl:'CONSECUTIVE DAYS',ms:['✓ First check-in','✓ 7 day streak','✓ -5kg','✓ 10 sessions']},
+    tf:{eye:'COACH LAID SAMMY',h:'The app that makes<br><em>transformation simple.</em>',l1:'clients',l2:'yrs exp.',l3:'delivery',cta:'Join now →'}
+  },
+  ar:{
+    words:['تتبّع','تمرَّن','تقدَّم','تطوَّر','تحوَّل'],
+    cs:{name:'سامي',date:'الجمعة 8 ماي',label:'تسجيل اليوم',title:'تقرير يومي',menu:'القائمة محترمة',train:'التمرين مكتمل',btn:'إرسال التسجيل',streak:'يوم متواصل'},
+    ft:{title:'مذكرة الطعام',p:'بروتين',c:'كارب',l:'دهون',q:'دجاج أرز',rn:'صدر دجاج (150غ)',rm:'165 سعر · 35غ بروتين · 0غ كارب · 2غ دهون'},
+    wg:{title:'تطور الوزن',w1:'أ1',w2:'أ4',w3:'أ8',w4:'أ12'},
+    tr:{title:'دفع — صدر وأكتاف',ex2:'بنش مائل',r:'تكرار'},
+    pg:{h:'أنت <em style="color:#C9A84C">لا يقاوم.</em>',lbl:'يوم متواصل',ms:['✓ أول تسجيل','✓ 7 أيام متواصلة','✓ -5كغ','✓ 10 جلسات']},
+    tf:{eye:'كوتش لعيد سامي',h:'التطبيق الذي يجعل<br><em>التحول بسيطاً.</em>',l1:'عميل',l2:'سنين خبرة',l3:'توصيل',cta:'← انضم الآن'}
+  }
+};
+
+let lang='fr',cur=0,timer=null;
+const N=11;
+const DURS=[1100,2800,1100,2800,1100,3000,1100,2800,1100,2800,4500];
+
+function setLang(l){
+  lang=l;
+  document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('on',b.textContent===l.toUpperCase()));
+  document.getElementById('frame').dir=l==='ar'?'rtl':'ltr';
+  applyContent();
+}
+function t(id,v){const el=document.getElementById(id);if(el)el.textContent=v||'';}
+function h(id,v){const el=document.getElementById(id);if(el)el.innerHTML=v||'';}
+
+function applyContent(){
+  const d=TR[lang];
+  d.words.forEach((w,i)=>t('w'+i,w));
+  t('cs-name',d.cs.name);t('cs-date',d.cs.date);t('cs-label',d.cs.label);t('cs-title',d.cs.title);
+  t('cs-menu',d.cs.menu);t('cs-train',d.cs.train);t('cs-btn',d.cs.btn);t('cs-streak',d.cs.streak);
+  t('ft-title',d.ft.title);t('ft-p',d.ft.p);t('ft-c',d.ft.c);t('ft-l',d.ft.l);t('ft-q',d.ft.q);t('ft-rn',d.ft.rn);t('ft-rm',d.ft.rm);
+  t('wg-title',d.wg.title);t('wg-w1',d.wg.w1);t('wg-w2',d.wg.w2);t('wg-w3',d.wg.w3);t('wg-w4',d.wg.w4);
+  t('tr-title',d.tr.title);t('tr-ex2',d.tr.ex2);
+  ['tr-r1','tr-r4'].forEach(id=>t(id,'10 '+d.tr.r));
+  ['tr-r2','tr-r5'].forEach(id=>t(id,'8 '+d.tr.r));
+  t('tr-r3','6 '+d.tr.r);t('tr-r6','8 '+d.tr.r);
+  h('pg-h',d.pg.h);t('pg-lbl',d.pg.lbl);d.pg.ms.forEach((m,i)=>t('ms'+(i+1),m));
+  t('tf-eye',d.tf.eye);h('tf-h',d.tf.h);t('tf-l1',d.tf.l1);t('tf-l2',d.tf.l2);t('tf-l3',d.tf.l3);t('tf-cta',d.tf.cta);
+}
+
+function showScene(idx){
+  if(timer)clearTimeout(timer);
+  for(let i=0;i<N;i++){
+    document.getElementById('sc'+i).classList.toggle('active',i===idx);
+  }
+  document.getElementById('replay').classList.remove('show');
+  timer=setTimeout(()=>{
+    if(idx<N-1){cur=idx+1;showScene(cur);}
+    else document.getElementById('replay').classList.add('show');
+  },DURS[idx]);
+}
+
+function start(){document.getElementById('replay').classList.remove('show');cur=0;showScene(0);}
+
+document.getElementById('frame').addEventListener('click',e=>{
+  if(e.target.closest('.lb')||e.target.closest('.replay-btn')||e.target.closest('.tf-cta'))return;
+  if(cur<N-1){cur++;showScene(cur);}
+  else document.getElementById('replay').classList.add('show');
+});
+
+applyContent();
+start();
+</script>
+</body>
+</html>

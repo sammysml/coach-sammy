@@ -1,0 +1,883 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coach Sammy — App Demo</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Inter',sans-serif}
+
+.story{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+.frame{
+  position:relative;
+  background:#000;overflow:hidden;
+  max-width:540px;
+}
+@media(min-aspect-ratio:9/16){.frame{aspect-ratio:9/16;height:100vh;width:auto}}
+@media(max-aspect-ratio:9/16){.frame{aspect-ratio:9/16;width:100vw;height:auto}}
+
+/* Progress */
+.progress{position:absolute;top:0;left:0;right:0;height:2px;background:rgba(255,255,255,0.1);z-index:100}
+.progress-fill{height:100%;background:#C9A84C;width:0;transition:none}
+
+/* Brand overlay — always on top */
+.brand-overlay{
+  position:absolute;top:16px;left:18px;right:18px;
+  display:flex;align-items:center;justify-content:space-between;
+  z-index:80;pointer-events:none;
+}
+.brand-left{display:flex;align-items:center;gap:8px}
+.brand-mark{width:20px;height:20px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#000}
+.brand-name{font-size:10px;font-weight:600;color:rgba(255,255,255,0.7);letter-spacing:1px;text-transform:uppercase}
+
+/* Phone shell */
+.phone{
+  position:absolute;
+  left:50%;top:50%;
+  transform:translate(-50%,-50%) scale(0.85);
+  width:72%;max-width:320px;
+  background:#050505;
+  border-radius:36px;
+  border:1.5px solid rgba(255,255,255,0.12);
+  box-shadow:0 40px 80px rgba(0,0,0,0.8),0 0 120px rgba(201,168,76,0.12);
+  overflow:hidden;
+  opacity:0;
+}
+
+/* Background radial for each scene */
+.scene-bg{
+  position:absolute;inset:0;opacity:0;transition:opacity 1s ease;pointer-events:none;z-index:0;
+}
+
+/* Tap ripple */
+.tap-ripple{
+  position:absolute;width:40px;height:40px;
+  border-radius:50%;background:rgba(201,168,76,0.35);
+  transform:scale(0);pointer-events:none;z-index:200;
+  margin-left:-20px;margin-top:-20px;
+}
+
+/* Screen area inside phone */
+.screen{
+  width:100%;
+  background:#050505;
+  position:relative;
+  overflow:hidden;
+  min-height:520px;
+}
+
+/* Gold glow line at top of screen */
+.glow-line{
+  position:absolute;top:0;left:50%;transform:translateX(-50%);
+  width:80px;height:1px;
+  background:linear-gradient(90deg,transparent,#C9A84C,transparent);
+  z-index:10;
+}
+
+/* ── APP HEADER ── */
+.app-header{
+  display:flex;align-items:center;justify-content:space-between;
+  padding:14px 16px 10px;
+  border-bottom:0.5px solid rgba(255,255,255,0.05);
+  background:#050505;
+}
+.app-logo{display:flex;align-items:center;gap:7px}
+.app-logo-mark{width:24px;height:24px;border-radius:50%;background:rgba(201,168,76,0.15);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#C9A84C}
+.app-logo-txt{font-size:10px;font-weight:600;color:rgba(255,255,255,0.5);letter-spacing:0.5px}
+.app-name{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:#fff;font-weight:300}
+.app-icons{display:flex;gap:10px;color:rgba(255,255,255,0.3)}
+
+/* ── TODAY SCREEN ── */
+.today-screen{padding:16px}
+.today-greet{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:22px;color:#fff;line-height:1.1;margin-bottom:2px}
+.today-greet em{color:#C9A84C}
+.today-date{font-size:10px;color:rgba(255,255,255,0.3);margin-bottom:14px}
+.hero-card{
+  background:rgba(201,168,76,0.04);
+  border:0.5px solid rgba(201,168,76,0.2);
+  border-radius:14px;padding:14px;margin-bottom:10px;
+  position:relative;overflow:hidden;
+}
+.hero-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent)}
+.hero-eyebrow{font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.hero-num{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:44px;color:#fff;line-height:1;letter-spacing:-1px}
+.hero-num span{font-size:13px;color:rgba(255,255,255,0.4);margin-left:2px}
+.hero-macros{font-size:9px;color:rgba(255,255,255,0.4);margin-top:6px}
+.glow-orb{position:absolute;bottom:-12px;left:50%;transform:translateX(-50%);width:80px;height:32px;background:rgba(201,168,76,0.08);border-radius:50%;filter:blur(12px)}
+.tap-row{
+  background:rgba(255,255,255,0.02);
+  border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:12px 14px;
+  display:flex;justify-content:space-between;align-items:center;
+  margin-bottom:12px;cursor:pointer;
+  transition:background 0.2s;
+}
+.tap-row:active,.tap-row.pressed{background:rgba(255,255,255,0.05)}
+.tap-row-l{font-size:11px;font-weight:500;color:#fff}
+.tap-row-s{font-size:9px;color:rgba(255,255,255,0.4);margin-top:2px}
+.tap-row-arr{color:#C9A84C;font-size:14px}
+.meta-strip{display:flex;justify-content:space-between;padding:0 2px}
+.meta-item{display:flex;align-items:baseline;gap:3px}
+.meta-v{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:rgba(255,255,255,0.75);font-weight:300}
+.meta-l{font-size:9px;color:rgba(255,255,255,0.3)}
+
+/* ── JOURNAL SCREEN ── */
+.journal-screen{padding:14px}
+.pill-tabs{display:flex;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.07);border-radius:20px;padding:3px;margin-bottom:12px}
+.ptab{flex:1;padding:6px;border-radius:16px;border:none;background:transparent;color:rgba(255,255,255,0.35);font-size:10px;cursor:pointer;text-align:center;font-family:'Inter',sans-serif;transition:all 0.2s}
+.ptab.active{background:rgba(201,168,76,0.12);color:#C9A84C;border:0.5px solid rgba(201,168,76,0.25)}
+.glass-card{background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.07);border-radius:14px;padding:12px;margin-bottom:10px;position:relative;overflow:hidden}
+.glass-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,0.05),transparent)}
+.field-eyebrow{font-size:7px;color:rgba(255,255,255,0.35);letter-spacing:2px;text-transform:uppercase;margin-bottom:8px}
+.field-row{display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:10px}
+.field-wrap{display:flex;flex-direction:column;gap:4px}
+.field-lbl{font-size:8px;color:rgba(255,255,255,0.35);letter-spacing:1px;text-transform:uppercase}
+.field-input{
+  background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.1);
+  border-radius:8px;padding:8px 10px;
+  color:#fff;font-size:13px;font-family:'Fraunces',serif;font-style:italic;font-weight:300;
+}
+.field-input.typing{border-color:rgba(201,168,76,0.4);background:rgba(201,168,76,0.03)}
+.toggle-row{display:flex;align-items:center;justify-content:space-between;padding:8px 0}
+.toggle-lbl{font-size:11px;color:rgba(255,255,255,0.7)}
+.toggle{width:36px;height:20px;border-radius:10px;background:rgba(255,255,255,0.1);border:0.5px solid rgba(255,255,255,0.1);position:relative;cursor:pointer;transition:all 0.3s}
+.toggle.on{background:#C9A84C;border-color:#C9A84C}
+.toggle-knob{position:absolute;top:2px;left:2px;width:16px;height:16px;border-radius:50%;background:#fff;transition:transform 0.3s;box-shadow:0 1px 3px rgba(0,0,0,0.3)}
+.toggle.on .toggle-knob{transform:translateX(16px)}
+.save-btn{
+  width:100%;background:#C9A84C;border:none;color:#000;
+  padding:12px;border-radius:12px;font-size:12px;font-weight:700;
+  cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:0.3px;
+  transition:all 0.2s;
+}
+.save-btn.pressed{transform:scale(0.97);background:#b8963f}
+.save-btn.success{background:#4ade80;color:#000}
+
+/* ── PLAN SCREEN ── */
+.plan-screen{padding:14px}
+.plan-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:14px}
+.plan-title{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:18px;color:#fff}
+.plan-title em{color:#C9A84C}
+.plan-week{font-size:9px;color:rgba(255,255,255,0.35);margin-top:2px}
+.meal-card{
+  background:rgba(255,255,255,0.02);
+  border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:12px;padding:12px;margin-bottom:8px;
+  opacity:0;transform:translateY(12px);
+}
+.meal-card.visible{transition:all 0.4s ease;opacity:1;transform:translateY(0)}
+.meal-tag{font-size:8px;font-weight:700;color:#C9A84C;letter-spacing:2px;text-transform:uppercase;margin-bottom:6px}
+.meal-name{font-size:13px;font-weight:500;color:#fff;margin-bottom:3px}
+.meal-items{font-size:11px;color:rgba(255,255,255,0.5);line-height:1.5}
+.meal-kcal{font-size:10px;color:rgba(201,168,76,0.7);margin-top:5px;font-weight:600}
+
+/* ── MESSAGES SCREEN ── */
+.msg-screen{display:flex;flex-direction:column;height:100%}
+.msg-header{padding:12px 14px;border-bottom:0.5px solid rgba(255,255,255,0.05);display:flex;align-items:center;gap:10px}
+.msg-init{width:30px;height:30px;border-radius:50%;background:rgba(201,168,76,0.12);display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:700;color:#C9A84C;flex-shrink:0}
+.msg-coach-name{font-size:12px;font-weight:600;color:#fff}
+.msg-status{display:flex;align-items:center;gap:4px;margin-top:2px}
+.msg-dot{width:5px;height:5px;border-radius:50%;background:#4ade80;box-shadow:0 0 6px rgba(74,222,128,0.6)}
+.msg-avail{font-size:9px;color:rgba(255,255,255,0.4)}
+.msg-list{flex:1;padding:12px 14px;display:flex;flex-direction:column;gap:8px}
+.msg-bubble-coach{
+  background:rgba(255,255,255,0.04);
+  border:0.5px solid rgba(255,255,255,0.07);
+  border-radius:14px 14px 14px 3px;
+  padding:10px 12px;max-width:80%;align-self:flex-start;
+  opacity:0;transform:translateY(8px);
+}
+.msg-bubble-coach.visible{transition:all 0.4s ease;opacity:1;transform:translateY(0)}
+.msg-bubble-client{
+  background:rgba(201,168,76,0.1);
+  border:0.5px solid rgba(201,168,76,0.2);
+  border-radius:14px 14px 3px 14px;
+  padding:10px 12px;max-width:80%;align-self:flex-end;
+  opacity:0;transform:translateY(8px);
+}
+.msg-bubble-client.visible{transition:all 0.4s ease;opacity:1;transform:translateY(0)}
+.msg-text{font-size:11px;color:rgba(255,255,255,0.85);line-height:1.4}
+.msg-time{font-size:8px;color:rgba(255,255,255,0.25);margin-top:4px}
+.msg-typing{display:flex;align-items:center;gap:3px;padding:8px 12px;opacity:0}
+.msg-typing.visible{opacity:1;transition:opacity 0.3s}
+.typing-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:typingBounce 1.2s ease-in-out infinite}
+.typing-dot:nth-child(2){animation-delay:0.2s}
+.typing-dot:nth-child(3){animation-delay:0.4s}
+@keyframes typingBounce{0%,60%,100%{transform:translateY(0)}30%{transform:translateY(-5px)}}
+.msg-input-row{padding:10px 12px 16px;border-top:0.5px solid rgba(255,255,255,0.05);display:flex;gap:8px;align-items:center}
+.msg-input-fake{
+  flex:1;background:rgba(255,255,255,0.03);
+  border:0.5px solid rgba(255,255,255,0.1);
+  border-radius:18px;padding:9px 12px;
+  font-size:11px;color:rgba(255,255,255,0.5);
+  font-family:'Inter',sans-serif;
+}
+.msg-input-fake.typing{border-color:rgba(201,168,76,0.3);color:#fff}
+.msg-send{width:32px;height:32px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;flex-shrink:0;box-shadow:0 0 14px rgba(201,168,76,0.3)}
+
+/* ── PROGRESS SCREEN ── */
+.prog-screen{padding:14px}
+.prog-eyebrow{font-size:8px;color:rgba(201,168,76,0.6);letter-spacing:2px;text-transform:uppercase;margin-bottom:4px}
+.prog-title{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:17px;color:#fff;line-height:1.2;margin-bottom:12px}
+.prog-title em{color:#C9A84C}
+.rapport-card{
+  background:rgba(201,168,76,0.03);
+  border:0.5px solid rgba(201,168,76,0.2);
+  border-radius:14px;padding:14px;margin-bottom:10px;
+  position:relative;overflow:hidden;
+}
+.rapport-card::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.2),transparent)}
+.rapport-stats{display:flex;justify-content:space-between;margin-bottom:10px}
+.rstat{text-align:center}
+.rstat-v{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:20px;color:#fff;line-height:1}
+.rstat-l{font-size:7px;color:rgba(255,255,255,0.35);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+.bar-wrap{height:2px;background:rgba(255,255,255,0.06);border-radius:1px;overflow:hidden;margin-bottom:10px}
+.bar-fill-prog{height:100%;background:linear-gradient(90deg,rgba(201,168,76,0.5),#C9A84C);border-radius:1px;width:0;transition:width 1.5s cubic-bezier(0.4,0,0.2,1)}
+.coach-quote{font-family:'Fraunces',serif;font-style:italic;font-size:10px;color:rgba(255,255,255,0.5);line-height:1.5}
+.stat-grid{display:grid;grid-template-columns:1fr 1fr;gap:6px}
+.stat-card{background:rgba(255,255,255,0.02);border:0.5px solid rgba(255,255,255,0.06);border-radius:10px;padding:9px 10px;opacity:0;transform:translateY(10px)}
+.stat-card.gold{background:rgba(201,168,76,0.04);border-color:rgba(201,168,76,0.2)}
+.stat-card.visible{transition:all 0.4s ease;opacity:1;transform:translateY(0)}
+.sc-v{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:18px;color:#fff}
+.sc-l{font-size:7px;color:rgba(255,255,255,0.3);letter-spacing:1px;text-transform:uppercase;margin-top:2px}
+
+/* ── BOTTOM NAV ── */
+.bottom-nav{
+  position:absolute;bottom:0;left:0;right:0;
+  height:54px;background:#050505;
+  border-top:0.5px solid rgba(255,255,255,0.05);
+  display:flex;padding:0 4px 6px;
+}
+.nav-item{flex:1;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:2px;cursor:pointer;padding-top:6px}
+.nav-ico{color:rgba(255,255,255,0.22);transition:color 0.2s}
+.nav-ico.act{color:#C9A84C}
+.nav-lbl{font-size:8px;color:rgba(255,255,255,0.22);letter-spacing:0.3px;transition:color 0.2s}
+.nav-lbl.act{color:#C9A84C}
+.nav-dot{width:3px;height:3px;border-radius:50%;background:#C9A84C;margin-top:1px}
+
+/* ── CAPTION OVERLAY ── */
+.caption{
+  position:absolute;bottom:80px;left:0;right:0;
+  text-align:center;z-index:50;pointer-events:none;
+  padding:0 24px;
+  opacity:0;transition:opacity 0.5s;
+}
+.caption.show{opacity:1}
+.caption-text{
+  display:inline-block;
+  background:rgba(0,0,0,0.7);backdrop-filter:blur(8px);
+  border:0.5px solid rgba(255,255,255,0.1);
+  border-radius:20px;padding:8px 16px;
+  font-size:12px;color:rgba(255,255,255,0.85);
+  letter-spacing:0.3px;line-height:1.4;
+}
+
+/* ── SCENE BGs ── */
+.bg-today{background:radial-gradient(ellipse at 30% 40%,#1a1400 0%,#000 65%)}
+.bg-journal{background:radial-gradient(ellipse at 50% 50%,#0d1a0d 0%,#000 65%)}
+.bg-plan{background:radial-gradient(ellipse at 70% 30%,#1a0d00 0%,#000 65%)}
+.bg-messages{background:radial-gradient(ellipse at 30% 70%,#0d0d1a 0%,#000 65%)}
+.bg-progress{background:radial-gradient(ellipse at 50% 50%,#1a1400 0%,#000 60%)}
+
+/* ── FINAL CTA ── */
+.cta-overlay{
+  position:absolute;inset:0;
+  display:flex;flex-direction:column;align-items:center;justify-content:center;
+  background:rgba(0,0,0,0.88);backdrop-filter:blur(12px);
+  z-index:150;opacity:0;pointer-events:none;transition:opacity 0.8s;
+}
+.cta-overlay.show{opacity:1;pointer-events:all}
+.cta-logo{width:56px;height:56px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:28px;color:#000;box-shadow:0 0 50px rgba(201,168,76,0.5);margin-bottom:20px}
+.cta-hl{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:44px;line-height:1.1;letter-spacing:-0.02em;color:#fff;text-align:center;margin-bottom:10px}
+.cta-hl em{color:#C9A84C}
+.cta-sub{font-size:13px;color:rgba(255,255,255,0.5);margin-bottom:24px;text-align:center}
+.cta-url{font-size:13px;color:rgba(201,168,76,0.9);letter-spacing:1.5px;font-weight:500;padding:11px 22px;border:0.5px solid rgba(201,168,76,0.4);border-radius:30px;background:rgba(201,168,76,0.05);margin-bottom:16px}
+.cta-replay{background:transparent;border:0.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);padding:10px 20px;border-radius:20px;font-size:11px;cursor:pointer;font-family:'Inter',sans-serif;margin-top:4px}
+
+/* Grain */
+.grain{position:absolute;inset:0;opacity:0.04;pointer-events:none;z-index:5;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:overlay}
+
+/* Confetti */
+.confetti-piece{position:absolute;width:6px;height:6px;border-radius:1px;pointer-events:none;z-index:300;opacity:0}
+
+@keyframes confettiFall{
+  0%{opacity:1;transform:translateY(0) rotate(0deg) scale(1)}
+  100%{opacity:0;transform:translateY(120px) rotate(720deg) scale(0.5)}
+}
+</style>
+</head>
+<body>
+<div class="story">
+<div class="frame" id="frame">
+  <div class="grain"></div>
+  <div class="progress"><div class="progress-fill" id="pf"></div></div>
+
+  <div class="brand-overlay">
+    <div class="brand-left">
+      <div class="brand-mark">LS</div>
+      <div class="brand-name">Coach Laid Sammy</div>
+    </div>
+  </div>
+
+  <!-- Scene backgrounds -->
+  <div class="scene-bg bg-today" id="bg-today"></div>
+  <div class="scene-bg bg-journal" id="bg-journal"></div>
+  <div class="scene-bg bg-plan" id="bg-plan"></div>
+  <div class="scene-bg bg-messages" id="bg-messages"></div>
+  <div class="scene-bg bg-progress" id="bg-progress"></div>
+
+  <!-- Phone shell -->
+  <div class="phone" id="phone">
+    <div class="screen" id="screen">
+      <div class="glow-line"></div>
+
+      <!-- APP HEADER (always visible) -->
+      <div class="app-header">
+        <div class="app-logo">
+          <div class="app-logo-mark">CLS</div>
+          <div>
+            <div class="app-logo-txt">Coach Laid Sammy</div>
+          </div>
+        </div>
+        <div class="app-name" id="app-username">Yasmine</div>
+        <div class="app-icons">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M18 8a6 6 0 0 0-12 0c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.7 21a2 2 0 0 1-3.4 0"/></svg>
+        </div>
+      </div>
+
+      <!-- SCREEN CONTENT (swapped by JS) -->
+      <div id="screen-content" style="padding-bottom:54px;overflow:hidden"></div>
+
+      <!-- BOTTOM NAV -->
+      <div class="bottom-nav" id="bottom-nav">
+        <div class="nav-item" id="nav-0">
+          <svg class="nav-ico act" id="navi-0" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"/></svg>
+          <div class="nav-dot" id="navd-0"></div>
+        </div>
+        <div class="nav-item" id="nav-1">
+          <svg class="nav-ico" id="navi-1" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="9 11 12 14 22 4"/><path d="M21 12v7a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h11"/></svg>
+          <span class="nav-lbl" id="navl-1">Journal</span>
+        </div>
+        <div class="nav-item" id="nav-2">
+          <svg class="nav-ico" id="navi-2" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M9 5H7a2 2 0 0 0-2 2v12a2 2 0 0 0 2 2h10a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2h-2M9 5a2 2 0 0 0 2 2h2a2 2 0 0 0 2-2M9 5a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2"/></svg>
+          <span class="nav-lbl" id="navl-2">Mon Plan</span>
+        </div>
+        <div class="nav-item" id="nav-3">
+          <svg class="nav-ico" id="navi-3" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>
+          <span class="nav-lbl" id="navl-3">Messages</span>
+        </div>
+        <div class="nav-item" id="nav-4">
+          <svg class="nav-ico" id="navi-4" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>
+          <span class="nav-lbl" id="navl-4">Progrès</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Tap ripple element -->
+  <div class="tap-ripple" id="tap-ripple"></div>
+
+  <!-- Caption -->
+  <div class="caption" id="caption">
+    <div class="caption-text" id="caption-text"></div>
+  </div>
+
+  <!-- Final CTA -->
+  <div class="cta-overlay" id="cta-overlay">
+    <div class="cta-logo">LS</div>
+    <div class="cta-hl">Ton tour.<br><em>Maintenant.</em></div>
+    <div class="cta-sub">9 ans · 1200+ personnes coachées</div>
+    <div class="cta-url">coachsammyapp.tiiny.site</div>
+    <button class="cta-replay" onclick="restartDemo()">↻ Revoir</button>
+  </div>
+</div>
+</div>
+
+<script>
+// ── SCREEN TEMPLATES ──
+
+const SCREENS = {
+  today: `
+    <div class="today-screen">
+      <div class="today-greet">Bonjour, <em>Yasmine.</em></div>
+      <div class="today-date">Vendredi 2 mai</div>
+      <div class="hero-card">
+        <div class="hero-eyebrow">Calories du jour</div>
+        <div class="hero-num" id="kcal-num">0<span>kcal</span></div>
+        <div class="hero-macros">125g prot · 180g carb · 60g fat</div>
+        <div class="glow-orb"></div>
+      </div>
+      <div class="tap-row" id="checkin-row">
+        <div>
+          <div class="tap-row-l">Check-in du jour</div>
+          <div class="tap-row-s">Pas encore enregistré</div>
+        </div>
+        <div class="tap-row-arr">→</div>
+      </div>
+      <div class="meta-strip">
+        <div class="meta-item"><span class="meta-v">7</span><span class="meta-l">j série</span></div>
+        <div class="meta-item"><span class="meta-v">82</span><span class="meta-l">kg</span></div>
+        <div class="meta-item"><span class="meta-v">−4</span><span class="meta-l">restant</span></div>
+      </div>
+    </div>`,
+
+  journal: `
+    <div class="journal-screen">
+      <div class="pill-tabs">
+        <div class="ptab active">Check-in</div>
+        <div class="ptab">Semaine</div>
+      </div>
+      <div class="glass-card">
+        <div class="field-eyebrow">Check-in du jour</div>
+        <div class="field-row">
+          <div class="field-wrap">
+            <div class="field-lbl">Poids (kg)</div>
+            <div class="field-input" id="weight-input"></div>
+          </div>
+          <div class="field-wrap">
+            <div class="field-lbl">Calories</div>
+            <div class="field-input">1800</div>
+          </div>
+        </div>
+        <div class="toggle-row">
+          <div class="toggle-lbl">Entraînement complété</div>
+          <div class="toggle" id="training-toggle">
+            <div class="toggle-knob"></div>
+          </div>
+        </div>
+      </div>
+      <button class="save-btn" id="save-btn">✓ Enregistrer le check-in</button>
+    </div>`,
+
+  plan: `
+    <div class="plan-screen">
+      <div class="plan-header">
+        <div>
+          <div class="plan-title">Mon plan <em>du jour</em></div>
+          <div class="plan-week">Semaine 2 · Vendredi</div>
+        </div>
+      </div>
+      <div class="meal-card" id="meal-1">
+        <div class="meal-tag">Petit-déjeuner</div>
+        <div class="meal-name">Avoine & Protéines</div>
+        <div class="meal-items">80g avoine · 1 banane · 30g whey · 15g amandes</div>
+        <div class="meal-kcal">487 kcal</div>
+      </div>
+      <div class="meal-card" id="meal-2">
+        <div class="meal-tag">Déjeuner</div>
+        <div class="meal-name">Poulet & Riz</div>
+        <div class="meal-items">200g poulet · 150g riz cuit · légumes vapeur · huile olive</div>
+        <div class="meal-kcal">624 kcal</div>
+      </div>
+      <div class="meal-card" id="meal-3">
+        <div class="meal-tag">Dîner</div>
+        <div class="meal-name">Saumon & Patate Douce</div>
+        <div class="meal-items">180g saumon · 200g patate douce · épinards</div>
+        <div class="meal-kcal">541 kcal</div>
+      </div>
+      <div class="meal-card" id="meal-4">
+        <div class="meal-tag">Collation</div>
+        <div class="meal-name">Fromage blanc & Fruits</div>
+        <div class="meal-items">200g fromage blanc 0% · 100g myrtilles</div>
+        <div class="meal-kcal">148 kcal</div>
+      </div>
+    </div>`,
+
+  messages: `
+    <div class="msg-screen">
+      <div class="msg-header">
+        <div class="msg-init">CLS</div>
+        <div>
+          <div class="msg-coach-name">Coach Laid Sammy</div>
+          <div class="msg-status">
+            <div class="msg-dot"></div>
+            <span class="msg-avail">Disponible</span>
+          </div>
+        </div>
+      </div>
+      <div class="msg-list" id="msg-list">
+        <div class="msg-bubble-coach" id="msg1">
+          <div class="msg-text">Salut Yasmine 👋 Check-in du matin reçu. Beau travail cette semaine.</div>
+          <div class="msg-time">Aujourd'hui · 08:14 · Coach</div>
+        </div>
+        <div class="msg-bubble-coach" id="msg2">
+          <div class="msg-text">J'ai ajusté tes glucides à 190g à partir de lundi. Tu progresses bien 💪</div>
+          <div class="msg-time">Aujourd'hui · 08:15 · Coach</div>
+        </div>
+        <div class="msg-typing" id="msg-typing">
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+          <div class="typing-dot"></div>
+        </div>
+        <div class="msg-bubble-client" id="msg3">
+          <div class="msg-text" id="msg3-text"></div>
+          <div class="msg-time">Maintenant · Toi</div>
+        </div>
+      </div>
+      <div class="msg-input-row">
+        <div class="msg-input-fake" id="msg-input">Écris un message...</div>
+        <div class="msg-send">
+          <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="#000" stroke-width="2.5"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></svg>
+        </div>
+      </div>
+    </div>`,
+
+  progress: `
+    <div class="prog-screen">
+      <div class="prog-eyebrow">Semaine du 25 avr</div>
+      <div class="prog-title">Ta progression,<br><em>semaine par semaine.</em></div>
+      <div class="rapport-card">
+        <div class="rapport-stats">
+          <div class="rstat"><div class="rstat-v">78kg</div><div class="rstat-l">Poids</div></div>
+          <div class="rstat"><div class="rstat-v" id="compliance-val" style="color:#C9A84C">0%</div><div class="rstat-l">Compliance</div></div>
+          <div class="rstat"><div class="rstat-v">5/7</div><div class="rstat-l">Check-ins</div></div>
+        </div>
+        <div class="bar-wrap"><div class="bar-fill-prog" id="prog-bar"></div></div>
+        <div class="coach-quote">"Belle semaine Yasmine. Continue comme ça, on est sur la bonne voie."</div>
+      </div>
+      <div class="stat-grid">
+        <div class="stat-card gold" id="sc1"><div class="sc-v">−1kg</div><div class="sc-l">Cette sem.</div></div>
+        <div class="stat-card" id="sc2"><div class="sc-v">82%</div><div class="sc-l">Compliance</div></div>
+        <div class="stat-card" id="sc3"><div class="sc-v">−4kg</div><div class="sc-l">Total</div></div>
+        <div class="stat-card" id="sc4"><div class="sc-v">78kg</div><div class="sc-l">Objectif</div></div>
+      </div>
+    </div>`
+};
+
+// ── ACTIVE NAV ──
+function setNav(idx) {
+  [0,1,2,3,4].forEach(i => {
+    const ico = document.getElementById('navi-'+i);
+    const lbl = document.getElementById('navl-'+i);
+    const dot = document.getElementById('navd-'+i);
+    if(ico) ico.classList.toggle('act', i===idx);
+    if(lbl) lbl.classList.toggle('act', i===idx);
+    if(dot) dot.style.display = i===idx?'block':'none';
+  });
+}
+
+// ── TAP RIPPLE ──
+function showRipple(x, y) {
+  const r = document.getElementById('tap-ripple');
+  const frame = document.getElementById('frame');
+  const rect = frame.getBoundingClientRect();
+  r.style.left = (x - rect.left) + 'px';
+  r.style.top = (y - rect.top) + 'px';
+  r.style.transform = 'scale(0)';
+  r.style.opacity = '1';
+  r.style.transition = 'none';
+  requestAnimationFrame(() => {
+    r.style.transition = 'transform 0.5s ease-out, opacity 0.5s ease-out';
+    r.style.transform = 'scale(4)';
+    r.style.opacity = '0';
+  });
+}
+
+function frameCenter() {
+  const f = document.getElementById('frame');
+  const r = f.getBoundingClientRect();
+  return { x: r.left + r.width/2, y: r.top + r.height/2 };
+}
+
+function tapAt(relX, relY) {
+  const f = document.getElementById('frame');
+  const r = f.getBoundingClientRect();
+  showRipple(r.left + relX * r.width, r.top + relY * r.height);
+}
+
+// ── CAPTION ──
+function showCaption(text, duration) {
+  const c = document.getElementById('caption');
+  const t = document.getElementById('caption-text');
+  t.textContent = text;
+  c.classList.add('show');
+  if(duration) setTimeout(() => c.classList.remove('show'), duration);
+}
+function hideCaption() {
+  document.getElementById('caption').classList.remove('show');
+}
+
+// ── PROGRESS BAR ──
+let _progressInterval = null;
+let _progressVal = 0;
+function startProgress(durationMs) {
+  if(_progressInterval) clearInterval(_progressInterval);
+  const fill = document.getElementById('pf');
+  const step = 100 / (durationMs / 50);
+  _progressInterval = setInterval(() => {
+    _progressVal = Math.min(100, _progressVal + step);
+    fill.style.width = _progressVal + '%';
+    if(_progressVal >= 100) clearInterval(_progressInterval);
+  }, 50);
+}
+
+// ── COUNT UP ──
+function countUp(el, target, duration) {
+  const start = Date.now();
+  const tick = () => {
+    const progress = Math.min(1, (Date.now() - start) / duration);
+    const ease = 1 - Math.pow(1 - progress, 3);
+    el.innerHTML = Math.round(target * ease) + '<span>kcal</span>';
+    if(progress < 1) requestAnimationFrame(tick);
+  };
+  tick();
+}
+
+// ── TYPE TEXT ──
+function typeText(el, text, speed, cb) {
+  let i = 0;
+  const interval = setInterval(() => {
+    el.textContent = text.slice(0, ++i);
+    if(i >= text.length) { clearInterval(interval); if(cb) cb(); }
+  }, speed);
+}
+
+// ── CONFETTI ──
+function spawnConfetti() {
+  const colors = ['#C9A84C','#fff','#f0e0b0','#C9A84C','#e8d48a'];
+  const frame = document.getElementById('frame');
+  const fr = frame.getBoundingClientRect();
+  for(let i = 0; i < 28; i++) {
+    const p = document.createElement('div');
+    p.className = 'confetti-piece';
+    p.style.left = (20 + Math.random() * 60) + '%';
+    p.style.top = (40 + Math.random() * 20) + '%';
+    p.style.background = colors[Math.floor(Math.random() * colors.length)];
+    p.style.width = (4 + Math.random() * 5) + 'px';
+    p.style.height = (4 + Math.random() * 5) + 'px';
+    p.style.borderRadius = Math.random() > 0.5 ? '50%' : '1px';
+    p.style.animationDelay = (Math.random() * 0.4) + 's';
+    p.style.animationDuration = (0.8 + Math.random() * 0.8) + 's';
+    p.style.animation = `confettiFall ${0.8 + Math.random() * 0.8}s ease-out ${Math.random() * 0.4}s forwards`;
+    document.getElementById('frame').appendChild(p);
+    setTimeout(() => p.remove(), 2000);
+  }
+}
+
+// ── SCENE BG SWITCH ──
+function setBg(id) {
+  ['bg-today','bg-journal','bg-plan','bg-messages','bg-progress'].forEach(b => {
+    document.getElementById(b).style.opacity = b === id ? '1' : '0';
+  });
+}
+
+// ── MAIN ANIMATION SEQUENCE ──
+let masterTimer = [];
+function after(ms, fn) {
+  const t = setTimeout(fn, ms);
+  masterTimer.push(t);
+  return t;
+}
+
+let totalDuration = 27000;
+
+function runDemo() {
+  let t = 0;
+  const sc = document.getElementById('screen-content');
+  const phone = document.getElementById('phone');
+
+  // Phone entrance
+  after(t += 300, () => {
+    phone.style.transition = 'opacity 0.8s ease, transform 0.8s cubic-bezier(0.4,0,0.2,1)';
+    phone.style.opacity = '1';
+    phone.style.transform = 'translate(-50%,-50%) scale(1)';
+    setBg('bg-today');
+    document.getElementById('bg-today').style.opacity = '1';
+    startProgress(totalDuration);
+  });
+
+  // SCENE 1 — TODAY
+  after(t += 900, () => {
+    sc.innerHTML = SCREENS.today;
+    setNav(0);
+    showCaption('Yasmine ouvre l\'app le matin', 2500);
+  });
+
+  after(t += 600, () => {
+    const el = document.getElementById('kcal-num');
+    if(el) countUp(el, 2200, 1200);
+  });
+
+  after(t += 1800, () => {
+    tapAt(0.5, 0.58);
+    const row = document.getElementById('checkin-row');
+    if(row) { row.classList.add('pressed'); setTimeout(() => row.classList.remove('pressed'), 200); }
+    showCaption('Elle tape sur Check-in', 2000);
+  });
+
+  // SCENE 2 — JOURNAL
+  after(t += 800, () => {
+    sc.innerHTML = SCREENS.journal;
+    setNav(1);
+    setBg('bg-journal');
+  });
+
+  after(t += 600, () => {
+    const w = document.getElementById('weight-input');
+    if(w) {
+      w.classList.add('typing');
+      showCaption('Elle entre son poids', 2000);
+      typeText(w, '82.4', 120);
+    }
+    tapAt(0.3, 0.45);
+  });
+
+  after(t += 1500, () => {
+    const tog = document.getElementById('training-toggle');
+    if(tog) {
+      tog.classList.add('on');
+      showCaption('Entraînement complété', 1500);
+      tapAt(0.75, 0.58);
+    }
+  });
+
+  after(t += 1200, () => {
+    const btn = document.getElementById('save-btn');
+    if(btn) {
+      btn.classList.add('pressed');
+      tapAt(0.5, 0.72);
+      showCaption('Enregistrement...', 800);
+    }
+  });
+
+  after(t += 600, () => {
+    const btn = document.getElementById('save-btn');
+    if(btn) {
+      btn.classList.remove('pressed');
+      btn.classList.add('success');
+      btn.textContent = '✓ Check-in enregistré !';
+      spawnConfetti();
+      showCaption('Fait. En 30 secondes.', 2200);
+    }
+  });
+
+  // SCENE 3 — PLAN
+  after(t += 2000, () => {
+    sc.innerHTML = SCREENS.plan;
+    setNav(2);
+    setBg('bg-plan');
+    tapAt(0.6, 0.93);
+    showCaption('Elle consulte son plan nutrition', 2000);
+  });
+
+  after(t += 700, () => {
+    ['meal-1','meal-2','meal-3','meal-4'].forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if(el) el.classList.add('visible');
+      }, i * 280);
+    });
+  });
+
+  // SCENE 4 — MESSAGES
+  after(t += 3200, () => {
+    sc.innerHTML = SCREENS.messages;
+    setNav(3);
+    setBg('bg-messages');
+    tapAt(0.8, 0.93);
+    showCaption('Message du coach ce matin', 2000);
+  });
+
+  after(t += 800, () => {
+    const m1 = document.getElementById('msg1');
+    if(m1) m1.classList.add('visible');
+  });
+
+  after(t += 700, () => {
+    const m2 = document.getElementById('msg2');
+    if(m2) m2.classList.add('visible');
+  });
+
+  after(t += 1200, () => {
+    const inp = document.getElementById('msg-input');
+    const typing = document.getElementById('msg-typing');
+    if(inp) {
+      inp.classList.add('typing');
+      showCaption('Yasmine répond...', 1800);
+    }
+    tapAt(0.4, 0.85);
+  });
+
+  after(t += 600, () => {
+    const inp = document.getElementById('msg-input');
+    if(inp) typeText(inp, 'Merci coach ! 💪', 60);
+  });
+
+  after(t += 1200, () => {
+    const inp = document.getElementById('msg-input');
+    const m3 = document.getElementById('msg3');
+    const m3t = document.getElementById('msg3-text');
+    if(inp && m3 && m3t) {
+      m3t.textContent = 'Merci coach ! 💪';
+      m3.classList.add('visible');
+      inp.textContent = 'Écris un message...';
+      inp.classList.remove('typing');
+      tapAt(0.82, 0.83);
+    }
+  });
+
+  // SCENE 5 — PROGRESS
+  after(t += 1800, () => {
+    sc.innerHTML = SCREENS.progress;
+    setNav(4);
+    setBg('bg-progress');
+    tapAt(1.0, 0.93);
+    showCaption('Sa progression de la semaine', 2200);
+  });
+
+  after(t += 800, () => {
+    const bar = document.getElementById('prog-bar');
+    if(bar) bar.style.width = '82%';
+    const val = document.getElementById('compliance-val');
+    if(val) {
+      let v = 0;
+      const iv = setInterval(() => {
+        val.textContent = (v+=3) + '%';
+        if(v >= 82) { val.textContent = '82%'; clearInterval(iv); }
+      }, 30);
+    }
+  });
+
+  after(t += 800, () => {
+    ['sc1','sc2','sc3','sc4'].forEach((id, i) => {
+      setTimeout(() => {
+        const el = document.getElementById(id);
+        if(el) el.classList.add('visible');
+      }, i * 200);
+    });
+    hideCaption();
+  });
+
+  // CTA
+  after(t += 2800, () => {
+    document.getElementById('cta-overlay').classList.add('show');
+  });
+}
+
+function restartDemo() {
+  masterTimer.forEach(clearTimeout);
+  masterTimer = [];
+  _progressVal = 0;
+  document.getElementById('pf').style.width = '0';
+  document.getElementById('cta-overlay').classList.remove('show');
+  document.getElementById('caption').classList.remove('show');
+  const phone = document.getElementById('phone');
+  phone.style.transition = 'none';
+  phone.style.opacity = '0';
+  phone.style.transform = 'translate(-50%,-50%) scale(0.85)';
+  ['bg-today','bg-journal','bg-plan','bg-messages','bg-progress'].forEach(b => {
+    document.getElementById(b).style.opacity = '0';
+  });
+  setTimeout(runDemo, 300);
+}
+
+// Start
+runDemo();
+</script>
+</body>
+</html>

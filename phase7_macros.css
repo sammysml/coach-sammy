@@ -1,0 +1,164 @@
+/* ═══════════════════════════════════════════════════════
+   PHASE 7 — DUAL MACRO TARGETS (Training Day / Rest Day)
+   ═══════════════════════════════════════════════════════ */
+
+/* ─── Day Type Badge (client side) ─── */
+.dt-badge{
+  display:flex;align-items:center;gap:14px;
+  background:linear-gradient(135deg,rgba(212,175,55,.18),rgba(212,175,55,.04));
+  border:1px solid rgba(212,175,55,.35);
+  border-radius:16px;padding:14px 16px;cursor:pointer;
+  transition:all .25s;margin:12px 0;position:relative;overflow:hidden
+}
+.dt-badge::before{
+  content:'';position:absolute;left:0;top:0;bottom:0;width:4px;
+  background:linear-gradient(180deg,#d4af37,#f4d35e)
+}
+.dt-badge.rest{
+  background:linear-gradient(135deg,rgba(147,197,253,.18),rgba(147,197,253,.04));
+  border-color:rgba(147,197,253,.35)
+}
+.dt-badge.rest::before{background:linear-gradient(180deg,#93c5fd,#dbeafe)}
+.dt-badge:hover{transform:translateY(-1px);box-shadow:0 6px 20px rgba(0,0,0,.25)}
+.dt-badge-icon{font-size:28px;filter:drop-shadow(0 2px 8px rgba(0,0,0,.35))}
+.dt-badge-body{flex:1;min-width:0}
+.dt-badge-title{
+  font-size:10px;color:rgba(255,255,255,.55);
+  text-transform:uppercase;letter-spacing:.6px;font-weight:600
+}
+.dt-badge-source{
+  font-size:9px;color:rgba(255,255,255,.4);
+  text-transform:none;letter-spacing:0;margin-left:6px;font-weight:400;font-style:italic
+}
+.dt-badge-target{font-size:15px;font-weight:600;color:#fff;margin-top:4px;line-height:1.3}
+.dt-badge-target b{color:#d4af37;font-variant-numeric:tabular-nums;font-size:18px}
+.dt-badge.rest .dt-badge-target b{color:#93c5fd}
+.dt-badge-macros{
+  font-size:11px;color:rgba(255,255,255,.55);margin-top:3px;
+  font-variant-numeric:tabular-nums
+}
+.dt-badge-toggle{
+  font-size:11px;color:rgba(255,255,255,.5);
+  background:rgba(255,255,255,.06);padding:4px 10px;border-radius:12px;
+  white-space:nowrap;transition:all .15s
+}
+.dt-badge:hover .dt-badge-toggle{background:rgba(255,255,255,.1);color:rgba(255,255,255,.8)}
+
+/* ─── Override Modal ─── */
+.dt-modal{
+  position:fixed;inset:0;background:rgba(0,0,0,.75);
+  display:flex;align-items:center;justify-content:center;z-index:9999;
+  backdrop-filter:blur(6px);animation:dtFadeIn .2s ease
+}
+@keyframes dtFadeIn{from{opacity:0}to{opacity:1}}
+.dt-modal-inner{
+  background:#1a1a1a;border:1px solid rgba(255,255,255,.1);
+  border-radius:18px;padding:24px;max-width:340px;width:90%;text-align:center;
+  animation:dtSlideUp .25s ease
+}
+@keyframes dtSlideUp{from{transform:translateY(20px);opacity:0}to{transform:none;opacity:1}}
+.dt-modal-icon{font-size:42px;margin-bottom:12px}
+.dt-modal-title{font-size:17px;font-weight:600;margin-bottom:8px;color:#fff}
+.dt-modal-text{font-size:13px;color:rgba(255,255,255,.65);margin-bottom:20px;line-height:1.5}
+.dt-modal-btns{display:flex;gap:8px}
+.dt-modal-btn{
+  flex:1;padding:11px;border-radius:10px;
+  border:1px solid rgba(255,255,255,.1);background:rgba(255,255,255,.05);
+  color:#fff;font-size:13px;cursor:pointer;font-family:inherit;font-weight:500;
+  transition:background .15s
+}
+.dt-modal-btn:hover{background:rgba(255,255,255,.1)}
+.dt-modal-btn.primary{
+  background:linear-gradient(135deg,#d4af37,#f4d35e);color:#000;
+  border-color:#d4af37;font-weight:600
+}
+.dt-modal-btn.primary:hover{background:linear-gradient(135deg,#f4d35e,#d4af37)}
+
+/* ─── Coach Macro Editor ─── */
+.mc-editor{padding:16px 0;color:#fff}
+.mc-section-title{
+  font-size:12px;font-weight:600;color:rgba(255,255,255,.85);
+  text-transform:uppercase;letter-spacing:.5px;margin:20px 0 12px;
+  display:flex;align-items:center;gap:8px
+}
+.mc-section-title::after{
+  content:'';flex:1;height:1px;
+  background:linear-gradient(to right,rgba(255,255,255,.08),transparent)
+}
+.mc-cols{display:grid;grid-template-columns:1fr 1fr;gap:12px;margin-bottom:16px}
+.mc-col{
+  background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02));
+  border-radius:14px;padding:16px;border:1px solid rgba(255,255,255,.06);
+  position:relative;overflow:hidden
+}
+.mc-col::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px}
+.mc-col.training::before{background:linear-gradient(180deg,#d4af37,#f4d35e)}
+.mc-col.rest::before{background:linear-gradient(180deg,#93c5fd,#dbeafe)}
+.mc-col-title{
+  font-size:13px;font-weight:600;margin-bottom:14px;
+  display:flex;align-items:center;gap:8px
+}
+.mc-col.training .mc-col-title{color:#d4af37}
+.mc-col.rest .mc-col-title{color:#93c5fd}
+.mc-field{display:flex;flex-direction:column;gap:5px;margin-bottom:10px}
+.mc-field label{
+  font-size:10px;color:rgba(255,255,255,.55);
+  text-transform:uppercase;letter-spacing:.4px;font-weight:500
+}
+.mc-field input{
+  background:rgba(0,0,0,.35);border:1px solid rgba(255,255,255,.08);
+  border-radius:8px;padding:9px 11px;color:#fff;
+  font-family:inherit;font-size:14px;font-variant-numeric:tabular-nums;
+  transition:border-color .15s
+}
+.mc-field input:focus{outline:none;border-color:#d4af37}
+.mc-col.rest .mc-field input:focus{border-color:#93c5fd}
+
+.mc-days{display:flex;gap:6px;flex-wrap:wrap;margin:12px 0 20px;justify-content:space-between}
+.mc-day-pill{
+  flex:1;min-width:38px;max-width:56px;height:46px;
+  border-radius:12px;background:rgba(255,255,255,.05);
+  border:1px solid rgba(255,255,255,.1);color:rgba(255,255,255,.65);
+  font-size:11px;font-weight:600;text-transform:uppercase;cursor:pointer;
+  display:flex;align-items:center;justify-content:center;
+  transition:all .2s;font-family:inherit;user-select:none
+}
+.mc-day-pill:hover{background:rgba(255,255,255,.1);transform:translateY(-1px)}
+.mc-day-pill.active{
+  background:linear-gradient(135deg,#d4af37,#f4d35e);
+  color:#000;border-color:#d4af37;
+  box-shadow:0 4px 12px rgba(212,175,55,.3)
+}
+
+.mc-save{
+  background:linear-gradient(135deg,#d4af37,#f4d35e);border:none;color:#000;
+  padding:13px 24px;border-radius:12px;font-weight:600;font-size:14px;
+  cursor:pointer;width:100%;font-family:inherit;
+  transition:all .15s;letter-spacing:.3px
+}
+.mc-save:hover:not(:disabled){
+  transform:translateY(-1px);
+  box-shadow:0 6px 16px rgba(212,175,55,.4)
+}
+.mc-save:disabled{opacity:.5;cursor:not-allowed}
+
+.mc-msg{
+  text-align:center;font-size:12px;padding:10px;
+  border-radius:8px;margin-top:10px;font-weight:500
+}
+.mc-msg.ok{background:rgba(74,222,128,.15);color:#4ade80;border:1px solid rgba(74,222,128,.3)}
+.mc-msg.err{background:rgba(239,68,68,.15);color:#f87171;border:1px solid rgba(239,68,68,.3)}
+
+.mc-hint{
+  font-size:11px;color:rgba(255,255,255,.45);
+  margin-top:6px;line-height:1.4;font-style:italic
+}
+
+@media (max-width:600px){
+  .mc-cols{grid-template-columns:1fr}
+  .dt-badge{padding:12px 14px;gap:10px}
+  .dt-badge-icon{font-size:24px}
+  .dt-badge-target{font-size:14px}
+  .dt-badge-target b{font-size:16px}
+  .mc-day-pill{height:42px;font-size:10px}
+}

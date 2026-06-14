@@ -1,0 +1,279 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8"/>
+<title>Coach Sammy · Seed Demo Sessions</title>
+<script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+body{background:#0D0D0D;color:#F0EDE8;font-family:-apple-system,BlinkMacSystemFont,'Inter',sans-serif;padding:32px;font-size:14px;line-height:1.6}
+h1{font-size:20px;font-weight:800;color:#C9A84C;margin-bottom:4px}
+.sub{color:rgba(255,255,255,.4);font-size:13px;margin-bottom:28px}
+.card{background:#1A1A1A;border:1px solid rgba(255,255,255,.08);border-radius:14px;padding:20px;margin-bottom:12px}
+.profile-name{font-weight:700;font-size:15px;color:#fff;margin-bottom:4px}
+.profile-id{font-size:11px;color:rgba(255,255,255,.3);margin-bottom:10px;font-family:monospace}
+.log{font-size:12px;font-family:monospace;color:rgba(255,255,255,.5);line-height:1.8}
+.log .ok{color:#4ade80}
+.log .err{color:#ef4444}
+.log .info{color:#C9A84C}
+.btn{background:#C9A84C;color:#0D0D0D;border:none;border-radius:10px;padding:12px 28px;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;letter-spacing:.02em;transition:opacity .2s}
+.btn:hover{opacity:.85}
+.btn:disabled{opacity:.4;cursor:not-allowed}
+.summary{margin-top:20px;padding:16px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.2);border-radius:12px;color:#4ade80;font-weight:700;font-size:15px;display:none}
+.warning{margin-bottom:24px;padding:14px 18px;background:rgba(255,152,0,.08);border:1px solid rgba(255,152,0,.25);border-radius:12px;color:#FF9800;font-size:13px}
+</style>
+</head>
+<body>
+<h1>🏋 Coach Sammy — Seed Demo Training Sessions</h1>
+<p class="sub">Inserts real workout programs for all 7 demo profiles into Supabase.</p>
+
+<div class="warning">
+  ⚠️ <strong>This will DELETE existing training sessions</strong> for the 7 demo UUIDs and replace them with fresh data. Safe to run multiple times.
+</div>
+
+<button class="btn" id="run-btn" onclick="runSeed()">▶ Run Seed</button>
+
+<div id="summary" class="summary"></div>
+
+<div id="profile-cards" style="margin-top:24px"></div>
+
+<script>
+const { createClient } = supabase;
+const sb = createClient(
+  'https://korektlpnwuefsagfuvq.supabase.co',
+  'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImtvcmVrdGxwbnd1ZWZzYWdmdXZxIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzYwMjI0NjQsImV4cCI6MjA5MTU5ODQ2NH0.46rZOEMUKoZCyL8eKzob8FDuOoFiA2LHbr2ZoKW-HrM'
+);
+
+// ── EXERCISE LIBRARIES ──────────────────────────────────────────────
+const PUSH_A=[
+  {n:'Développé couché barre',   sets:'4×8',  cues:'Descente contrôlée 3s',rest:120},
+  {n:'Développé incliné haltères',sets:'3×10',cues:'Contraction au sommet', rest:90},
+  {n:'Écarté câble bas',         sets:'3×12', cues:'Arc léger',             rest:75},
+  {n:'Développé militaire barre',sets:'3×10', cues:'Core serré',            rest:90},
+  {n:'Élévations latérales',     sets:'4×15', cues:'Lent en descente',      rest:60},
+  {n:'Extension triceps poulie', sets:'3×12', cues:'Coude fixe',            rest:60},
+];
+const PUSH_B=[
+  {n:'Développé incliné barre',  sets:'4×8',  cues:'Descente contrôlée 3s',rest:120},
+  {n:'Pompes lestées',           sets:'3×12', cues:'Full ROM',              rest:90},
+  {n:'Fly machine',              sets:'3×12', cues:'Contraction peak',      rest:75},
+  {n:'Élévations frontales',     sets:'3×12', cues:'Prise neutre',          rest:60},
+  {n:'Dips',                     sets:'3×10', cues:'Légèrement penché',     rest:90},
+  {n:'Kickback triceps',         sets:'3×15', cues:'Bras parallèle au sol', rest:60},
+];
+const PULL_A=[
+  {n:'Tractions pronation',      sets:'4×8',  cues:'Full ROM',              rest:120},
+  {n:'Rowing barre Pendlay',     sets:'4×8',  cues:'Explosion concentrique',rest:120},
+  {n:'Tirage vertical serré',    sets:'3×10', cues:'Rétraction omoplate',   rest:90},
+  {n:'Curl barre EZ',            sets:'3×10', cues:'Supination au sommet',  rest:75},
+  {n:'Curl marteau',             sets:'3×12', cues:'Prise neutre',          rest:60},
+  {n:'Gainage planche',          sets:'3×45s',cues:'Respirez normalement',  rest:60},
+];
+const PULL_B=[
+  {n:'Tirage vertical large',    sets:'4×10', cues:'Coudes vers le bas',    rest:90},
+  {n:'Rowing machine',           sets:'4×10', cues:'Pause 1s au milieu',    rest:90},
+  {n:'Face pull',                sets:'3×15', cues:'Mains oreilles en fin', rest:60},
+  {n:'Curl incliné haltères',    sets:'3×12', cues:'Étirement bicep',       rest:75},
+  {n:'Shrugs haltères',          sets:'3×15', cues:'Trap supérieur',        rest:60},
+  {n:'L-sit isométrique',        sets:'3×30s',cues:'Épaules basses',        rest:60},
+];
+const LEGS_A=[
+  {n:'Squat barre',              sets:'4×8',  cues:'Descente 3s / pause',   rest:150},
+  {n:'Presse à cuisses',         sets:'3×12', cues:'Pied milieu plateau',   rest:120},
+  {n:'Fentes marchées haltères', sets:'3×12', cues:'Genou avant ≥90°',      rest:90},
+  {n:'Leg curl couché',          sets:'3×12', cues:'Full ROM',              rest:75},
+  {n:'Mollets debout',           sets:'4×15', cues:'Pause 1s en bas',       rest:60},
+];
+const LEGS_B=[
+  {n:'Soulevé de terre roumain', sets:'4×10', cues:'Hanches arrière',       rest:120},
+  {n:'Hack squat',               sets:'3×10', cues:'Largeur épaule',        rest:120},
+  {n:'Leg extension',            sets:'3×15', cues:'Contraction peak 1s',   rest:75},
+  {n:'Glute bridge barre',       sets:'4×12', cues:'Poussée via talons',    rest:90},
+  {n:'Mollets assis',            sets:'4×20', cues:'Amplitude maximale',    rest:60},
+];
+const UPPER=[
+  {n:'Développé couché haltères',sets:'4×10', cues:'Descente contrôlée',    rest:90},
+  {n:'Rowing haltères',          sets:'4×10', cues:'Coude 45° du corps',    rest:90},
+  {n:'Développé militaire assis',sets:'3×10', cues:'Regard frontal',        rest:90},
+  {n:'Tirage vertical',          sets:'3×12', cues:'Coudes vers sol',       rest:75},
+  {n:'Curl barre',               sets:'3×12', cues:'Pas de balancement',    rest:60},
+  {n:'Triceps poulie corde',     sets:'3×12', cues:'Flaire les poignets',   rest:60},
+];
+const LOWER=[
+  {n:'Squat gobelet',            sets:'4×12', cues:'Talons à plat',         rest:90},
+  {n:'Soulevé de terre',         sets:'4×8',  cues:'Dos neutre obligatoire',rest:150},
+  {n:'Leg press',                sets:'3×15', cues:'Profondeur ≥90°',       rest:90},
+  {n:'Leg curl assis',           sets:'3×15', cues:'Full ROM',              rest:75},
+  {n:'Abducteur machine',        sets:'3×20', cues:'Lent en retour',        rest:60},
+  {n:'Mollets debout',           sets:'4×20', cues:'Amplitude complète',    rest:60},
+];
+const FULL_A=[
+  {n:'Squat barre',              sets:'4×8',  cues:'Descente 3s',           rest:120},
+  {n:'Développé couché haltères',sets:'4×10', cues:'Contrôlé',             rest:90},
+  {n:'Soulevé de terre roumain', sets:'3×10', cues:'Hanches arrière',       rest:120},
+  {n:'Rowing haltères',          sets:'3×10', cues:'Coude haut',            rest:90},
+  {n:'Développé militaire',      sets:'3×10', cues:'Core serré',            rest:90},
+  {n:'Curl + extension poulie',  sets:'3×12', cues:'Superset',              rest:75},
+];
+const FULL_B=[
+  {n:'Gobelet squat',            sets:'4×12', cues:'Profondeur maximale',   rest:90},
+  {n:'Pompes',                   sets:'4×15', cues:'Full ROM',              rest:75},
+  {n:'Hip thrust',               sets:'4×12', cues:'Poussée via talons',    rest:90},
+  {n:'Tirage poulie basse',      sets:'3×12', cues:'Pause 1s au milieu',    rest:90},
+  {n:'Planche dynamique',        sets:'3×45s',cues:'Hanches stables',       rest:60},
+  {n:'Fentes latérales',         sets:'3×12', cues:'Genou au-dessus pied',  rest:75},
+];
+const FULL_C=[
+  {n:'Box squat barre',          sets:'4×8',  cues:'Explosion concentrique',rest:120},
+  {n:'Incliné haltères',         sets:'4×10', cues:'Pause 1s bas',          rest:90},
+  {n:'Fentes bulgares',          sets:'3×10', cues:'Arrière pied surélevé', rest:100},
+  {n:'Rowing cable',             sets:'3×12', cues:'Rétraction omoplate',   rest:90},
+  {n:'Arnold press',             sets:'3×12', cues:'Rotation fluide',       rest:90},
+  {n:'Abdos rouleau',            sets:'3×10', cues:'Core engagé',           rest:60},
+];
+
+const C_SHORT=[{activity:'Tapis roulant incliné',duration:'15 min',notes:'7% pente, 5.5 km/h'}];
+const C_HIIT =[{activity:'HIIT vélo',duration:'12 min',notes:'20s sprint / 40s récup'}];
+const C_NONE =[];
+
+// ── PROGRAMS PER DEMO PROFILE ─────────────────────────────────────
+const DEMO_PROGRAMS={
+  // Sammy — 4j/sem — Recomposition — PPL + Upper
+  '2b574ba9-d502-4922-8f40-c4ca327ea67d':{
+    label:'⭐ Sammy (profil réel)', emoji:'⭐',
+    sessions:[
+      {name:'Push — Poitrine & Épaules & Triceps', type:'Hypertrophie', exercises:PUSH_A, cardio:C_SHORT, rest_time:90},
+      {name:'Pull — Dos & Biceps',                 type:'Hypertrophie', exercises:PULL_A, cardio:C_NONE,  rest_time:90},
+      {name:'Legs — Quadriceps & Ischios',         type:'Hypertrophie', exercises:LEGS_A, cardio:C_NONE,  rest_time:90},
+      {name:'Upper — Full Haut du Corps',          type:'Hypertrophie', exercises:UPPER,  cardio:C_SHORT, rest_time:90},
+    ]
+  },
+  // Amine — 3j/sem — Perte de gras — Full Body
+  'ea6d0c3a-5777-4aec-b153-e428c01c73a7':{
+    label:'🔥 Amine', emoji:'🔥',
+    sessions:[
+      {name:'Full Body A — Force',     type:'Force',        exercises:FULL_A, cardio:C_SHORT, rest_time:90},
+      {name:'Full Body B — Volume',    type:'Hypertrophie', exercises:FULL_B, cardio:C_HIIT,  rest_time:75},
+      {name:'Full Body C — Intensité', type:'Hypertrophie', exercises:FULL_C, cardio:C_SHORT, rest_time:75},
+    ]
+  },
+  // Yasmine — 3j/sem — Perte de gras — Upper/Lower/Full
+  '343d2ddc-9b6b-4a80-ac69-dcce65663b57':{
+    label:'✨ Yasmine', emoji:'✨',
+    sessions:[
+      {name:'Upper — Haut du Corps',            type:'Hypertrophie', exercises:UPPER,  cardio:C_HIIT,  rest_time:75},
+      {name:'Lower — Jambes & Fessiers',        type:'Hypertrophie', exercises:LOWER,  cardio:C_NONE,  rest_time:75},
+      {name:'Full Body — Récupération active',  type:'Circuit',      exercises:FULL_B, cardio:C_SHORT, rest_time:60},
+    ]
+  },
+  // Rayan — 4j/sem — Prise de muscle — PPL×2
+  '4dcaa588-6914-49be-80de-0d9f45d1625b':{
+    label:'💪 Rayan', emoji:'💪',
+    sessions:[
+      {name:'Push A — Poitrine focus',          type:'Hypertrophie', exercises:PUSH_A, cardio:C_NONE, rest_time:90},
+      {name:'Pull A — Dos & Biceps',            type:'Hypertrophie', exercises:PULL_A, cardio:C_NONE, rest_time:90},
+      {name:'Push B — Épaules focus',           type:'Hypertrophie', exercises:PUSH_B, cardio:C_NONE, rest_time:90},
+      {name:'Legs B — Postérieure chaîne',      type:'Force',        exercises:LEGS_B, cardio:C_NONE, rest_time:120},
+    ]
+  },
+  // Lina — 3j/sem — Recomposition — Full Body
+  'b68d1dd9-572a-4ed0-9051-5949d879713b':{
+    label:'⚡ Lina', emoji:'⚡',
+    sessions:[
+      {name:'Full Body A — Lundi',    type:'Hypertrophie', exercises:FULL_A, cardio:C_SHORT, rest_time:75},
+      {name:'Full Body B — Mercredi', type:'Hypertrophie', exercises:FULL_B, cardio:C_SHORT, rest_time:75},
+      {name:'Full Body C — Vendredi', type:'Circuit',      exercises:FULL_C, cardio:C_HIIT,  rest_time:60},
+    ]
+  },
+  // Karim — 3j/sem — Recomposition — Upper/Lower
+  '5e48c03b-1ef5-4651-82b5-9e578e97d56d':{
+    label:'⚖️ Karim', emoji:'⚖️',
+    sessions:[
+      {name:'Upper — Haut du Corps',        type:'Hypertrophie', exercises:UPPER,  cardio:C_SHORT, rest_time:90},
+      {name:'Lower — Jambes',               type:'Force',        exercises:LOWER,  cardio:C_NONE,  rest_time:120},
+      {name:'Full Body — Performance',      type:'Circuit',      exercises:FULL_A, cardio:C_HIIT,  rest_time:75},
+    ]
+  },
+  // Sarah — 4j/sem — Performance — PPL+L
+  '049fc750-716f-482c-83ff-1999b672a510':{
+    label:'🏆 Sarah', emoji:'🏆',
+    sessions:[
+      {name:'Push — Force & Volume',            type:'Force', exercises:PUSH_A, cardio:C_NONE,  rest_time:120},
+      {name:'Pull — Dos & Biceps',              type:'Force', exercises:PULL_B, cardio:C_NONE,  rest_time:120},
+      {name:'Legs A — Quadriceps',              type:'Force', exercises:LEGS_A, cardio:C_NONE,  rest_time:150},
+      {name:'Legs B — Postérieure chaîne',      type:'Force', exercises:LEGS_B, cardio:C_SHORT, rest_time:120},
+    ]
+  },
+};
+
+// ── SEED FUNCTION ─────────────────────────────────────────────────
+async function runSeed(){
+  const btn=document.getElementById('run-btn');
+  btn.disabled=true;
+  btn.textContent='⏳ Running...';
+
+  const container=document.getElementById('profile-cards');
+  container.innerHTML='';
+  let totalInserted=0,totalFailed=0;
+
+  for(const [clientId,prog] of Object.entries(DEMO_PROGRAMS)){
+    const card=document.createElement('div');
+    card.className='card';
+    card.innerHTML=`<div class="profile-name">${prog.label}</div><div class="profile-id">${clientId}</div><div class="log" id="log-${clientId}"></div>`;
+    container.appendChild(card);
+    const log=document.getElementById('log-'+clientId);
+
+    const addLog=(msg,cls='')=>{ log.innerHTML+=`<div class="${cls}">${msg}</div>`; };
+
+    // 1. Delete existing
+    addLog('🗑 Deleting existing sessions…','info');
+    const {error:delErr}=await sb.from('training_sessions').delete().eq('client_id',clientId);
+    if(delErr){ addLog('⚠ Delete: '+delErr.message,'err'); }
+    else{ addLog('✓ Cleared','ok'); }
+
+    // 2. Insert fresh
+    const rows=prog.sessions.map(s=>({
+      client_id:clientId,
+      name:s.name,
+      type:s.type,
+      
+      exercises:s.exercises,
+      cardio:s.cardio,
+      rest_time:s.rest_time,
+    }));
+
+    addLog(`➕ Inserting ${rows.length} sessions…`,'info');
+    const {data,error:insErr}=await sb.from('training_sessions').insert(rows).select('id,name');
+
+    if(insErr){
+      addLog('❌ Insert error: '+insErr.message,'err');
+      if(insErr.hint) addLog('   Hint: '+insErr.hint,'err');
+      if(insErr.details) addLog('   Details: '+insErr.details,'err');
+      totalFailed++;
+    } else {
+      data.forEach(r=>addLog(`✅ ${r.name}  <span style="color:rgba(255,255,255,.25);font-size:10px">${r.id}</span>`,'ok'));
+      totalInserted+=data.length;
+    }
+  }
+
+  // Summary
+  const sumEl=document.getElementById('summary');
+  sumEl.style.display='block';
+  if(totalFailed===0){
+    sumEl.style.background='rgba(74,222,128,.06)';
+    sumEl.style.borderColor='rgba(74,222,128,.2)';
+    sumEl.style.color='#4ade80';
+    sumEl.textContent=`🎉 Succès — ${totalInserted} séances insérées pour 7 profils démo.`;
+  } else {
+    sumEl.style.background='rgba(239,68,68,.06)';
+    sumEl.style.borderColor='rgba(239,68,68,.2)';
+    sumEl.style.color='#ef4444';
+    sumEl.textContent=`⚠ ${totalFailed} profil(s) échoué(s) · ${totalInserted} séances insérées. Voir les détails ci-dessous.`;
+  }
+
+  btn.disabled=false;
+  btn.textContent='🔄 Re-run Seed';
+}
+</script>
+</body>
+</html>

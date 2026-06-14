@@ -1,0 +1,493 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coach Laid Sammy — Hook v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,500&family=Inter:wght@500;600;700;800;900&family=Anton&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Inter',-apple-system,sans-serif;color:#fff}
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#000}
+.frame{position:relative;background:#000;overflow:hidden;width:100%;height:100%}
+@media(min-aspect-ratio:9/16){.frame{aspect-ratio:9/16;height:100vh;width:auto;max-width:500px}}
+@media(max-aspect-ratio:9/16){.frame{aspect-ratio:9/16;width:100vw;height:auto}}
+
+.lang-row{position:absolute;top:18px;right:14px;display:flex;gap:5px;z-index:100}
+.lb{background:rgba(0,0,0,0.5);border:0.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-size:9px;font-weight:700;padding:4px 8px;border-radius:12px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:1.5px;backdrop-filter:blur(8px)}
+.lb.on{border-color:#C9A84C;color:#C9A84C;background:rgba(201,168,76,0.1)}
+.brand{position:absolute;top:18px;left:14px;display:flex;align-items:center;gap:8px;z-index:100;opacity:0.7}
+.bm{width:22px;height:22px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:800;color:#000}
+.bn{font-size:9px;font-weight:700;letter-spacing:2px;text-transform:uppercase;color:rgba(255,255,255,0.6)}
+
+.scene{position:absolute;inset:0;opacity:0;pointer-events:none}
+.scene.active{opacity:1;pointer-events:all}
+.flash{position:absolute;inset:0;background:#fff;opacity:0;z-index:90;pointer-events:none}
+@keyframes flashIn{0%{opacity:0}25%{opacity:0.3}100%{opacity:0}}
+.grain{position:absolute;inset:0;opacity:0.05;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:overlay;pointer-events:none;z-index:50}
+.vig{position:absolute;inset:0;pointer-events:none;z-index:48;background:radial-gradient(ellipse at center,transparent 50%,rgba(0,0,0,0.6) 100%)}
+
+@keyframes scaleIn{0%{opacity:0;transform:scale(0.3)}60%{opacity:1;transform:scale(1.15)}100%{opacity:1;transform:scale(1)}}
+@keyframes bigPop{0%{opacity:0;transform:scale(0.5) rotate(-3deg)}50%{opacity:1;transform:scale(1.15) rotate(1deg)}100%{opacity:1;transform:scale(1) rotate(0)}}
+@keyframes fadeUp{0%{opacity:0;transform:translateY(20px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes slideR{0%{opacity:0;transform:translateX(-20px)}100%{opacity:1;transform:translateX(0)}}
+@keyframes fadeIn{to{opacity:1}}
+@keyframes glowPulse{0%,100%{filter:drop-shadow(0 0 0 rgba(201,168,76,0))}50%{filter:drop-shadow(0 0 18px rgba(201,168,76,0.7))}}
+@keyframes burst{0%{transform:translate(-50%,-50%) scale(0);opacity:1}100%{transform:translate(-50%,-50%) scale(3);opacity:0}}
+@keyframes confettiFall{0%{transform:translateY(-100vh) rotate(0deg);opacity:1}100%{transform:translateY(100vh) rotate(720deg);opacity:0}}
+
+.ctx{position:absolute;top:9%;left:0;right:0;padding:0 24px;z-index:35;text-align:center;opacity:0}
+.scene.active .ctx{animation:fadeUp 0.6s ease 0.2s forwards}
+.ctx-eye{font-size:9px;font-weight:700;letter-spacing:4px;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:8px}
+.ctx-line{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(13px,2.2vw,16px);color:#fff;line-height:1.35;font-weight:300;max-width:340px;margin:0 auto}
+.ctx-line em{color:#C9A84C}
+
+.tag{position:absolute;bottom:9%;left:0;right:0;text-align:center;z-index:35}
+.tag-h{font-family:'Anton',sans-serif;font-size:clamp(40px,11vw,68px);font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1;text-transform:uppercase;opacity:0}
+.tag-h em{color:#C9A84C;font-style:normal}
+.scene.active .tag-h{animation:bigPop 0.6s cubic-bezier(.34,1.56,.64,1) 2.2s forwards}
+
+.sc0-bg{position:absolute;inset:0;background:radial-gradient(ellipse at center,#1a1000 0%,#000 60%)}
+.sc0-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px;text-align:center}
+.face-frame{width:clamp(180px,42vw,260px);aspect-ratio:1;border-radius:50%;border:2px dashed rgba(201,168,76,0.4);display:flex;flex-direction:column;align-items:center;justify-content:center;margin-bottom:32px;position:relative;opacity:0;transform:scale(0.8);background:rgba(201,168,76,0.03)}
+.scene.active .face-frame{animation:scaleIn 0.7s cubic-bezier(.34,1.56,.64,1) 0.1s forwards}
+.face-label{font-family:'Anton',sans-serif;font-size:14px;color:rgba(201,168,76,0.5);letter-spacing:3px;text-transform:uppercase;margin-bottom:6px}
+.face-sub{font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;font-weight:600}
+.face-icon{font-size:36px;color:rgba(201,168,76,0.4);margin-bottom:10px}
+.sc0-eye{font-size:10px;letter-spacing:5px;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:14px;opacity:0;font-weight:700}
+.scene.active .sc0-eye{animation:fadeUp 0.5s ease 0.7s forwards}
+.sc0-h{font-family:'Anton',sans-serif;font-size:clamp(36px,9.5vw,60px);font-weight:900;color:#fff;letter-spacing:-1.5px;line-height:1;text-transform:uppercase;opacity:0;margin-bottom:14px}
+.sc0-h em{color:#C9A84C;font-style:normal;display:block}
+.scene.active .sc0-h{animation:bigPop 0.7s cubic-bezier(.34,1.56,.64,1) 1s forwards}
+.sc0-sub{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(14px,2.2vw,17px);color:rgba(255,255,255,0.5);line-height:1.4;opacity:0;max-width:340px}
+.scene.active .sc0-sub{animation:fadeUp 0.5s ease 1.6s forwards}
+
+.sc1-bg{position:absolute;inset:0;background:radial-gradient(ellipse at center,#0a0500 0%,#000 60%)}
+.sc1-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 28px;text-align:center}
+.sc1-eye{font-size:10px;letter-spacing:5px;color:rgba(201,168,76,0.7);text-transform:uppercase;margin-bottom:24px;opacity:0;font-weight:700}
+.scene.active .sc1-eye{animation:fadeUp 0.4s ease 0.1s forwards}
+.sc1-h{font-family:'Anton',sans-serif;font-size:clamp(42px,11vw,70px);font-weight:900;color:#fff;letter-spacing:-2px;line-height:0.95;text-transform:uppercase;opacity:0;margin-bottom:20px}
+.sc1-h em{color:#C9A84C;font-style:normal;display:block}
+.scene.active .sc1-h{animation:bigPop 0.7s cubic-bezier(.34,1.56,.64,1) 0.4s forwards}
+.sc1-sub{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(15px,2.5vw,18px);color:rgba(255,255,255,0.55);line-height:1.5;opacity:0;max-width:360px;margin-bottom:24px}
+.scene.active .sc1-sub{animation:fadeUp 0.5s ease 1s forwards}
+.sc1-stat{display:flex;gap:20px;opacity:0}
+.scene.active .sc1-stat{animation:fadeIn 0.5s ease 1.5s forwards}
+.s1-stat-item{text-align:center}
+.s1-stat-n{font-family:'Anton',sans-serif;font-size:32px;color:#C9A84C;line-height:1;font-weight:900}
+.s1-stat-l{font-size:9px;color:rgba(255,255,255,0.4);letter-spacing:2px;text-transform:uppercase;margin-top:3px;font-weight:700}
+
+.app-frame{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;padding-top:26%;padding-bottom:22%}
+.phone{width:72%;max-width:300px;background:#0a0a0a;border-radius:32px;padding:10px;box-shadow:0 30px 80px rgba(0,0,0,0.7),0 0 0 1.5px rgba(255,255,255,0.04),0 0 60px rgba(201,168,76,0.06)}
+.screen{background:#000;border-radius:22px;aspect-ratio:9/19;overflow:hidden;padding:12px;position:relative}
+.status-bar{display:flex;justify-content:space-between;align-items:center;font-size:8px;color:rgba(255,255,255,0.5);margin-bottom:10px}
+
+.sc2-bg{position:absolute;inset:0;background:linear-gradient(160deg,#0a0500 0%,#000 60%)}
+.cin-title{font-family:'Fraunces',serif;font-style:italic;font-size:14px;color:#fff;margin-bottom:10px;text-align:center}
+.cin-w-row{display:flex;align-items:baseline;gap:5px;margin-bottom:14px;justify-content:center}
+.cin-w{font-family:'Fraunces',serif;font-style:italic;font-size:44px;color:#C9A84C;line-height:1;font-weight:300}
+.cin-u{font-size:12px;color:rgba(255,255,255,0.4)}
+.cin-toggle{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.04);border-radius:10px;padding:10px 12px;margin-bottom:7px}
+.cin-toggle-l{font-size:10px;color:rgba(255,255,255,0.8)}
+.cin-tg{width:28px;height:16px;border-radius:9px;background:rgba(255,255,255,0.1);position:relative;transition:background 0.4s}
+.cin-tg::after{content:'';position:absolute;left:2px;top:1.5px;width:13px;height:13px;border-radius:50%;background:rgba(255,255,255,0.3);transition:all 0.4s}
+.scene.active .cin-tg{animation:tgOn 0.5s ease 0.9s forwards}
+@keyframes tgOn{to{background:#C9A84C}}
+.scene.active .cin-tg::after{animation:tgSlide 0.5s ease 0.9s forwards}
+@keyframes tgSlide{to{left:13px;background:#000}}
+.cin-btn{background:#C9A84C;color:#000;border:none;width:100%;padding:10px;border-radius:10px;font-size:11px;font-weight:800;margin-top:6px}
+.big-check{position:absolute;top:50%;left:50%;transform:translate(-50%,-50%) scale(0);width:100px;height:100px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;z-index:20;opacity:0;box-shadow:0 0 60px rgba(201,168,76,0.5)}
+.scene.active .big-check{animation:checkExplode 0.7s cubic-bezier(.34,1.56,.64,1) 1.6s forwards}
+@keyframes checkExplode{0%{opacity:0;transform:translate(-50%,-50%) scale(0)}50%{opacity:1;transform:translate(-50%,-50%) scale(1.15)}80%{transform:translate(-50%,-50%) scale(0.95)}100%{opacity:1;transform:translate(-50%,-50%) scale(1)}}
+.big-check svg{width:50px;height:50px}
+
+.sc3-bg{position:absolute;inset:0;background:linear-gradient(160deg,#080800 0%,#000 60%)}
+.ft-title{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:#fff;margin-bottom:10px;text-align:center}
+.ft-grid{display:grid;grid-template-columns:repeat(4,1fr);gap:5px;margin-bottom:10px}
+.ft-cell{background:rgba(255,255,255,0.04);border-radius:8px;padding:8px 4px;text-align:center}
+.ft-val{font-family:'Fraunces',serif;font-style:italic;font-size:17px;color:#C9A84C;line-height:1;font-weight:300}
+.ft-lbl{font-size:7px;color:rgba(255,255,255,0.4);text-transform:uppercase;letter-spacing:1px;margin-top:3px;font-weight:600}
+.ft-bar{height:3px;background:rgba(255,255,255,0.06);border-radius:2px;margin-bottom:10px;overflow:hidden}
+.ft-bar-f{height:100%;background:linear-gradient(90deg,#C9A84C,#e3c074);border-radius:2px;width:0}
+.scene.active .ft-bar-f{animation:barFill 2s ease 0.4s forwards}
+@keyframes barFill{to{width:96%}}
+.ft-row{display:flex;align-items:center;gap:7px;background:rgba(201,168,76,0.05);border:0.5px solid rgba(201,168,76,0.22);border-radius:8px;padding:8px 10px;margin-bottom:5px;opacity:0;transform:translateX(-20px)}
+.scene.active .ft-row:nth-of-type(1){animation:slideR 0.4s ease 1.4s forwards}
+.scene.active .ft-row:nth-of-type(2){animation:slideR 0.4s ease 1.7s forwards}
+.ft-rc{width:15px;height:15px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.ft-rt{font-size:9px;color:#fff;font-weight:600}
+.ft-rk{font-size:8px;color:rgba(255,255,255,0.45);margin-left:auto;font-family:'Fraunces',serif;font-style:italic}
+
+.sc4-bg{position:absolute;inset:0;background:radial-gradient(ellipse at center,#180c00 0%,#000 60%)}
+.pr-card{background:rgba(255,255,255,0.03);border:0.5px solid rgba(201,168,76,0.22);border-radius:12px;padding:12px;margin-bottom:6px}
+.pr-ex{font-size:11px;font-weight:700;color:#fff;margin-bottom:8px;text-align:center}
+.pr-sets{display:grid;grid-template-columns:repeat(3,1fr);gap:5px}
+.pr-set{background:rgba(255,255,255,0.03);border-radius:7px;padding:8px;text-align:center}
+.pr-set-w{font-family:'Fraunces',serif;font-style:italic;font-size:19px;color:#C9A84C;font-weight:300}
+.pr-set-r{font-size:7px;color:rgba(255,255,255,0.4);margin-top:3px}
+.pr-set.pr-now{border:1px solid #C9A84C;background:rgba(201,168,76,0.08);position:relative;opacity:0;transform:scale(0.8)}
+.scene.active .pr-set.pr-now{animation:scaleIn 0.5s cubic-bezier(.34,1.56,.64,1) 1s forwards}
+.pr-badge{position:absolute;top:-7px;right:-7px;background:#C9A84C;color:#000;font-size:7px;font-weight:900;padding:2px 5px;border-radius:4px;letter-spacing:1px;opacity:0;transform:scale(0)}
+.scene.active .pr-badge{animation:scaleIn 0.5s cubic-bezier(.34,1.56,.64,1) 1.5s forwards}
+.pr-blast{position:absolute;top:50%;left:50%;width:180px;height:180px;border-radius:50%;border:3px solid #C9A84C;opacity:0;z-index:25}
+.scene.active .pr-blast{animation:burst 1s ease 1.6s forwards}
+.pr-blast-2{position:absolute;top:50%;left:50%;width:80px;height:80px;border-radius:50%;border:2px solid #C9A84C;opacity:0;z-index:25}
+.scene.active .pr-blast-2{animation:burst 0.8s ease 1.7s forwards}
+
+.sc5-bg{position:absolute;inset:0;background:linear-gradient(160deg,#001008 0%,#000 60%)}
+.wg-card{padding:10px}
+.wg-title{font-size:8px;color:rgba(201,168,76,0.6);letter-spacing:3px;text-transform:uppercase;margin-bottom:10px;text-align:center}
+.wg-row{display:flex;align-items:baseline;gap:6px;justify-content:center;margin-bottom:12px}
+.wg-s{font-family:'Fraunces',serif;font-style:italic;font-size:15px;color:rgba(255,255,255,0.3);text-decoration:line-through}
+.wg-arr{color:rgba(255,255,255,0.2)}
+.wg-e{font-family:'Fraunces',serif;font-style:italic;font-size:32px;color:#fff;font-weight:300}
+.wg-delta{position:absolute;top:30%;right:10%;background:rgba(74,222,128,0.15);color:#4ade80;font-size:12px;font-weight:900;padding:5px 10px;border-radius:8px;opacity:0;transform:scale(0);z-index:25}
+.scene.active .wg-delta{animation:scaleIn 0.5s cubic-bezier(.34,1.56,.64,1) 1.4s forwards}
+.wg-chart{height:110px;position:relative;margin:0 4px}
+.wg-line{stroke-dasharray:400;stroke-dashoffset:400}
+.scene.active .wg-line{animation:drawLine 1.8s ease 0.3s forwards}
+@keyframes drawLine{to{stroke-dashoffset:0}}
+.wg-dot{opacity:0}
+.scene.active .wg-dot{animation:fadeIn 0.3s ease 2s forwards}
+
+.sc6-bg{position:absolute;inset:0;background:linear-gradient(160deg,#040810 0%,#000 60%)}
+.af-live{display:flex;align-items:center;gap:5px;margin-bottom:7px;justify-content:center}
+.af-live-dot{width:6px;height:6px;border-radius:50%;background:#C9A84C}
+.scene.active .af-live-dot{animation:livePulse 1s infinite}
+@keyframes livePulse{0%,100%{opacity:1}50%{opacity:0.3}}
+.af-live-l{font-size:7px;color:#C9A84C;letter-spacing:2px;text-transform:uppercase;font-weight:700}
+.af-title{font-family:'Fraunces',serif;font-style:italic;font-size:12px;color:#fff;margin-bottom:8px;text-align:center}
+.af-item{display:flex;align-items:center;gap:6px;padding:7px 9px;background:rgba(255,255,255,0.03);border-radius:9px;margin-bottom:4px;border-left:2.5px solid;opacity:0;transform:translateX(-20px)}
+.scene.active .af-item:nth-of-type(1){animation:slideR 0.4s ease 0.4s forwards}
+.scene.active .af-item:nth-of-type(2){animation:slideR 0.4s ease 0.8s forwards}
+.scene.active .af-item:nth-of-type(3){animation:slideR 0.4s ease 1.2s forwards}
+.scene.active .af-item:nth-of-type(4){animation:slideR 0.4s ease 1.6s forwards}
+.af-item.gold{border-left-color:#C9A84C}
+.af-item.red{border-left-color:#ff4444}
+.af-av{width:22px;height:22px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#000;flex-shrink:0}
+.af-av.rd{background:rgba(255,60,60,0.15);color:#ff4444}
+.af-info{flex:1;min-width:0}
+.af-name{font-size:9px;font-weight:700;color:#fff;line-height:1.2}
+.af-ac{font-size:7px;color:rgba(255,255,255,0.4);margin-top:1px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.af-time{font-size:7px;color:rgba(255,255,255,0.25);flex-shrink:0}
+
+.sc7-bg{position:absolute;inset:0;background:radial-gradient(ellipse at center,#1a1200 0%,#000 60%)}
+.confetti-wrap{position:absolute;inset:0;pointer-events:none;z-index:30;overflow:hidden}
+.confetti{position:absolute;width:8px;height:14px;background:#C9A84C;opacity:0;top:-20px}
+.scene.active .confetti{animation:confettiFall 3s ease-in infinite}
+.ms-center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 24px;text-align:center;z-index:25}
+.ms-badge{width:130px;height:130px;border-radius:50%;background:linear-gradient(135deg,#C9A84C 0%,#e3c074 100%);display:flex;align-items:center;justify-content:center;box-shadow:0 0 60px rgba(201,168,76,0.5),0 0 100px rgba(201,168,76,0.3);opacity:0;transform:scale(0);margin-top:20px}
+.scene.active .ms-badge{animation:scaleIn 0.7s cubic-bezier(.34,1.56,.64,1) 0.7s forwards,glowPulse 2s ease 1.5s infinite}
+.ms-badge-icon{font-family:'Anton',sans-serif;font-size:54px;color:#000;font-weight:900;line-height:1}
+
+.sc8-bg{position:absolute;inset:0;background:radial-gradient(ellipse at center,#1a1000 0%,#000 50%)}
+.cta-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 28px;text-align:center;z-index:25}
+.cta-eye{font-family:'Anton',sans-serif;font-size:11px;letter-spacing:6px;color:rgba(201,168,76,0.6);text-transform:uppercase;font-weight:900;margin-bottom:20px;opacity:0}
+.scene.active .cta-eye{animation:fadeUp 0.5s ease 0.1s forwards}
+.cta-h{font-family:'Anton',sans-serif;font-size:clamp(48px,14vw,86px);font-weight:900;color:#fff;letter-spacing:-3px;line-height:0.95;text-transform:uppercase;margin-bottom:14px;opacity:0}
+.cta-h em{color:#C9A84C;font-style:normal;display:block}
+.scene.active .cta-h{animation:bigPop 0.7s cubic-bezier(.34,1.56,.64,1) 0.3s forwards}
+.cta-sub{font-family:'Fraunces',serif;font-style:italic;font-size:clamp(14px,2vw,17px);color:rgba(255,255,255,0.5);margin-bottom:28px;line-height:1.4;max-width:340px;opacity:0}
+.scene.active .cta-sub{animation:fadeUp 0.5s ease 0.8s forwards}
+.cta-stats{display:flex;gap:24px;margin-bottom:28px;opacity:0}
+.scene.active .cta-stats{animation:fadeIn 0.5s ease 1s forwards}
+.cs-n{font-family:'Anton',sans-serif;font-size:28px;color:#C9A84C;font-weight:900;line-height:1}
+.cs-l{font-size:8px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;margin-top:3px;font-weight:700}
+.cta-btn{background:#C9A84C;color:#000;border:none;padding:16px 40px;border-radius:32px;font-family:'Anton',sans-serif;font-size:14px;font-weight:900;cursor:pointer;letter-spacing:2px;text-transform:uppercase;opacity:0;transform:translateY(10px);text-decoration:none;display:inline-block}
+.scene.active .cta-btn{animation:fadeUp 0.6s ease 1.2s forwards,glowPulse 2s ease 2.5s infinite}
+.cta-url{font-size:10px;color:rgba(255,255,255,0.25);letter-spacing:2px;margin-top:14px;opacity:0}
+.scene.active .cta-url{animation:fadeIn 0.5s ease 1.7s forwards}
+
+.replay{position:absolute;inset:0;background:rgba(0,0,0,0.8);display:none;align-items:center;justify-content:center;z-index:99}
+.replay.show{display:flex}
+.replay-btn{background:transparent;border:0.5px solid rgba(201,168,76,0.4);color:#C9A84C;padding:14px 32px;border-radius:24px;font-size:12px;cursor:pointer;font-family:'Anton',sans-serif;letter-spacing:3px;text-transform:uppercase}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="frame" id="frame">
+  <div class="flash" id="flash"></div>
+  <div class="brand"><div class="bm">LS</div><span class="bn">Coach Sammy</span></div>
+  <div class="lang-row">
+    <button class="lb on" onclick="setLang('fr')">FR</button>
+    <button class="lb" onclick="setLang('en')">EN</button>
+    <button class="lb" onclick="setLang('ar')">AR</button>
+  </div>
+
+  <div class="scene active" id="sc0">
+    <div class="sc0-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="sc0-wrap">
+      <div class="face-frame">
+        <div class="face-icon">◉</div>
+        <div class="face-label">TOI ICI</div>
+        <div class="face-sub">RECORD YOURSELF</div>
+      </div>
+      <div class="sc0-eye" id="s0-eye">COACH LAID SAMMY</div>
+      <h1 class="sc0-h" id="s0-h">JE NE SUIS PAS<br><em>JUSTE UN COACH.</em></h1>
+      <p class="sc0-sub" id="s0-sub">J'ai construit l'app que mes clients utilisent chaque jour.</p>
+    </div>
+  </div>
+
+  <div class="scene" id="sc1">
+    <div class="sc1-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="sc1-wrap">
+      <div class="sc1-eye" id="s1-eye">CE QUE C'EST</div>
+      <h1 class="sc1-h" id="s1-h">UNE PLATEFORME<br><em>POUR MES CLIENTS.</em></h1>
+      <p class="sc1-sub" id="s1-sub">Coaching en ligne complet. Suivi quotidien. Résultats mesurés. Je vois tout, je guide tout.</p>
+      <div class="sc1-stat">
+        <div class="s1-stat-item"><div class="s1-stat-n">+1200</div><div class="s1-stat-l" id="s1-l1">clients</div></div>
+        <div class="s1-stat-item"><div class="s1-stat-n">8</div><div class="s1-stat-l" id="s1-l2">ans</div></div>
+        <div class="s1-stat-item"><div class="s1-stat-n">24/7</div><div class="s1-stat-l" id="s1-l3">suivi</div></div>
+      </div>
+    </div>
+  </div>
+
+  <div class="scene" id="sc2">
+    <div class="sc2-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="ctx">
+      <div class="ctx-eye" id="s2-ctx-eye">FONCTION 1 — LE CHECK-IN</div>
+      <div class="ctx-line" id="s2-ctx-line">Chaque matin mes clients <em>me logguent leur poids</em> et confirment s'ils ont respecté leur menu.</div>
+    </div>
+    <div class="app-frame">
+      <div class="phone"><div class="screen">
+        <div class="status-bar"><span>9:14</span><span>●●● 92%</span></div>
+        <div class="cin-title" id="s2-title">Check-in du jour</div>
+        <div class="cin-w-row"><span class="cin-w">84.2</span><span class="cin-u">kg</span></div>
+        <div class="cin-toggle"><span class="cin-toggle-l" id="s2-menu">Menu respecté</span><div class="cin-tg"></div></div>
+        <div class="cin-toggle"><span class="cin-toggle-l" id="s2-train">Entraînement OK</span><div class="cin-tg"></div></div>
+        <button class="cin-btn" id="s2-btn">Valider</button>
+        <div class="big-check"><svg viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div>
+      </div></div>
+    </div>
+    <div class="tag"><div class="tag-h" id="s2-tag">10 SECONDES <em>PAR JOUR.</em></div></div>
+  </div>
+
+  <div class="scene" id="sc3">
+    <div class="sc3-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="ctx">
+      <div class="ctx-eye" id="s3-ctx-eye">FONCTION 2 — LE TRACKER NUTRI</div>
+      <div class="ctx-line" id="s3-ctx-line">Ils tapent leurs repas, <em>l'app calcule les macros</em> automatiquement. Plus d'excuses.</div>
+    </div>
+    <div class="app-frame">
+      <div class="phone"><div class="screen">
+        <div class="status-bar"><span>12:42</span><span>●●● 87%</span></div>
+        <div class="ft-title" id="s3-title">Macros du jour</div>
+        <div class="ft-grid">
+          <div class="ft-cell"><div class="ft-val">1640</div><div class="ft-lbl">kcal</div></div>
+          <div class="ft-cell"><div class="ft-val">98g</div><div class="ft-lbl" id="s3-p">prot</div></div>
+          <div class="ft-cell"><div class="ft-val">180g</div><div class="ft-lbl" id="s3-c">carb</div></div>
+          <div class="ft-cell"><div class="ft-val">42g</div><div class="ft-lbl" id="s3-l">lip</div></div>
+        </div>
+        <div class="ft-bar"><div class="ft-bar-f"></div></div>
+        <div class="ft-row"><div class="ft-rc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ft-rt" id="s3-r1">Blanc de poulet</span><span class="ft-rk">165</span></div>
+        <div class="ft-row"><div class="ft-rc"><svg width="9" height="9" viewBox="0 0 24 24" fill="none"><path d="M5 13l4 4L19 7" stroke="#000" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg></div><span class="ft-rt" id="s3-r2">Riz basmati</span><span class="ft-rk">240</span></div>
+      </div></div>
+    </div>
+    <div class="tag"><div class="tag-h" id="s3-tag">MACROS <em>VERROUILLÉES.</em></div></div>
+  </div>
+
+  <div class="scene" id="sc4">
+    <div class="sc4-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="ctx">
+      <div class="ctx-eye" id="s4-ctx-eye">FONCTION 3 — LE SUIVI ENTRAÎNEMENT</div>
+      <div class="ctx-line" id="s4-ctx-line">Quand ils battent un record, <em>je suis le premier averti.</em></div>
+    </div>
+    <div class="app-frame">
+      <div class="phone"><div class="screen">
+        <div class="status-bar"><span>18:30</span><span>●●● 76%</span></div>
+        <div class="ft-title" style="margin-bottom:8px" id="s4-title">Push — Pecs</div>
+        <div class="pr-card">
+          <div class="pr-ex" id="s4-ex">Bench Press</div>
+          <div class="pr-sets">
+            <div class="pr-set"><div class="pr-set-w">90</div><div class="pr-set-r" id="s4-r1">10 reps</div></div>
+            <div class="pr-set"><div class="pr-set-w">95</div><div class="pr-set-r" id="s4-r2">8 reps</div></div>
+            <div class="pr-set pr-now"><div class="pr-set-w">100</div><div class="pr-set-r" id="s4-r3">6 reps</div><div class="pr-badge">PR</div></div>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="pr-blast"></div>
+    <div class="pr-blast-2"></div>
+    <div class="tag"><div class="tag-h" id="s4-tag" style="color:#C9A84C">+5KG <em style="color:#fff">SUR LE BENCH.</em></div></div>
+  </div>
+
+  <div class="scene" id="sc5">
+    <div class="sc5-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="ctx">
+      <div class="ctx-eye" id="s5-ctx-eye">FONCTION 4 — LA PROGRESSION</div>
+      <div class="ctx-line" id="s5-ctx-line">Chaque pesée est enregistrée. <em>La progression devient visible</em> — pas une impression.</div>
+    </div>
+    <div class="app-frame">
+      <div class="phone"><div class="screen">
+        <div class="status-bar"><span>21:30</span><span>●●● 58%</span></div>
+        <div class="wg-card">
+          <div class="wg-title" id="s5-title">Progression poids</div>
+          <div class="wg-row"><span class="wg-s">94kg</span><span class="wg-arr">→</span><span class="wg-e">84.8kg</span></div>
+          <div class="wg-chart">
+            <svg viewBox="0 0 280 120" fill="none" width="100%" height="100%" preserveAspectRatio="none">
+              <defs>
+                <linearGradient id="ln1" x1="0" y1="0" x2="1" y2="0"><stop offset="0%" stop-color="rgba(201,168,76,0.4)"/><stop offset="100%" stop-color="#C9A84C"/></linearGradient>
+                <linearGradient id="ar1" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="rgba(201,168,76,0.25)"/><stop offset="100%" stop-color="rgba(201,168,76,0)"/></linearGradient>
+              </defs>
+              <path d="M0,15 C30,20 60,32 100,50 C140,68 180,82 220,95 L260,108 L260,120 L0,120 Z" fill="url(#ar1)"/>
+              <path class="wg-line" d="M0,15 C30,20 60,32 100,50 C140,68 180,82 220,95 L260,108" stroke="url(#ln1)" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+              <circle class="wg-dot" cx="260" cy="108" r="5" fill="#C9A84C"/>
+            </svg>
+          </div>
+        </div>
+      </div></div>
+    </div>
+    <div class="wg-delta" id="s5-delta">-9.2 KG</div>
+    <div class="tag"><div class="tag-h" id="s5-tag">EN 12 <em>SEMAINES.</em></div></div>
+  </div>
+
+  <div class="scene" id="sc6">
+    <div class="sc6-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="ctx">
+      <div class="ctx-eye" id="s6-ctx-eye">CÔTÉ COACH — CE QUE MOI JE VOIS</div>
+      <div class="ctx-line" id="s6-ctx-line">Je vois chaque check-in, chaque record, <em>chaque absence.</em> En direct.</div>
+    </div>
+    <div class="app-frame">
+      <div class="phone"><div class="screen">
+        <div class="status-bar"><span>7:00</span><span>●●● 100%</span></div>
+        <div class="af-live"><div class="af-live-dot"></div><span class="af-live-l" id="s6-live">EN DIRECT</span></div>
+        <div class="af-title" id="s6-title">Action Feed</div>
+        <div class="af-item gold"><div class="af-av">Z</div><div class="af-info"><div class="af-name">Zaki</div><div class="af-ac" id="s6-a1">check-in fait</div></div><div class="af-time">2m</div></div>
+        <div class="af-item gold"><div class="af-av">S</div><div class="af-info"><div class="af-name">Sara</div><div class="af-ac" id="s6-a2">-0.8kg cette sem.</div></div><div class="af-time">14m</div></div>
+        <div class="af-item gold"><div class="af-av">O</div><div class="af-info"><div class="af-name">Ouhachi</div><div class="af-ac" id="s6-a3">PR — Bench 100kg</div></div><div class="af-time">1h</div></div>
+        <div class="af-item red"><div class="af-av rd">A</div><div class="af-info"><div class="af-name">Aya</div><div class="af-ac" id="s6-a4">pas de check-in (2j)</div></div><div class="af-time">2j</div></div>
+      </div></div>
+    </div>
+    <div class="tag"><div class="tag-h" id="s6-tag">RIEN<br><em>NE PASSE.</em></div></div>
+  </div>
+
+  <div class="scene" id="sc7">
+    <div class="sc7-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="confetti-wrap" id="confetti-wrap"></div>
+    <div class="ctx">
+      <div class="ctx-eye" id="s7-ctx-eye">LES MILESTONES</div>
+      <div class="ctx-line" id="s7-ctx-line">Tous les 7, 30, 100 jours — <em>une célébration.</em> La discipline mérite d'être fêtée.</div>
+    </div>
+    <div class="ms-center">
+      <div class="ms-badge"><div class="ms-badge-icon">30</div></div>
+    </div>
+    <div class="tag"><div class="tag-h" id="s7-tag">30 JOURS <em>D'AFFILÉE.</em></div></div>
+  </div>
+
+  <div class="scene" id="sc8">
+    <div class="sc8-bg"></div><div class="grain"></div><div class="vig"></div>
+    <div class="cta-wrap">
+      <div class="cta-eye" id="s8-eye">DEVIENS MON CLIENT</div>
+      <h1 class="cta-h" id="s8-h">ET TOI ?<br><em>TU ATTENDS QUOI ?</em></h1>
+      <p class="cta-sub" id="s8-sub">Rejoins l'app. Je m'occupe du reste.</p>
+      <div class="cta-stats">
+        <div><div class="cs-n">+1200</div><div class="cs-l" id="s8-c1">clients</div></div>
+        <div><div class="cs-n">8</div><div class="cs-l" id="s8-c2">ans</div></div>
+        <div><div class="cs-n">DZ</div><div class="cs-l" id="s8-c3">livraison</div></div>
+      </div>
+      <a href="https://coachsammyapp.tiiny.site" class="cta-btn" id="s8-btn">Rejoindre →</a>
+      <div class="cta-url">coachsammyapp.tiiny.site</div>
+    </div>
+  </div>
+
+  <div class="replay" id="replay"><button class="replay-btn" onclick="start()">↻ Replay</button></div>
+</div>
+</div>
+
+<script>
+const TR={
+  fr:{
+    s0:{eye:'COACH LAID SAMMY',h:'JE NE SUIS PAS<br><em>JUSTE UN COACH.</em>',sub:'J\'ai construit l\'app que mes clients utilisent chaque jour.'},
+    s1:{eye:'CE QUE C\'EST',h:'UNE PLATEFORME<br><em>POUR MES CLIENTS.</em>',sub:'Coaching en ligne complet. Suivi quotidien. Résultats mesurés. Je vois tout, je guide tout.',l1:'clients',l2:'ans',l3:'suivi'},
+    s2:{ctxEye:'FONCTION 1 — LE CHECK-IN',ctxLine:'Chaque matin mes clients <em>me logguent leur poids</em> et confirment s\'ils ont respecté leur menu.',title:'Check-in du jour',menu:'Menu respecté',train:'Entraînement OK',btn:'Valider',tag:'10 SECONDES <em>PAR JOUR.</em>'},
+    s3:{ctxEye:'FONCTION 2 — LE TRACKER NUTRI',ctxLine:'Ils tapent leurs repas, <em>l\'app calcule les macros</em> automatiquement. Plus d\'excuses.',title:'Macros du jour',p:'prot',c:'carb',l:'lip',r1:'Blanc de poulet',r2:'Riz basmati',tag:'MACROS <em>VERROUILLÉES.</em>'},
+    s4:{ctxEye:'FONCTION 3 — LE SUIVI ENTRAÎNEMENT',ctxLine:'Quand ils battent un record, <em>je suis le premier averti.</em>',title:'Push — Pecs',ex:'Bench Press',r1:'10 reps',r2:'8 reps',r3:'6 reps',tag:'+5KG <em style="color:#fff">SUR LE BENCH.</em>'},
+    s5:{ctxEye:'FONCTION 4 — LA PROGRESSION',ctxLine:'Chaque pesée est enregistrée. <em>La progression devient visible</em> — pas une impression.',title:'Progression poids',tag:'EN 12 <em>SEMAINES.</em>',delta:'-9.2 KG'},
+    s6:{ctxEye:'CÔTÉ COACH — CE QUE MOI JE VOIS',ctxLine:'Je vois chaque check-in, chaque record, <em>chaque absence.</em> En direct.',live:'EN DIRECT',title:'Action Feed',a1:'check-in fait',a2:'-0.8kg cette sem.',a3:'PR — Bench 100kg',a4:'pas de check-in (2j)',tag:'RIEN<br><em>NE PASSE.</em>'},
+    s7:{ctxEye:'LES MILESTONES',ctxLine:'Tous les 7, 30, 100 jours — <em>une célébration.</em> La discipline mérite d\'être fêtée.',tag:'30 JOURS <em>D\'AFFILÉE.</em>'},
+    s8:{eye:'DEVIENS MON CLIENT',h:'ET TOI ?<br><em>TU ATTENDS QUOI ?</em>',sub:'Rejoins l\'app. Je m\'occupe du reste.',c1:'clients',c2:'ans',c3:'livraison',btn:'Rejoindre →'}
+  },
+  en:{
+    s0:{eye:'COACH LAID SAMMY',h:'I\'M NOT JUST<br><em>A COACH.</em>',sub:'I built the app my clients use every single day.'},
+    s1:{eye:'WHAT IT IS',h:'A PLATFORM<br><em>FOR MY CLIENTS.</em>',sub:'Full online coaching. Daily tracking. Measured results. I see everything, I guide everything.',l1:'clients',l2:'years',l3:'support'},
+    s2:{ctxEye:'FEATURE 1 — THE CHECK-IN',ctxLine:'Every morning my clients <em>log their weight</em> and confirm if they followed their meal plan.',title:'Today\'s check-in',menu:'Menu respected',train:'Training OK',btn:'Submit',tag:'10 SECONDS <em>A DAY.</em>'},
+    s3:{ctxEye:'FEATURE 2 — THE NUTRITION TRACKER',ctxLine:'They type their meals, <em>the app calculates macros</em> automatically. No more excuses.',title:'Today\'s macros',p:'prot',c:'carb',l:'fat',r1:'Chicken breast',r2:'Basmati rice',tag:'MACROS <em>LOCKED IN.</em>'},
+    s4:{ctxEye:'FEATURE 3 — TRAINING TRACKING',ctxLine:'When they break a record, <em>I\'m the first to know.</em>',title:'Push — Chest',ex:'Bench Press',r1:'10 reps',r2:'8 reps',r3:'6 reps',tag:'+5KG <em style="color:#fff">ON THE BENCH.</em>'},
+    s5:{ctxEye:'FEATURE 4 — PROGRESSION',ctxLine:'Every weigh-in logged. <em>Progress becomes visible</em> — not a feeling.',title:'Weight progress',tag:'IN 12 <em>WEEKS.</em>',delta:'-9.2 KG'},
+    s6:{ctxEye:'COACH SIDE — WHAT I SEE',ctxLine:'I see every check-in, every record, <em>every absence.</em> Live.',live:'LIVE',title:'Action Feed',a1:'check-in done',a2:'-0.8kg this week',a3:'PR — Bench 100kg',a4:'no check-in (2d)',tag:'NOTHING<br><em>GETS MISSED.</em>'},
+    s7:{ctxEye:'THE MILESTONES',ctxLine:'Every 7, 30, 100 days — <em>a celebration.</em> Discipline deserves to be celebrated.',tag:'30 DAY<br><em>STREAK.</em>'},
+    s8:{eye:'BECOME MY CLIENT',h:'AND YOU?<br><em>WHAT ARE YOU WAITING FOR?</em>',sub:'Join the app. I\'ll take care of the rest.',c1:'clients',c2:'years',c3:'delivery',btn:'Join →'}
+  },
+  ar:{
+    s0:{eye:'كوتش لعيد سامي',h:'أنا لست<br><em>مجرد كوتش.</em>',sub:'بنيت التطبيق الذي يستخدمه عملائي كل يوم.'},
+    s1:{eye:'ما هو',h:'منصة<br><em>لعملائي.</em>',sub:'كوتشينغ كامل أونلاين. متابعة يومية. نتائج مقاسة. أرى كل شيء، أوجه كل شيء.',l1:'عميل',l2:'سنوات',l3:'دعم'},
+    s2:{ctxEye:'الميزة 1 — التسجيل اليومي',ctxLine:'كل صباح عملائي <em>يسجلون وزنهم</em> ويؤكدون احترامهم لقائمتهم.',title:'تسجيل اليوم',menu:'القائمة محترمة',train:'التمرين تم',btn:'إرسال',tag:'10 ثوانٍ <em>في اليوم.</em>'},
+    s3:{ctxEye:'الميزة 2 — متتبع التغذية',ctxLine:'يكتبون وجباتهم، <em>التطبيق يحسب الماكروز</em> تلقائياً. لا أعذار بعد الآن.',title:'ماكروز اليوم',p:'بروتين',c:'كارب',l:'دهون',r1:'صدر دجاج',r2:'أرز بسمتي',tag:'الماكروز <em>محققة.</em>'},
+    s4:{ctxEye:'الميزة 3 — متابعة التمرين',ctxLine:'عندما يحققون رقماً قياسياً، <em>أنا أول من يعلم.</em>',title:'دفع — صدر',ex:'بنش بريس',r1:'10 تكرار',r2:'8 تكرار',r3:'6 تكرار',tag:'+5كغ <em style="color:#fff">على البنش.</em>'},
+    s5:{ctxEye:'الميزة 4 — التقدم',ctxLine:'كل وزن مسجل. <em>التقدم يصبح مرئياً</em> — وليس شعوراً.',title:'تطور الوزن',tag:'في 12 <em>أسبوع.</em>',delta:'-9.2 كغ'},
+    s6:{ctxEye:'جانب الكوتش — ما أراه أنا',ctxLine:'أرى كل تسجيل، كل رقم قياسي، <em>كل غياب.</em> مباشرة.',live:'مباشر',title:'تغذية الأحداث',a1:'تم التسجيل',a2:'-0.8كغ الأسبوع',a3:'رقم بنش 100',a4:'بدون تسجيل (2ي)',tag:'لا شيء<br><em>يفوتني.</em>'},
+    s7:{ctxEye:'الإنجازات',ctxLine:'كل 7، 30، 100 يوم — <em>احتفال.</em> الانضباط يستحق الاحتفال.',tag:'30 يوم<br><em>متواصل.</em>'},
+    s8:{eye:'كن عميلي',h:'وأنت ؟<br><em>ماذا تنتظر ؟</em>',sub:'انضم إلى التطبيق. أنا أتولى الباقي.',c1:'عميل',c2:'سنة',c3:'توصيل',btn:'← انضم'}
+  }
+};
+
+let lang='fr',cur=0,timer=null;
+const N=9;
+const DURS=[4000,4500,4200,4200,4200,4200,4500,4000,5500];
+
+function setLang(l){lang=l;document.querySelectorAll('.lb').forEach(b=>b.classList.toggle('on',b.textContent===l.toUpperCase()));document.getElementById('frame').dir=l==='ar'?'rtl':'ltr';applyContent();}
+function t(id,v){const el=document.getElementById(id);if(el)el.textContent=v||'';}
+function h(id,v){const el=document.getElementById(id);if(el)el.innerHTML=v||'';}
+
+function applyContent(){
+  const d=TR[lang];
+  t('s0-eye',d.s0.eye);h('s0-h',d.s0.h);t('s0-sub',d.s0.sub);
+  t('s1-eye',d.s1.eye);h('s1-h',d.s1.h);t('s1-sub',d.s1.sub);t('s1-l1',d.s1.l1);t('s1-l2',d.s1.l2);t('s1-l3',d.s1.l3);
+  t('s2-ctx-eye',d.s2.ctxEye);h('s2-ctx-line',d.s2.ctxLine);t('s2-title',d.s2.title);t('s2-menu',d.s2.menu);t('s2-train',d.s2.train);t('s2-btn',d.s2.btn);h('s2-tag',d.s2.tag);
+  t('s3-ctx-eye',d.s3.ctxEye);h('s3-ctx-line',d.s3.ctxLine);t('s3-title',d.s3.title);t('s3-p',d.s3.p);t('s3-c',d.s3.c);t('s3-l',d.s3.l);t('s3-r1',d.s3.r1);t('s3-r2',d.s3.r2);h('s3-tag',d.s3.tag);
+  t('s4-ctx-eye',d.s4.ctxEye);h('s4-ctx-line',d.s4.ctxLine);t('s4-title',d.s4.title);t('s4-ex',d.s4.ex);t('s4-r1',d.s4.r1);t('s4-r2',d.s4.r2);t('s4-r3',d.s4.r3);h('s4-tag',d.s4.tag);
+  t('s5-ctx-eye',d.s5.ctxEye);h('s5-ctx-line',d.s5.ctxLine);t('s5-title',d.s5.title);h('s5-tag',d.s5.tag);t('s5-delta',d.s5.delta);
+  t('s6-ctx-eye',d.s6.ctxEye);h('s6-ctx-line',d.s6.ctxLine);t('s6-live',d.s6.live);t('s6-title',d.s6.title);t('s6-a1',d.s6.a1);t('s6-a2',d.s6.a2);t('s6-a3',d.s6.a3);t('s6-a4',d.s6.a4);h('s6-tag',d.s6.tag);
+  t('s7-ctx-eye',d.s7.ctxEye);h('s7-ctx-line',d.s7.ctxLine);h('s7-tag',d.s7.tag);
+  t('s8-eye',d.s8.eye);h('s8-h',d.s8.h);t('s8-sub',d.s8.sub);t('s8-c1',d.s8.c1);t('s8-c2',d.s8.c2);t('s8-c3',d.s8.c3);t('s8-btn',d.s8.btn);
+}
+
+function generateConfetti(){
+  const wrap=document.getElementById('confetti-wrap');wrap.innerHTML='';
+  const colors=['#C9A84C','#e3c074','#fff','#C9A84C'];
+  for(let i=0;i<50;i++){
+    const c=document.createElement('div');c.className='confetti';
+    c.style.left=Math.random()*100+'%';c.style.background=colors[Math.floor(Math.random()*colors.length)];
+    c.style.animationDelay=Math.random()*1.5+'s';c.style.animationDuration=(2+Math.random()*1.5)+'s';
+    c.style.width=(4+Math.random()*6)+'px';c.style.height=(8+Math.random()*8)+'px';
+    wrap.appendChild(c);
+  }
+}
+
+function flashTransition(cb){const f=document.getElementById('flash');f.style.animation='none';void f.offsetWidth;f.style.animation='flashIn 0.3s ease forwards';setTimeout(cb,80);}
+
+function showScene(idx){
+  if(timer)clearTimeout(timer);
+  for(let i=0;i<N;i++){document.getElementById('sc'+i).classList.toggle('active',i===idx);}
+  if(idx===7)generateConfetti();
+  document.getElementById('replay').classList.remove('show');
+  timer=setTimeout(()=>{
+    if(idx<N-1){flashTransition(()=>{cur=idx+1;showScene(cur);});}
+    else document.getElementById('replay').classList.add('show');
+  },DURS[idx]);
+}
+
+function start(){document.getElementById('replay').classList.remove('show');cur=0;showScene(0);}
+
+document.getElementById('frame').addEventListener('click',e=>{
+  if(e.target.closest('.lb')||e.target.closest('.replay-btn')||e.target.closest('.cta-btn'))return;
+  if(cur<N-1){flashTransition(()=>{cur++;showScene(cur);});}
+  else document.getElementById('replay').classList.add('show');
+});
+
+applyContent();start();
+</script>
+</body>
+</html>

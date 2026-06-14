@@ -1,0 +1,122 @@
+/* ═══════════════════════════════════════════════════════
+   PHASE 6 — COACH INSIGHTS
+   Dashboard cards · Activity feed · Training log · Meal log
+   ═══════════════════════════════════════════════════════ */
+
+.ci-wrap{padding:16px;max-width:1280px;margin:0 auto;color:#fff}
+.ci-header{display:flex;align-items:center;justify-content:space-between;margin-bottom:20px;flex-wrap:wrap;gap:12px}
+.ci-title{font-size:24px;font-weight:600;margin:0;color:#fff;display:flex;align-items:center;gap:8px}
+.ci-title-icon{font-size:22px}
+
+.ci-tabs{display:flex;gap:4px;background:rgba(255,255,255,.05);padding:4px;border-radius:12px;border:1px solid rgba(255,255,255,.06)}
+.ci-tab{background:transparent;border:none;color:rgba(255,255,255,.6);padding:8px 16px;font-size:13px;font-weight:500;border-radius:8px;cursor:pointer;transition:all .2s;font-family:inherit}
+.ci-tab:hover{color:rgba(255,255,255,.9)}
+.ci-tab.active{background:linear-gradient(135deg,#d4af37,#f4d35e);color:#000;box-shadow:0 2px 8px rgba(212,175,55,.25)}
+
+.ci-content{position:relative;min-height:200px}
+.ci-pane{display:none;animation:ciPaneIn .3s ease}
+.ci-pane.active{display:block}
+@keyframes ciPaneIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+
+.ci-loading{text-align:center;color:rgba(255,255,255,.4);padding:40px;font-size:13px;font-style:italic}
+.ci-empty{text-align:center;color:rgba(255,255,255,.4);padding:28px 16px;background:rgba(255,255,255,.03);border-radius:12px;font-size:13px;border:1px dashed rgba(255,255,255,.08)}
+
+/* ─── PRIORITY 2 — Client Dashboard Cards ─── */
+.ci-filters{display:flex;gap:6px;margin-bottom:14px;flex-wrap:wrap}
+.ci-filter{padding:6px 12px;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.06);border-radius:20px;font-size:11px;color:rgba(255,255,255,.65);cursor:pointer;transition:all .15s;font-family:inherit}
+.ci-filter:hover{background:rgba(255,255,255,.08);color:#fff}
+.ci-filter.active{background:rgba(212,175,55,.18);border-color:#d4af37;color:#d4af37}
+.ci-filter-count{display:inline-block;margin-left:4px;opacity:.7;font-variant-numeric:tabular-nums}
+
+.ci-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:12px}
+.ci-card{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02));border:1px solid rgba(255,255,255,.06);border-radius:14px;padding:14px;cursor:pointer;transition:all .2s;position:relative;overflow:hidden}
+.ci-card::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:var(--ci-status-color,#888)}
+.ci-card:hover{border-color:rgba(212,175,55,.4);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.35)}
+.ci-card-top{display:flex;align-items:center;gap:10px;margin-bottom:12px}
+.ci-avatar{width:42px;height:42px;border-radius:50%;object-fit:cover;background:rgba(255,255,255,.08);flex-shrink:0}
+.ci-avatar-fallback{display:flex;align-items:center;justify-content:center;font-size:17px;font-weight:600;color:#d4af37;background:rgba(212,175,55,.12)}
+.ci-card-info{flex:1;min-width:0}
+.ci-card-name{font-weight:600;font-size:14px;color:#fff;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;margin-bottom:2px}
+.ci-card-meta{font-size:10px;color:rgba(255,255,255,.45);text-transform:uppercase;letter-spacing:.4px}
+.ci-status-pill{font-size:9px;padding:3px 8px;border-radius:10px;background:var(--ci-status-bg);color:var(--ci-status-color);text-transform:uppercase;letter-spacing:.4px;font-weight:600;border:1px solid var(--ci-status-color)}
+.ci-card-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;margin:10px 0;padding:10px 0;border-top:1px solid rgba(255,255,255,.05);border-bottom:1px solid rgba(255,255,255,.05)}
+.ci-mini-stat{text-align:center}
+.ci-mini-stat-num{font-size:15px;font-weight:700;color:#fff;font-variant-numeric:tabular-nums;line-height:1}
+.ci-mini-stat-label{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.4px;margin-top:3px}
+.ci-card-foot{display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(255,255,255,.55)}
+.ci-card-action{color:#d4af37;font-size:16px;transition:transform .15s}
+.ci-card:hover .ci-card-action{transform:translateX(4px)}
+
+/* ─── PRIORITY 4 — Activity Feed ─── */
+.ci-feed{display:flex;flex-direction:column;gap:24px}
+.ci-feed-day-title{font-size:11px;font-weight:600;color:#d4af37;text-transform:uppercase;letter-spacing:.6px;margin-bottom:10px;padding:0 4px}
+.ci-feed-day-items{display:flex;flex-direction:column;gap:6px}
+.ci-feed-item{display:flex;gap:12px;background:rgba(255,255,255,.03);padding:12px 14px;border-radius:12px;border-left:3px solid transparent;transition:background .15s;cursor:default}
+.ci-feed-item:hover{background:rgba(255,255,255,.05)}
+.ci-feed-icon{font-size:20px;width:30px;text-align:center;flex-shrink:0;display:flex;align-items:center;justify-content:center}
+.ci-feed-body{flex:1;min-width:0}
+.ci-feed-text{font-size:13px;color:rgba(255,255,255,.85);line-height:1.45}
+.ci-feed-text b{color:#fff;font-weight:600}
+.ci-feed-text i{font-style:normal;color:#d4af37}
+.ci-feed-time{font-size:10px;color:rgba(255,255,255,.35);margin-top:4px;font-variant-numeric:tabular-nums}
+
+.ci-feed-pr{border-left-color:#d4af37;background:rgba(212,175,55,.04)}
+.ci-feed-pr .ci-feed-text b{background:linear-gradient(135deg,#d4af37,#f4d35e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text}
+.ci-feed-exercise{border-left-color:rgba(74,222,128,.3)}
+.ci-feed-meal{border-left-color:rgba(251,146,60,.3)}
+.ci-feed-weight{border-left-color:rgba(147,197,253,.3)}
+.ci-feed-checkin{border-left-color:rgba(216,180,254,.3)}
+
+/* ─── PRIORITY 1 — Performance / Training Log (in client profile) ─── */
+.ci-perf{padding:8px 0}
+.ci-perf-stats{display:grid;grid-template-columns:repeat(4,1fr);gap:8px;margin-bottom:24px}
+.ci-stat{background:linear-gradient(135deg,rgba(255,255,255,.05),rgba(255,255,255,.02));padding:14px 8px;border-radius:12px;text-align:center;border:1px solid rgba(255,255,255,.05)}
+.ci-stat-num{font-size:26px;font-weight:700;background:linear-gradient(135deg,#d4af37,#f4d35e);-webkit-background-clip:text;-webkit-text-fill-color:transparent;background-clip:text;line-height:1;font-variant-numeric:tabular-nums}
+.ci-stat-num-sub{font-size:13px;color:rgba(255,255,255,.5);font-weight:500;margin-left:2px}
+.ci-stat-label{font-size:10px;color:rgba(255,255,255,.5);margin-top:8px;text-transform:uppercase;letter-spacing:.4px}
+
+.ci-section-title{font-size:13px;font-weight:600;color:rgba(255,255,255,.85);margin:24px 0 12px;display:flex;align-items:center;gap:8px;text-transform:uppercase;letter-spacing:.5px}
+.ci-section-title::after{content:'';flex:1;height:1px;background:linear-gradient(to right,rgba(255,255,255,.1),transparent)}
+
+.ci-log-session{background:rgba(255,255,255,.04);border-radius:12px;padding:12px 14px;margin-bottom:8px;border:1px solid rgba(255,255,255,.04);transition:all .15s}
+.ci-log-session:hover{border-color:rgba(255,255,255,.08);background:rgba(255,255,255,.05)}
+.ci-log-head{display:flex;justify-content:space-between;align-items:center;margin-bottom:10px;padding-bottom:8px;border-bottom:1px solid rgba(255,255,255,.05)}
+.ci-log-name{font-weight:600;font-size:13px;color:#fff}
+.ci-log-date{font-size:10px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.3px}
+.ci-log-exos{display:flex;flex-direction:column;gap:5px}
+.ci-log-exo{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:3px 0;color:rgba(255,255,255,.7)}
+.ci-log-exo-name{color:rgba(255,255,255,.85)}
+.ci-log-exo-meta{color:#d4af37;font-variant-numeric:tabular-nums;font-weight:500;font-size:11px}
+
+.ci-pr-list{display:flex;flex-direction:column;gap:6px}
+.ci-pr-item{display:grid;grid-template-columns:24px 1fr auto auto;gap:10px;align-items:center;background:linear-gradient(135deg,rgba(212,175,55,.08),rgba(212,175,55,.03));border-left:3px solid #d4af37;padding:10px 12px;border-radius:8px}
+.ci-pr-trophy{font-size:14px}
+.ci-pr-name{font-size:13px;color:#fff;font-weight:500}
+.ci-pr-val{font-size:12px;color:#d4af37;font-variant-numeric:tabular-nums;font-weight:600;background:rgba(212,175,55,.12);padding:3px 8px;border-radius:6px}
+.ci-pr-date{font-size:10px;color:rgba(255,255,255,.4);font-variant-numeric:tabular-nums}
+
+/* ─── PRIORITY 3 — Meal Log Strip (in performance view) ─── */
+.ci-meal-strip{display:grid;grid-template-columns:repeat(7,1fr);gap:6px;margin-bottom:8px}
+.ci-meal-day{background:rgba(255,255,255,.03);border-radius:8px;padding:8px 6px;text-align:center;cursor:pointer;transition:background .15s}
+.ci-meal-day:hover{background:rgba(255,255,255,.06)}
+.ci-meal-day-label{font-size:9px;color:rgba(255,255,255,.4);text-transform:uppercase;letter-spacing:.4px;margin-bottom:4px}
+.ci-meal-day-kcal{font-size:13px;color:#fff;font-weight:600;font-variant-numeric:tabular-nums}
+.ci-meal-day-pct{font-size:9px;color:rgba(255,255,255,.5);margin-top:2px}
+.ci-meal-day.on-target{background:rgba(74,222,128,.1)}
+.ci-meal-day.over{background:rgba(251,146,60,.12)}
+.ci-meal-day.under{background:rgba(147,197,253,.1)}
+
+.ci-meal-recent{display:flex;flex-direction:column;gap:5px;margin-top:8px}
+.ci-meal-recent-item{display:flex;justify-content:space-between;align-items:center;font-size:12px;padding:6px 10px;background:rgba(255,255,255,.03);border-radius:8px}
+.ci-meal-recent-name{color:rgba(255,255,255,.85)}
+.ci-meal-recent-kcal{color:#d4af37;font-variant-numeric:tabular-nums;font-size:11px}
+
+/* Mobile */
+@media (max-width:640px){
+  .ci-grid{grid-template-columns:1fr}
+  .ci-perf-stats{grid-template-columns:repeat(2,1fr)}
+  .ci-stat-num{font-size:22px}
+  .ci-meal-strip{grid-template-columns:repeat(7,1fr);gap:3px}
+  .ci-meal-day{padding:6px 3px}
+  .ci-meal-day-kcal{font-size:11px}
+}

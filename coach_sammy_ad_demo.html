@@ -1,0 +1,523 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coach Laid Sammy — App Demo Ad</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;1,9..144,300;1,9..144,400&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Inter',-apple-system,sans-serif;color:#fff}
+
+/* ── STAGE ── */
+.stage{position:fixed;inset:0;display:flex;align-items:center;justify-content:center;background:#080808}
+.frame-wrap{position:relative;display:flex;align-items:center;justify-content:center}
+
+/* Story format (9:16) */
+.story-frame{position:relative;background:#000;overflow:hidden}
+@media(min-aspect-ratio:9/16){.story-frame{aspect-ratio:9/16;height:100vh;width:auto;max-width:540px}}
+@media(max-aspect-ratio:9/16){.story-frame{aspect-ratio:9/16;width:100vw;height:auto}}
+
+/* 16:9 frame (hidden by default, shown when format=16:9) */
+.wide-frame{position:relative;background:#000;overflow:hidden;display:none}
+@media(min-aspect-ratio:16/9){.wide-frame{aspect-ratio:16/9;height:100vh;width:auto;max-width:calc(100vh*16/9)}}
+@media(max-aspect-ratio:16/9){.wide-frame{aspect-ratio:16/9;width:100vw;height:auto}}
+
+/* ── CHROME ── */
+.progress{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:4px;z-index:60}
+.bar{flex:1;height:2px;background:rgba(255,255,255,0.2);border-radius:1px;overflow:hidden}
+.bar-fill{height:100%;background:#fff;width:0}
+
+.brand{position:absolute;top:30px;left:18px;display:flex;align-items:center;gap:8px;z-index:50}
+.brand-mark{width:22px;height:22px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000}
+.brand-name{font-size:11px;font-weight:600;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.8)}
+
+.format-btn{position:absolute;top:30px;right:60px;z-index:60;background:rgba(255,255,255,0.08);border:0.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.5);font-size:9px;font-weight:600;letter-spacing:1px;padding:4px 8px;border-radius:8px;cursor:pointer;font-family:'Inter',sans-serif}
+.lang-picker{position:absolute;top:30px;right:18px;display:flex;gap:5px;z-index:60}
+.lang-btn{background:transparent;border:0.5px solid rgba(255,255,255,0.15);color:rgba(255,255,255,0.4);font-size:9px;font-weight:600;padding:4px 8px;border-radius:12px;cursor:pointer;font-family:'Inter',sans-serif;transition:all .2s}
+.lang-btn.active{border-color:rgba(201,168,76,0.5);color:#C9A84C}
+
+.slide-dots{position:absolute;bottom:28px;left:50%;transform:translateX(-50%);display:flex;gap:6px;z-index:50}
+.dot{width:4px;height:4px;border-radius:50%;background:rgba(255,255,255,0.2);transition:all .4s}
+.dot.active{background:#C9A84C;width:16px;border-radius:2px}
+
+/* ── SLIDES ── */
+.slide{position:absolute;inset:0;opacity:0;pointer-events:none;transition:opacity .6s ease}
+.slide.active{opacity:1;pointer-events:all}
+.bg{position:absolute;inset:0}
+.vignette{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.97) 0%,rgba(0,0,0,0.15) 55%,rgba(0,0,0,0.5) 100%);pointer-events:none}
+.grain{position:absolute;inset:0;opacity:0.05;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");mix-blend-mode:overlay}
+
+/* text overlays */
+.slide-text{position:absolute;bottom:80px;left:28px;right:28px;z-index:10}
+[dir="rtl"] .slide-text{text-align:right}
+.eyebrow{font-size:9px;font-weight:700;color:rgba(201,168,76,0.7);letter-spacing:4px;text-transform:uppercase;margin-bottom:14px;opacity:0;transform:translateY(8px)}
+.slide.active .eyebrow{animation:fadeUp .6s ease .1s forwards}
+.headline{font-family:'Fraunces',serif;font-weight:300;font-style:italic;font-size:clamp(36px,9vw,54px);line-height:1.06;letter-spacing:-0.02em;color:#fff;margin-bottom:14px;opacity:0;transform:translateY(20px)}
+.headline em{color:#C9A84C}
+.slide.active .headline{animation:fadeUp .9s cubic-bezier(.4,0,.2,1) .25s forwards}
+.sub-text{font-size:clamp(12px,3vw,15px);color:rgba(255,255,255,0.5);line-height:1.6;opacity:0}
+.slide.active .sub-text{animation:fadeUp .7s ease .55s forwards}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+
+/* ── PHONE MOCKUP ── */
+.phone-wrap{position:absolute;z-index:5;opacity:0;transform:translateY(30px) scale(0.95)}
+.slide.active .phone-wrap{animation:phoneIn .8s cubic-bezier(.4,0,.2,1) .3s forwards}
+@keyframes phoneIn{to{opacity:1;transform:translateY(0) scale(1)}}
+
+.phone{position:relative;width:clamp(140px,38vw,220px);background:#0d0d0d;border-radius:clamp(18px,5vw,28px);border:2px solid rgba(255,255,255,0.12);overflow:hidden;box-shadow:0 30px 80px rgba(0,0,0,0.8),0 0 0 1px rgba(255,255,255,0.05),inset 0 1px 0 rgba(255,255,255,0.1)}
+.phone-screen{width:100%;background:#000;overflow:hidden;position:relative}
+.phone-notch{width:35%;height:14px;background:#0d0d0d;border-radius:0 0 10px 10px;margin:0 auto;position:relative;z-index:2}
+
+/* ── PHONE SCREEN CONTENTS ── */
+/* Scene 1 — Check-in */
+.checkin-screen{padding:12px;background:#0a0a0a}
+.ci-header{font-size:8px;letter-spacing:2px;color:rgba(201,168,76,0.6);text-transform:uppercase;margin-bottom:6px}
+.ci-title{font-family:'Fraunces',serif;font-style:italic;font-size:16px;color:#fff;margin-bottom:10px}
+.ci-weight-row{display:flex;align-items:center;gap:6px;margin-bottom:10px}
+.ci-weight-input{background:rgba(255,255,255,0.05);border:0.5px solid rgba(201,168,76,0.3);border-radius:8px;padding:6px 10px;font-size:14px;font-weight:700;color:#C9A84C;font-family:'Inter',sans-serif;width:70px;text-align:center}
+.ci-weight-lbl{font-size:9px;color:rgba(255,255,255,0.4)}
+.ci-toggle-row{display:flex;align-items:center;justify-content:space-between;background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.06);border-radius:10px;padding:8px 10px;margin-bottom:8px}
+.ci-toggle-label{font-size:9px;color:rgba(255,255,255,0.7)}
+.ci-toggle{width:28px;height:16px;border-radius:8px;background:#C9A84C;position:relative;transition:background .3s}
+.ci-toggle::after{content:'';position:absolute;right:2px;top:2px;width:12px;height:12px;border-radius:50%;background:#000;transition:transform .3s}
+.ci-btn{width:100%;background:#C9A84C;border:none;color:#000;padding:8px;border-radius:10px;font-size:10px;font-weight:700;cursor:pointer;font-family:'Inter',sans-serif;margin-top:6px}
+.ci-streak{display:flex;align-items:center;gap:4px;font-size:9px;color:rgba(255,255,255,0.4);margin-top:6px;justify-content:center}
+.ci-streak span{color:#C9A84C;font-weight:700}
+
+/* Scene 2 — Coach Action Feed */
+.feed-screen{padding:10px;background:#0a0a0a}
+.feed-header{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:#fff;margin-bottom:8px}
+.feed-item{display:flex;align-items:center;gap:8px;padding:7px 8px;background:rgba(255,255,255,0.03);border-radius:8px;margin-bottom:5px;border-left:2.5px solid}
+.feed-item.gold{border-left-color:#C9A84C}
+.feed-item.red{border-left-color:rgba(255,60,60,0.8)}
+.feed-item.blue{border-left-color:rgba(100,150,255,0.8)}
+.feed-avatar{width:24px;height:24px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:800;color:#000;flex-shrink:0}
+.feed-content{flex:1;min-width:0}
+.feed-name{font-size:9px;font-weight:700;color:#fff}
+.feed-action{font-size:8px;color:rgba(255,255,255,0.4);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.feed-time{font-size:7px;color:rgba(255,255,255,0.25);flex-shrink:0}
+.feed-notif{display:flex;align-items:center;gap:4px;margin-bottom:8px}
+.feed-notif-dot{width:6px;height:6px;border-radius:50%;background:#C9A84C;animation:pulse 1.5s infinite}
+@keyframes pulse{0%,100%{opacity:1;transform:scale(1)}50%{opacity:0.5;transform:scale(0.8)}}
+.feed-notif-text{font-size:8px;color:rgba(201,168,76,0.7);font-weight:600}
+
+/* Scene 3 — Food Tracker */
+.food-screen{padding:10px;background:#0a0a0a}
+.food-header{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:#fff;margin-bottom:8px}
+.food-macros{display:grid;grid-template-columns:repeat(4,1fr);gap:4px;margin-bottom:8px}
+.macro-box{background:rgba(255,255,255,0.04);border-radius:6px;padding:4px 3px;text-align:center}
+.macro-val{font-size:10px;font-weight:700;color:#C9A84C}
+.macro-lbl{font-size:6px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.5px}
+.food-progress{height:2px;background:rgba(255,255,255,0.08);border-radius:1px;margin-bottom:8px;overflow:hidden}
+.food-progress-fill{height:100%;background:#C9A84C;border-radius:1px;width:0;transition:width 1.5s ease 1s}
+.slide.active .food-progress-fill{width:68%}
+.food-search{display:flex;align-items:center;gap:6px;background:rgba(255,255,255,0.05);border:0.5px solid rgba(255,255,255,0.1);border-radius:8px;padding:6px 8px;margin-bottom:8px}
+.food-search-text{font-size:8px;color:rgba(255,255,255,0.6);flex:1}
+.food-typing{display:inline-block;width:1px;height:10px;background:#C9A84C;animation:blink .7s infinite}
+@keyframes blink{0%,100%{opacity:1}50%{opacity:0}}
+.food-result{background:rgba(255,255,255,0.04);border:0.5px solid rgba(201,168,76,0.2);border-radius:8px;padding:6px 8px;opacity:0}
+.slide.active .food-result{animation:fadeUp .5s ease 1.8s forwards}
+.food-result-name{font-size:9px;font-weight:700;color:#fff;margin-bottom:2px}
+.food-result-macros{font-size:7px;color:rgba(255,255,255,0.35)}
+.food-result-badge{display:inline-block;font-size:6px;background:rgba(201,168,76,0.15);color:#C9A84C;padding:1px 4px;border-radius:4px;margin-bottom:3px}
+
+/* Scene 4 — Coach Client Grid */
+.grid-screen{padding:10px;background:#0a0a0a}
+.grid-header{font-family:'Fraunces',serif;font-style:italic;font-size:13px;color:#fff;margin-bottom:6px}
+.grid-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:4px;margin-bottom:8px}
+.gstat{background:rgba(255,255,255,0.04);border-radius:6px;padding:5px;text-align:center}
+.gstat-num{font-size:13px;font-weight:300;font-family:'Fraunces',serif;font-style:italic;color:#C9A84C}
+.gstat-lbl{font-size:6px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:.5px}
+.client-mini-grid{display:grid;grid-template-columns:repeat(3,1fr);gap:4px}
+.client-mini{background:rgba(255,255,255,0.04);border-radius:8px;padding:6px 4px;text-align:center;border:1px solid}
+.client-mini.green{border-color:rgba(0,200,100,0.5)}
+.client-mini.yellow{border-color:rgba(255,200,0,0.4)}
+.client-mini.red{border-color:rgba(255,60,60,0.4)}
+.client-mini-av{width:22px;height:22px;border-radius:50%;background:#C9A84C;margin:0 auto 3px;display:flex;align-items:center;justify-content:center;font-size:7px;font-weight:800;color:#000}
+.client-mini-name{font-size:7px;color:rgba(255,255,255,0.7);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.client-mini-streak{font-size:6px;color:rgba(255,255,255,0.35);margin-top:1px}
+
+/* Scene 5 — Progress / CTA */
+.prog-screen{padding:12px;background:#0a0a0a}
+.prog-header{font-size:8px;letter-spacing:2px;color:rgba(201,168,76,0.6);text-transform:uppercase;margin-bottom:6px}
+.prog-weight-row{display:flex;align-items:baseline;gap:6px;margin-bottom:10px}
+.prog-weight-num{font-family:'Fraunces',serif;font-style:italic;font-size:28px;color:#fff}
+.prog-weight-delta{font-size:11px;color:#4ade80;font-weight:700}
+.prog-chart{height:40px;position:relative;margin-bottom:10px}
+.prog-chart svg{width:100%;height:100%}
+.prog-streak-row{display:flex;align-items:center;justify-content:space-between}
+.prog-streak{font-size:9px;color:rgba(255,255,255,0.5)}
+.prog-streak span{color:#C9A84C;font-weight:700}
+.prog-compliance{background:rgba(201,168,76,0.08);border:0.5px solid rgba(201,168,76,0.2);border-radius:8px;padding:6px 8px;margin-top:8px}
+.prog-comp-lbl{font-size:7px;color:rgba(255,255,255,0.35);text-transform:uppercase;letter-spacing:1px;margin-bottom:4px}
+.prog-comp-bar{height:3px;background:rgba(255,255,255,0.08);border-radius:2px;overflow:hidden}
+.prog-comp-fill{height:100%;background:#C9A84C;width:0;transition:width 1.5s ease 1s;border-radius:2px}
+.slide.active .prog-comp-fill{width:87%}
+.prog-comp-num{font-size:9px;color:#C9A84C;font-weight:700;margin-top:3px}
+
+/* Backgrounds */
+.bg-s1{background:radial-gradient(ellipse at 30% 70%,#0d0800 0%,#000 65%)}
+.bg-s2{background:radial-gradient(ellipse at 70% 40%,#080d08 0%,#000 60%)}
+.bg-s3{background:radial-gradient(ellipse at 50% 60%,#0d0800 0%,#000 60%)}
+.bg-s4{background:radial-gradient(ellipse at 40% 50%,#06080d 0%,#000 65%)}
+.bg-s5{background:radial-gradient(ellipse at 50% 50%,#100d00 0%,#000 55%)}
+
+/* typing animation */
+.type-text{overflow:hidden;white-space:nowrap;width:0}
+.slide.active .type-text{animation:typing 1s steps(20,end) .8s forwards}
+@keyframes typing{to{width:100%}}
+
+/* notification pop */
+.notif-pop{position:absolute;top:20px;left:10px;right:10px;background:rgba(20,20,20,0.95);border:0.5px solid rgba(201,168,76,0.3);border-radius:10px;padding:8px 10px;display:flex;align-items:center;gap:8px;z-index:20;opacity:0;transform:translateY(-10px)}
+.slide.active .notif-pop{animation:notifIn .5s ease .6s forwards}
+@keyframes notifIn{to{opacity:1;transform:translateY(0)}}
+.notif-icon{width:20px;height:20px;border-radius:6px;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-size:10px;flex-shrink:0}
+.notif-content{flex:1}
+.notif-title{font-size:8px;font-weight:700;color:#fff}
+.notif-body{font-size:7px;color:rgba(255,255,255,0.5)}
+
+/* Replay */
+.replay{position:absolute;inset:0;background:rgba(0,0,0,0.7);display:none;align-items:center;justify-content:center;z-index:70;flex-direction:column;gap:16px}
+.replay.show{display:flex}
+.replay-btn{background:transparent;border:0.5px solid rgba(201,168,76,0.4);color:#C9A84C;padding:12px 28px;border-radius:24px;font-size:12px;cursor:pointer;font-family:'Inter',sans-serif;letter-spacing:1.5px}
+</style>
+</head>
+<body>
+<div class="stage">
+<div class="story-frame" id="main-frame">
+  <div class="progress">
+    <div class="bar"><div class="bar-fill" id="b0"></div></div>
+    <div class="bar"><div class="bar-fill" id="b1"></div></div>
+    <div class="bar"><div class="bar-fill" id="b2"></div></div>
+    <div class="bar"><div class="bar-fill" id="b3"></div></div>
+    <div class="bar"><div class="bar-fill" id="b4"></div></div>
+  </div>
+
+  <div class="brand"><div class="brand-mark">LS</div><span class="brand-name">Coach Laid Sammy</span></div>
+
+  <div class="lang-picker">
+    <button class="lang-btn active" onclick="setLang('fr')">FR</button>
+    <button class="lang-btn" onclick="setLang('en')">EN</button>
+    <button class="lang-btn" onclick="setLang('ar')">AR</button>
+  </div>
+
+  <div class="slide-dots">
+    <div class="dot active" id="d0"></div>
+    <div class="dot" id="d1"></div>
+    <div class="dot" id="d2"></div>
+    <div class="dot" id="d3"></div>
+    <div class="dot" id="d4"></div>
+  </div>
+
+  <!-- ── SCENE 1 — CHECK-IN ── -->
+  <div class="slide active" id="s0">
+    <div class="bg bg-s1"></div><div class="grain"></div><div class="vignette"></div>
+    <!-- phone top center -->
+    <div class="phone-wrap" style="top:10%;left:50%;transform:translateX(-50%)">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="checkin-screen">
+            <div class="ci-header" id="ci-h"></div>
+            <div class="ci-title" id="ci-t"></div>
+            <div class="ci-weight-row">
+              <div class="ci-weight-input">84.2</div>
+              <div class="ci-weight-lbl">kg</div>
+            </div>
+            <div class="ci-toggle-row">
+              <div class="ci-toggle-label" id="ci-menu"></div>
+              <div class="ci-toggle"></div>
+            </div>
+            <div class="ci-btn" id="ci-btn"></div>
+            <div class="ci-streak">🔥 <span>14</span>&nbsp;<span id="ci-streak-lbl"></span></div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-text">
+      <div class="eyebrow" id="s0-eye"></div>
+      <h2 class="headline" id="s0-h"></h2>
+      <p class="sub-text" id="s0-s"></p>
+    </div>
+  </div>
+
+  <!-- ── SCENE 2 — COACH FEED ── -->
+  <div class="slide" id="s1">
+    <div class="bg bg-s2"></div><div class="grain"></div><div class="vignette"></div>
+    <div class="phone-wrap" style="top:8%;left:50%;transform:translateX(-50%)">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="feed-screen">
+            <div class="feed-notif"><div class="feed-notif-dot"></div><div class="feed-notif-text" id="f-live"></div></div>
+            <div class="feed-header" id="f-h"></div>
+            <div class="feed-item gold">
+              <div class="feed-avatar">ZK</div>
+              <div class="feed-content"><div class="feed-name">Zaki</div><div class="feed-action" id="f-a1"></div></div>
+              <div class="feed-time">2m</div>
+            </div>
+            <div class="feed-item gold">
+              <div class="feed-avatar">SM</div>
+              <div class="feed-content"><div class="feed-name">Sara M.</div><div class="feed-action" id="f-a2"></div></div>
+              <div class="feed-time">14m</div>
+            </div>
+            <div class="feed-item gold">
+              <div class="feed-avatar">OM</div>
+              <div class="feed-content"><div class="feed-name">Ouhachi M.</div><div class="feed-action" id="f-a3"></div></div>
+              <div class="feed-time">1h</div>
+            </div>
+            <div class="feed-item red">
+              <div class="feed-avatar" style="background:rgba(255,60,60,0.3);color:rgba(255,60,60,0.9)">AY</div>
+              <div class="feed-content"><div class="feed-name">Aya</div><div class="feed-action" id="f-a4"></div></div>
+              <div class="feed-time">2j</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-text">
+      <div class="eyebrow" id="s1-eye"></div>
+      <h2 class="headline" id="s1-h"></h2>
+      <p class="sub-text" id="s1-s"></p>
+    </div>
+  </div>
+
+  <!-- ── SCENE 3 — FOOD TRACKER ── -->
+  <div class="slide" id="s2">
+    <div class="bg bg-s3"></div><div class="grain"></div><div class="vignette"></div>
+    <!-- notification pop -->
+    <div class="notif-pop" style="top:12%">
+      <div class="notif-icon">✓</div>
+      <div class="notif-content">
+        <div class="notif-title" id="n-t"></div>
+        <div class="notif-body" id="n-b"></div>
+      </div>
+    </div>
+    <div class="phone-wrap" style="top:18%;left:50%;transform:translateX(-50%)">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="food-screen">
+            <div class="food-header" id="fd-h"></div>
+            <div class="food-macros">
+              <div class="macro-box"><div class="macro-val">1640</div><div class="macro-lbl">kcal</div></div>
+              <div class="macro-box"><div class="macro-val">98g</div><div class="macro-lbl" id="fd-p"></div></div>
+              <div class="macro-box"><div class="macro-val">180g</div><div class="macro-lbl" id="fd-c"></div></div>
+              <div class="macro-box"><div class="macro-val">42g</div><div class="macro-lbl" id="fd-l"></div></div>
+            </div>
+            <div class="food-progress"><div class="food-progress-fill"></div></div>
+            <div class="food-search">
+              <svg width="8" height="8" viewBox="0 0 16 16" fill="none"><circle cx="6" cy="6" r="5" stroke="rgba(255,255,255,0.3)" stroke-width="2"/><path d="m10 10 4 4" stroke="rgba(255,255,255,0.3)" stroke-width="2" stroke-linecap="round"/></svg>
+              <div class="food-search-text type-text" id="fd-query"></div>
+              <div class="food-typing"></div>
+            </div>
+            <div class="food-result">
+              <div class="food-result-badge" id="fd-src"></div>
+              <div class="food-result-name" id="fd-name"></div>
+              <div class="food-result-macros" id="fd-macros"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-text">
+      <div class="eyebrow" id="s2-eye"></div>
+      <h2 class="headline" id="s2-h"></h2>
+      <p class="sub-text" id="s2-s"></p>
+    </div>
+  </div>
+
+  <!-- ── SCENE 4 — CLIENT GRID ── -->
+  <div class="slide" id="s3">
+    <div class="bg bg-s4"></div><div class="grain"></div><div class="vignette"></div>
+    <div class="phone-wrap" style="top:8%;left:50%;transform:translateX(-50%)">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="grid-screen">
+            <div class="grid-header" id="gr-h"></div>
+            <div class="grid-stats">
+              <div class="gstat"><div class="gstat-num">43</div><div class="gstat-lbl" id="gr-s1"></div></div>
+              <div class="gstat"><div class="gstat-num" style="color:#4ade80">87%</div><div class="gstat-lbl" id="gr-s2"></div></div>
+              <div class="gstat"><div class="gstat-num" style="color:#ff6b6b">3</div><div class="gstat-lbl" id="gr-s3"></div></div>
+            </div>
+            <div class="client-mini-grid">
+              <div class="client-mini green"><div class="client-mini-av">ZK</div><div class="client-mini-name">Zaki</div><div class="client-mini-streak">🔥 14j</div></div>
+              <div class="client-mini green"><div class="client-mini-av">SM</div><div class="client-mini-name">Sara</div><div class="client-mini-streak">🔥 9j</div></div>
+              <div class="client-mini green"><div class="client-mini-av">OM</div><div class="client-mini-name">Ouhachi</div><div class="client-mini-streak">🔥 21j</div></div>
+              <div class="client-mini yellow"><div class="client-mini-av">LG</div><div class="client-mini-name">Iamis</div><div class="client-mini-streak">🔥 3j</div></div>
+              <div class="client-mini green"><div class="client-mini-av">AB</div><div class="client-mini-name">Abder.</div><div class="client-mini-streak">🔥 7j</div></div>
+              <div class="client-mini red"><div class="client-mini-av" style="background:rgba(255,60,60,0.3);color:rgba(255,60,60,0.9)">AY</div><div class="client-mini-name">Aya</div><div class="client-mini-streak" style="color:rgba(255,60,60,0.6)">0j</div></div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-text">
+      <div class="eyebrow" id="s3-eye"></div>
+      <h2 class="headline" id="s3-h"></h2>
+      <p class="sub-text" id="s3-s"></p>
+    </div>
+  </div>
+
+  <!-- ── SCENE 5 — PROGRESS + CTA ── -->
+  <div class="slide" id="s4">
+    <div class="bg bg-s5"></div><div class="grain"></div><div class="vignette"></div>
+    <div class="phone-wrap" style="top:8%;left:50%;transform:translateX(-50%)">
+      <div class="phone">
+        <div class="phone-notch"></div>
+        <div class="phone-screen">
+          <div class="prog-screen">
+            <div class="prog-header" id="pg-h"></div>
+            <div class="prog-weight-row">
+              <div class="prog-weight-num">79.4kg</div>
+              <div class="prog-weight-delta">-4.8kg</div>
+            </div>
+            <div class="prog-chart">
+              <svg viewBox="0 0 200 40" preserveAspectRatio="none">
+                <defs><linearGradient id="lg" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stop-color="#C9A84C" stop-opacity="0.3"/><stop offset="100%" stop-color="#C9A84C" stop-opacity="0"/></linearGradient></defs>
+                <path d="M0,35 C20,33 40,30 60,26 S100,20 120,18 S160,12 200,8" stroke="#C9A84C" stroke-width="1.5" fill="none"/>
+                <path d="M0,35 C20,33 40,30 60,26 S100,20 120,18 S160,12 200,8 L200,40 L0,40 Z" fill="url(#lg)"/>
+              </svg>
+            </div>
+            <div class="prog-streak-row">
+              <div class="prog-streak" id="pg-streak"></div>
+            </div>
+            <div class="prog-compliance">
+              <div class="prog-comp-lbl" id="pg-comp-lbl"></div>
+              <div class="prog-comp-bar"><div class="prog-comp-fill"></div></div>
+              <div class="prog-comp-num">87%</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+    <div class="slide-text">
+      <div class="eyebrow" id="s4-eye"></div>
+      <h2 class="headline" id="s4-h"></h2>
+      <p class="sub-text" id="s4-s"></p>
+    </div>
+  </div>
+
+  <div class="replay" id="replay"><button class="replay-btn" onclick="startAd()">↻</button></div>
+</div>
+</div>
+
+<script>
+const TR={
+  fr:{
+    s0:{eye:'SCENE 1 — LE CHECK-IN',h:'En 10 secondes.<br><em>Chaque matin.</em>',s:'Poids, menu respecté, streak. Tout est logué.',
+      ci_h:'CHECK-IN DU JOUR',ci_t:'Bilan quotidien',ci_menu:'Menu respecté ✓',ci_btn:'Soumettre le check-in',ci_streak:'jours consécutifs'},
+    s1:{eye:'SCENE 2 — LE COACH VOIT TOUT',h:'Rien ne<br><em>passe inaperçu.</em>',s:'Je vois chaque check-in, chaque record, chaque absence.',
+      f_live:'EN DIRECT',f_h:'Action Feed',f_a1:'a soumis son check-in · menu respecté',f_a2:'-0.8kg cette semaine',f_a3:'nouveau record — Bench 100kg',f_a4:'aucun check-in depuis 2 jours'},
+    s2:{eye:'SCENE 3 — LE TRACKER FOOD',h:'Tape ton repas.<br><em>Les macros apparaissent.</em>',s:'Open Food Facts + IA. Précis. Instantané.',
+      fd_h:'Journal alimentaire',fd_p:'PROT',fd_c:'CARB',fd_l:'LIP',fd_query:'poulet riz salade',fd_src:'Open Food Facts',fd_name:'Blanc de poulet (150g)',fd_macros:'165 kcal · 35g prot · 0g carb · 2g lip',
+      n_t:'Repas du déjeuner',n_b:'Macros calculés automatiquement'},
+    s3:{eye:'SCENE 4 — VUE COACH',h:'43 clients.<br><em>Un seul regard.</em>',s:'Vert, jaune, rouge. Je sais qui a besoin de moi.',
+      gr_h:'Mes clients',gr_s1:'actifs',gr_s2:'compliance',gr_s3:'à rappeler'},
+    s4:{eye:'SCENE 5 — LES RÉSULTATS',h:'La méthode<br><em>qui fonctionne.</em>',s:'Rejoins coachsammyapp.tiiny.site',
+      pg_h:'PROGRESSION',pg_streak:'🔥 <span>14 jours</span> consécutifs',pg_comp_lbl:'COMPLIANCE SEMAINE'},
+  },
+  en:{
+    s0:{eye:'SCENE 1 — CHECK-IN',h:'10 seconds.<br><em>Every morning.</em>',s:'Weight, menu respected, streak. All logged.',
+      ci_h:'DAILY CHECK-IN',ci_t:'Daily report',ci_menu:'Menu respected ✓',ci_btn:'Submit check-in',ci_streak:'consecutive days'},
+    s1:{eye:'SCENE 2 — COACH SEES EVERYTHING',h:'Nothing<br><em>goes unnoticed.</em>',s:'I see every check-in, every record, every absence.',
+      f_live:'LIVE',f_h:'Action Feed',f_a1:'submitted check-in · menu respected',f_a2:'-0.8kg this week',f_a3:'new record — Bench 100kg',f_a4:'no check-in for 2 days'},
+    s2:{eye:'SCENE 3 — FOOD TRACKER',h:'Type your meal.<br><em>Macros appear.</em>',s:'Open Food Facts + AI. Accurate. Instant.',
+      fd_h:'Food journal',fd_p:'PROT',fd_c:'CARB',fd_l:'FAT',fd_query:'grilled chicken rice',fd_src:'Open Food Facts',fd_name:'Chicken breast (150g)',fd_macros:'165 kcal · 35g prot · 0g carb · 2g fat',
+      n_t:'Lunch meal',n_b:'Macros calculated automatically'},
+    s3:{eye:'SCENE 4 — COACH VIEW',h:'43 clients.<br><em>One glance.</em>',s:'Green, yellow, red. I know who needs me.',
+      gr_h:'My clients',gr_s1:'active',gr_s2:'compliance',gr_s3:'to remind'},
+    s4:{eye:'SCENE 5 — THE RESULTS',h:'The method<br><em>that works.</em>',s:'Join coachsammyapp.tiiny.site',
+      pg_h:'PROGRESS',pg_streak:'🔥 <span>14 days</span> in a row',pg_comp_lbl:'WEEKLY COMPLIANCE'},
+  },
+  ar:{
+    s0:{eye:'المشهد 1 — تسجيل اليومي',h:'10 ثوانٍ.<br><em>كل صباح.</em>',s:'الوزن، القائمة محترمة، الاستمرارية. كل شيء مسجل.',
+      ci_h:'تسجيل اليوم',ci_t:'تقرير يومي',ci_menu:'القائمة محترمة ✓',ci_btn:'إرسال التسجيل',ci_streak:'يوم متواصل'},
+    s1:{eye:'المشهد 2 — الكوتش يرى كل شيء',h:'لا شيء<br><em>يمر دون انتباه.</em>',s:'أرى كل تسجيل، كل رقم قياسي، كل غياب.',
+      f_live:'مباشر',f_h:'تغذية الأحداث',f_a1:'أرسل تسجيله · القائمة محترمة',f_a2:'-0.8 كغ هذا الأسبوع',f_a3:'رقم قياسي جديد — بنش 100كغ',f_a4:'لا تسجيل منذ يومين'},
+    s2:{eye:'المشهد 3 — تتبع الطعام',h:'اكتب وجبتك.<br><em>الماكروز تظهر فوراً.</em>',s:'Open Food Facts + ذكاء اصطناعي. دقيق. فوري.',
+      fd_h:'مذكرة الطعام',fd_p:'بروتين',fd_c:'كارب',fd_l:'دهون',fd_query:'دجاج مشوي أرز',fd_src:'Open Food Facts',fd_name:'صدر دجاج (150غ)',fd_macros:'165 سعر · 35غ بروتين · 0غ كارب · 2غ دهون',
+      n_t:'وجبة الغداء',n_b:'تم حساب الماكروز تلقائياً'},
+    s3:{eye:'المشهد 4 — نظرة الكوتش',h:'43 كلايان.<br><em>نظرة واحدة.</em>',s:'أخضر، أصفر، أحمر. أعرف من يحتاجني.',
+      gr_h:'كلياناتي',gr_s1:'نشط',gr_s2:'الالتزام',gr_s3:'للتذكير'},
+    s4:{eye:'المشهد 5 — النتائج',h:'المنهجية<br><em>التي تنجح.</em>',s:'انضم على coachsammyapp.tiiny.site',
+      pg_h:'التقدم',pg_streak:'🔥 <span>14 يوم</span> متواصل',pg_comp_lbl:'الالتزام الأسبوعي'},
+  }
+};
+
+let lang='fr',cur=0,timer=null,raf=null,startT=0;
+const DUR=6000;
+
+function setLang(l){
+  lang=l;
+  document.querySelectorAll('.lang-btn').forEach(b=>b.classList.toggle('active',b.textContent===l.toUpperCase()));
+  document.getElementById('main-frame').dir=l==='ar'?'rtl':'ltr';
+  applyContent();
+}
+
+function applyContent(){
+  const t=TR[lang];
+  // Scene 0
+  setText('s0-eye',t.s0.eye);setHTML('s0-h',t.s0.h);setText('s0-s',t.s0.s);
+  setText('ci-h',t.s0.ci_h);setText('ci-t',t.s0.ci_t);setText('ci-menu',t.s0.ci_menu);setText('ci-btn',t.s0.ci_btn);setText('ci-streak-lbl',t.s0.ci_streak);
+  // Scene 1
+  setText('s1-eye',t.s1.eye);setHTML('s1-h',t.s1.h);setText('s1-s',t.s1.s);
+  setText('f-live',t.s1.f_live);setText('f-h',t.s1.f_h);setText('f-a1',t.s1.f_a1);setText('f-a2',t.s1.f_a2);setText('f-a3',t.s1.f_a3);setText('f-a4',t.s1.f_a4);
+  // Scene 2
+  setText('s2-eye',t.s2.eye);setHTML('s2-h',t.s2.h);setText('s2-s',t.s2.s);
+  setText('fd-h',t.s2.fd_h);setText('fd-p',t.s2.fd_p);setText('fd-c',t.s2.fd_c);setText('fd-l',t.s2.fd_l);
+  setText('fd-query',t.s2.fd_query);setText('fd-src',t.s2.fd_src);setText('fd-name',t.s2.fd_name);setText('fd-macros',t.s2.fd_macros);
+  setText('n-t',t.s2.n_t);setText('n-b',t.s2.n_b);
+  // Scene 3
+  setText('s3-eye',t.s3.eye);setHTML('s3-h',t.s3.h);setText('s3-s',t.s3.s);
+  setText('gr-h',t.s3.gr_h);setText('gr-s1',t.s3.gr_s1);setText('gr-s2',t.s3.gr_s2);setText('gr-s3',t.s3.gr_s3);
+  // Scene 4
+  setText('s4-eye',t.s4.eye);setHTML('s4-h',t.s4.h);setText('s4-s',t.s4.s);
+  setText('pg-h',t.s4.pg_h);setHTML('pg-streak',t.s4.pg_streak);setText('pg-comp-lbl',t.s4.pg_comp_lbl);
+}
+
+function setText(id,v){const el=document.getElementById(id);if(el)el.textContent=v;}
+function setHTML(id,v){const el=document.getElementById(id);if(el)el.innerHTML=v;}
+
+function showSlide(idx){
+  if(timer)clearTimeout(timer);
+  if(raf)cancelAnimationFrame(raf);
+  for(let i=0;i<5;i++){
+    document.getElementById('s'+i).classList.toggle('active',i===idx);
+    document.getElementById('d'+i).classList.toggle('active',i===idx);
+    const fill=document.getElementById('b'+i);
+    fill.style.transition='none';
+    fill.style.width=i<idx?'100%':'0';
+  }
+  document.getElementById('replay').classList.remove('show');
+  startT=Date.now();
+  const fill=document.getElementById('b'+idx);
+  function tick(){
+    const p=Math.min(100,(Date.now()-startT)/DUR*100);
+    fill.style.width=p+'%';
+    if(p<100)raf=requestAnimationFrame(tick);
+  }
+  tick();
+  timer=setTimeout(()=>{
+    fill.style.width='100%';
+    if(idx<4){cur=idx+1;showSlide(cur);}
+    else document.getElementById('replay').classList.add('show');
+  },DUR);
+}
+
+function startAd(){document.getElementById('replay').classList.remove('show');cur=0;showSlide(0);}
+
+document.getElementById('main-frame').addEventListener('click',e=>{
+  if(e.target.closest('.lang-btn')||e.target.closest('.replay-btn'))return;
+  if(cur<4){cur++;showSlide(cur);}else document.getElementById('replay').classList.add('show');
+});
+
+applyContent();
+startAd();
+</script>
+</body>
+</html>

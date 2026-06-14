@@ -1,0 +1,476 @@
+
+<style>
+*{box-sizing:border-box;margin:0;padding:0}
+.iga-wrap{display:flex;flex-direction:column;align-items:center;padding:24px 0;font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',sans-serif}
+.iga-frame{width:340px;height:600px;background:#050505;border-radius:32px;position:relative;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,0.7),0 0 0 1px rgba(255,255,255,0.06);cursor:pointer}
+.iga-progress{position:absolute;top:12px;left:12px;right:12px;display:flex;gap:4px;z-index:30}
+.iga-progress-bar{flex:1;height:2.5px;background:rgba(255,255,255,0.25);border-radius:2px;overflow:hidden;position:relative}
+.iga-progress-fill{position:absolute;top:0;left:0;bottom:0;background:#fff;width:0;border-radius:2px}
+.iga-progress-bar.iga-done .iga-progress-fill{width:100%}
+.iga-header{position:absolute;top:30px;left:16px;right:16px;display:flex;align-items:center;gap:10px;z-index:25}
+.iga-avatar{width:32px;height:32px;border-radius:50%;background:linear-gradient(135deg,#D4B556,#C9A84C);display:flex;align-items:center;justify-content:center;font-family:Georgia,serif;font-style:italic;font-size:13px;color:#000;font-weight:400;flex-shrink:0;border:1.5px solid #fff}
+.iga-handle{font-size:13px;font-weight:600;color:#fff;letter-spacing:0.2px}
+.iga-handle .iga-time{color:rgba(255,255,255,0.55);font-weight:400;margin-left:6px}
+.iga-sponsored{font-size:11px;color:rgba(255,255,255,0.55);margin-top:1px}
+
+.iga-scene{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:80px 28px 60px;text-align:center;opacity:0;visibility:hidden;transition:opacity 0.5s ease,visibility 0.5s ease}
+.iga-scene.iga-on{opacity:1;visibility:visible}
+
+/* Scene 1 — Hook */
+.iga-s1-line{font-family:Georgia,'Times New Roman',serif;font-style:italic;font-weight:300;color:rgba(255,255,255,0.85);font-size:34px;line-height:1.1;letter-spacing:-1px;margin-bottom:14px;opacity:0;transform:translateY(20px)}
+.iga-on .iga-s1-line.l1{animation:igaWordIn 0.7s ease 0.3s forwards}
+.iga-on .iga-s1-line.l2{animation:igaWordIn 0.7s ease 1.2s forwards}
+.iga-on .iga-s1-line.l3{animation:igaWordIn 0.7s ease 2.1s forwards}
+.iga-s1-final{font-family:Georgia,serif;font-style:italic;font-weight:300;font-size:30px;line-height:1.15;letter-spacing:-0.8px;color:#fff;margin-top:28px;opacity:0;transform:translateY(20px)}
+.iga-s1-final em{color:#C9A84C;font-style:italic}
+.iga-on .iga-s1-final{animation:igaWordIn 0.9s ease 3.2s forwards}
+
+/* Scene 2 — Brand reveal */
+.iga-s2-orb{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.2) 0%,transparent 60%);top:32%;left:50%;transform:translate(-50%,-50%);filter:blur(30px);opacity:0}
+.iga-on .iga-s2-orb{animation:igaOrbIn 1.8s ease forwards}
+.iga-s2-eye{font-size:10px;letter-spacing:4px;text-transform:uppercase;font-weight:700;color:#C9A84C;margin-bottom:18px;opacity:0}
+.iga-on .iga-s2-eye{animation:igaWordIn 0.7s ease 0.5s forwards}
+.iga-s2-name{font-family:Georgia,serif;font-style:italic;font-weight:300;font-size:54px;line-height:1;letter-spacing:-2px;color:#fff;margin-bottom:22px;opacity:0;transform:scale(0.85)}
+.iga-on .iga-s2-name{animation:igaScaleIn 1s cubic-bezier(.34,1.56,.64,1) 0.9s forwards}
+.iga-s2-sub{font-size:14px;color:rgba(255,255,255,0.6);line-height:1.55;max-width:240px;opacity:0}
+.iga-on .iga-s2-sub{animation:igaWordIn 0.7s ease 1.8s forwards}
+
+/* Generic phone container for app scenes */
+.iga-phone-stage{display:flex;flex-direction:column;align-items:center;width:100%;height:100%;padding-top:60px}
+.iga-stage-eye{font-size:10px;letter-spacing:3.5px;text-transform:uppercase;font-weight:700;color:#C9A84C;margin-bottom:8px;opacity:0}
+.iga-on .iga-stage-eye{animation:igaWordIn 0.5s ease 0.2s forwards}
+.iga-stage-title{font-family:Georgia,serif;font-style:italic;font-weight:300;font-size:22px;color:#fff;line-height:1.15;margin-bottom:16px;opacity:0;text-align:center;max-width:280px}
+.iga-stage-title em{color:#C9A84C}
+.iga-on .iga-stage-title{animation:igaWordIn 0.6s ease 0.5s forwards}
+.iga-phone-bezel{width:220px;height:380px;background:#0a0a0a;border-radius:32px;border:2px solid rgba(255,255,255,0.15);position:relative;overflow:hidden;box-shadow:0 24px 48px rgba(0,0,0,0.6);opacity:0;transform:translateY(40px) scale(0.92)}
+.iga-on .iga-phone-bezel{animation:igaPhoneIn 0.8s cubic-bezier(.34,1.56,.64,1) 0.7s forwards}
+.iga-phone-bezel::before{content:'';position:absolute;top:9px;left:50%;transform:translateX(-50%);width:60px;height:5px;background:rgba(255,255,255,0.15);border-radius:3px;z-index:10}
+.iga-phone-screen{position:absolute;inset:0;padding:32px 14px 14px;overflow:hidden}
+
+/* Scene 3 — Today screen */
+.iga-ph-hdr{font-size:8px;letter-spacing:1.5px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-bottom:2px;font-weight:600}
+.iga-ph-name{font-family:Georgia,serif;font-style:italic;font-size:20px;color:#fff;font-weight:300;margin-bottom:14px;letter-spacing:-0.3px}
+.iga-ph-name em{color:#C9A84C}
+.iga-ph-stats{display:grid;grid-template-columns:repeat(3,1fr);gap:5px;margin-bottom:10px}
+.iga-ph-stat{background:#111;border-radius:10px;padding:10px 4px;text-align:center;border:0.5px solid rgba(255,255,255,0.06);opacity:0;transform:translateY(10px)}
+.iga-on .s3-active .iga-ph-stat:nth-child(1){animation:igaWordIn 0.5s ease 1.5s forwards}
+.iga-on .s3-active .iga-ph-stat:nth-child(2){animation:igaWordIn 0.5s ease 1.7s forwards}
+.iga-on .s3-active .iga-ph-stat:nth-child(3){animation:igaWordIn 0.5s ease 1.9s forwards}
+.iga-ph-sv{font-family:Georgia,serif;font-style:italic;font-size:16px;color:#fff;line-height:1}
+.iga-ph-sv.gold{color:#C9A84C}
+.iga-ph-sv.green{color:#4ade80}
+.iga-ph-sl{font-size:7px;color:rgba(255,255,255,0.3);text-transform:uppercase;letter-spacing:0.6px;margin-top:3px;font-weight:700}
+.iga-ph-cal{background:#111;border-radius:12px;padding:11px;border:0.5px solid rgba(255,255,255,0.05);margin-bottom:7px;opacity:0;transform:translateY(10px)}
+.iga-on .s3-active .iga-ph-cal{animation:igaWordIn 0.6s ease 2.2s forwards}
+.iga-ph-ceye{font-size:7px;letter-spacing:1.8px;text-transform:uppercase;color:#C9A84C;font-weight:700;margin-bottom:4px}
+.iga-ph-cnum{font-family:Georgia,serif;font-style:italic;font-size:24px;color:#fff;font-weight:300;line-height:1}
+.iga-ph-cnum span{font-size:10px;color:rgba(255,255,255,0.4);font-family:inherit;font-style:normal;margin-left:2px}
+.iga-ph-cmac{font-size:8px;color:rgba(255,255,255,0.35);margin-top:4px}
+.iga-ph-cta{background:linear-gradient(135deg,rgba(201,168,76,0.16),rgba(201,168,76,0.08));border:1px solid rgba(201,168,76,0.32);border-radius:11px;padding:9px 11px;display:flex;align-items:center;justify-content:space-between;margin-top:6px;opacity:0;transform:translateY(10px)}
+.iga-on .s3-active .iga-ph-cta{animation:igaWordIn 0.6s ease 2.7s forwards}
+.iga-ph-ctal{font-family:Georgia,serif;font-style:italic;font-size:11px;color:#fff;line-height:1.2}
+.iga-ph-ctas{font-size:8px;color:rgba(255,255,255,0.4);margin-top:1px}
+.iga-ph-ctaa{width:20px;height:20px;border-radius:50%;background:rgba(201,168,76,0.2);display:flex;align-items:center;justify-content:center;color:#C9A84C;font-size:11px}
+.iga-tap-pulse{position:absolute;width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,0.95);opacity:0;pointer-events:none;z-index:5}
+.iga-on .s3-active .iga-tap-pulse{animation:igaTap 1.8s ease 3.4s infinite}
+
+/* Scene 4 — Journal check-in */
+.iga-j-day{background:#111;border-radius:10px;padding:9px 11px;margin-bottom:6px;border:0.5px solid rgba(255,255,255,0.06);opacity:0;transform:translateY(10px)}
+.iga-on .s4-active .iga-j-day{animation:igaWordIn 0.5s ease 1.4s forwards}
+.iga-j-eye{font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#C9A84C;font-weight:700;margin-bottom:5px}
+.iga-j-pills{display:flex;gap:5px}
+.iga-j-pill{flex:1;padding:6px 4px;border-radius:7px;font-size:9px;font-weight:700;text-align:center}
+.iga-j-pill.j-on{background:rgba(201,168,76,0.18);color:#C9A84C;border:0.5px solid rgba(201,168,76,0.35)}
+.iga-j-pill.j-off{background:rgba(255,255,255,0.04);color:rgba(255,255,255,0.35);border:0.5px solid rgba(255,255,255,0.08)}
+.iga-j-tog-row{display:flex;align-items:center;justify-content:space-between;padding:9px 10px;background:#111;border:0.5px solid rgba(255,255,255,0.06);border-radius:10px;margin-bottom:5px;opacity:0;transform:translateY(10px)}
+.iga-on .s4-active .iga-j-tog-row.r1{animation:igaWordIn 0.5s ease 1.8s forwards}
+.iga-on .s4-active .iga-j-tog-row.r2{animation:igaWordIn 0.5s ease 2.1s forwards}
+.iga-on .s4-active .iga-j-tog-row.r3{animation:igaWordIn 0.5s ease 2.4s forwards}
+.iga-j-tog-lbl{display:flex;align-items:center;gap:7px;font-size:10px;color:rgba(255,255,255,0.7);font-weight:500}
+.iga-j-tog{width:28px;height:16px;background:rgba(255,255,255,0.15);border-radius:8px;position:relative;flex-shrink:0;transition:background 0.4s}
+.iga-j-tog::after{content:'';position:absolute;top:2px;left:2px;width:12px;height:12px;background:#000;border-radius:50%;transition:left 0.4s,background 0.4s}
+.iga-j-tog.tog-on{background:#4ade80}
+.iga-j-tog.tog-on::after{left:14px;background:#000}
+/* Animation triggers for toggles */
+.iga-on .s4-active .iga-j-tog.anim1{animation:igaTogOn 0.4s ease 2.8s forwards}
+.iga-on .s4-active .iga-j-tog.anim2{animation:igaTogOn 0.4s ease 3.2s forwards}
+.iga-j-mood{margin-top:6px;background:#111;border-radius:10px;padding:9px;border:0.5px solid rgba(255,255,255,0.06);opacity:0;transform:translateY(10px)}
+.iga-on .s4-active .iga-j-mood{animation:igaWordIn 0.5s ease 2.7s forwards}
+.iga-j-mood-lbl{font-size:7px;letter-spacing:1.5px;text-transform:uppercase;color:#C9A84C;font-weight:700;margin-bottom:6px}
+.iga-j-emojis{display:flex;gap:3px}
+.iga-j-em{flex:1;padding:6px 0;border-radius:7px;border:0.5px solid rgba(255,255,255,0.08);text-align:center;font-size:14px;background:rgba(255,255,255,0.03);transition:all 0.3s}
+.iga-j-em.iga-em-selected{background:rgba(201,168,76,0.2);border-color:rgba(201,168,76,0.4);transform:scale(1.15)}
+.iga-on .s4-active .iga-j-em.iga-em-anim{animation:igaEmojiPick 0.4s ease 3.7s forwards}
+.iga-j-save{margin-top:7px;background:linear-gradient(135deg,#D4B556,#C9A84C);border-radius:10px;padding:9px;text-align:center;font-size:10px;font-weight:800;color:#000;opacity:0;transform:translateY(10px)}
+.iga-on .s4-active .iga-j-save{animation:igaWordIn 0.5s ease 4.1s forwards}
+
+/* Scene 5 — Progress chart */
+.iga-p-card{background:#111;border-radius:14px;padding:14px;border:0.5px solid rgba(255,255,255,0.05);opacity:0;transform:translateY(20px)}
+.iga-on .s5-active .iga-p-card{animation:igaWordIn 0.6s ease 1.3s forwards}
+.iga-p-eye{font-size:8px;letter-spacing:2px;text-transform:uppercase;color:#C9A84C;font-weight:700;margin-bottom:10px}
+.iga-p-row{display:flex;align-items:flex-end;justify-content:space-between;margin-bottom:12px}
+.iga-p-num{font-family:Georgia,serif;font-style:italic;font-size:38px;color:#4ade80;font-weight:300;line-height:1;opacity:0}
+.iga-on .s5-active .iga-p-num{animation:igaWordIn 0.6s ease 1.8s forwards}
+.iga-p-num-sub{font-size:8px;letter-spacing:1.2px;text-transform:uppercase;color:rgba(255,255,255,0.35);margin-top:4px;font-weight:700}
+.iga-p-chip{background:rgba(74,222,128,0.12);color:#4ade80;border:0.5px solid rgba(74,222,128,0.28);border-radius:99px;font-size:9px;font-weight:700;padding:4px 9px;white-space:nowrap;opacity:0;transform:translateX(10px)}
+.iga-on .s5-active .iga-p-chip{animation:igaSlideX 0.5s ease 2.3s forwards}
+.iga-p-svg{width:100%;height:60px}
+.iga-p-line{fill:none;stroke:#4ade80;stroke-width:2;stroke-linecap:round;stroke-dasharray:300;stroke-dashoffset:300}
+.iga-on .s5-active .iga-p-line{animation:igaDrawLine 1.6s ease 2.6s forwards}
+.iga-p-fill{fill:url(#igaGradGrn);opacity:0}
+.iga-on .s5-active .iga-p-fill{animation:igaFadeIn 0.6s ease 3.8s forwards}
+.iga-p-dot{opacity:0}
+.iga-on .s5-active .iga-p-dot{animation:igaDotPop 0.4s cubic-bezier(.34,1.56,.64,1) 4.1s forwards}
+.iga-p-goal{stroke:rgba(255,255,255,0.15);stroke-dasharray:3 4;stroke-width:0.8;opacity:0}
+.iga-on .s5-active .iga-p-goal{animation:igaFadeIn 0.5s ease 4.3s forwards}
+.iga-p-cap{font-size:9px;color:rgba(255,255,255,0.4);border-top:0.5px solid rgba(255,255,255,0.06);padding-top:8px;margin-top:4px;opacity:0}
+.iga-on .s5-active .iga-p-cap{animation:igaWordIn 0.5s ease 4.6s forwards}
+
+/* Scene 6 — Coach checkin popup */
+.iga-cn-bg{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.78);opacity:0}
+.iga-on .s6-active .iga-cn-bg{animation:igaFadeIn 0.4s ease 0.6s forwards}
+.iga-cn-card{position:relative;background:linear-gradient(165deg,#1a1208,#0d0a05);border:1px solid rgba(201,168,76,0.45);border-radius:22px;padding:28px 22px 18px;width:280px;text-align:center;box-shadow:0 24px 60px rgba(201,168,76,0.25);transform:scale(0.7) translateY(40px);opacity:0;overflow:hidden}
+.iga-on .s6-active .iga-cn-card{animation:igaCardPop 0.6s cubic-bezier(.34,1.56,.64,1) 0.8s forwards}
+.iga-cn-burst{position:absolute;inset:-40%;background:radial-gradient(circle at 50% 0%,rgba(201,168,76,0.4) 0%,transparent 55%);pointer-events:none}
+.iga-cn-icon{font-size:48px;margin-bottom:8px;display:inline-block}
+.iga-on .s6-active .iga-cn-icon{animation:igaShake 0.8s ease 1.1s}
+.iga-cn-eye{font-size:9px;letter-spacing:3px;color:#C9A84C;font-weight:800;margin-bottom:5px}
+.iga-cn-from{font-family:Georgia,serif;font-style:italic;font-weight:300;font-size:18px;color:#fff;margin-bottom:12px}
+.iga-cn-body{font-size:12px;line-height:1.5;color:rgba(255,255,255,0.85);background:rgba(255,255,255,0.04);border:0.5px solid rgba(255,255,255,0.08);border-radius:11px;padding:11px;text-align:left;margin-bottom:14px}
+.iga-cn-cta{width:100%;background:linear-gradient(135deg,#D4B556,#C9A84C);color:#0d0a05;border:none;border-radius:11px;padding:10px;font-size:12px;font-weight:800;font-family:inherit}
+.iga-s6-bottom{position:absolute;bottom:70px;left:0;right:0;text-align:center;padding:0 28px;opacity:0}
+.iga-on .s6-active .iga-s6-bottom{animation:igaWordIn 0.6s ease 1.8s forwards}
+.iga-s6-bottom-h{font-family:Georgia,serif;font-style:italic;font-weight:300;font-size:22px;color:#fff;line-height:1.15}
+.iga-s6-bottom-h em{color:#C9A84C}
+
+/* Scene 7 — Stats */
+.iga-s7-eye{font-size:10px;letter-spacing:3.5px;text-transform:uppercase;font-weight:700;color:#C9A84C;margin-bottom:24px;opacity:0}
+.iga-on .iga-s7-eye{animation:igaWordIn 0.5s ease 0.3s forwards}
+.iga-stat-block{margin-bottom:20px;opacity:0;transform:translateY(20px)}
+.iga-on .iga-stat-block.s1{animation:igaWordIn 0.6s ease 0.7s forwards}
+.iga-on .iga-stat-block.s2{animation:igaWordIn 0.6s ease 1.4s forwards}
+.iga-on .iga-stat-block.s3{animation:igaWordIn 0.6s ease 2.1s forwards}
+.iga-stat-num{font-family:Georgia,serif;font-style:italic;font-weight:300;font-size:56px;color:#C9A84C;line-height:1;letter-spacing:-2px}
+.iga-stat-num span{font-size:22px;color:rgba(201,168,76,0.6);margin-left:2px}
+.iga-stat-lbl{font-size:11px;color:rgba(255,255,255,0.55);letter-spacing:1.2px;text-transform:uppercase;font-weight:600;margin-top:6px}
+
+/* Scene 8 — CTA */
+.iga-s8-orb{position:absolute;width:500px;height:500px;border-radius:50%;background:radial-gradient(circle,rgba(201,168,76,0.22) 0%,transparent 60%);top:60%;left:50%;transform:translate(-50%,-50%);filter:blur(30px);opacity:0}
+.iga-on .iga-s8-orb{animation:igaOrbIn 1.5s ease forwards}
+.iga-s8-eye{font-size:10px;letter-spacing:3.5px;text-transform:uppercase;font-weight:700;color:#C9A84C;margin-bottom:18px;opacity:0}
+.iga-on .iga-s8-eye{animation:igaWordIn 0.5s ease 0.3s forwards}
+.iga-s8-h{font-family:Georgia,serif;font-style:italic;font-weight:300;font-size:40px;line-height:1.1;letter-spacing:-1.2px;color:#fff;margin-bottom:16px;opacity:0;transform:translateY(20px)}
+.iga-s8-h em{color:#C9A84C}
+.iga-on .iga-s8-h{animation:igaWordIn 0.8s ease 0.6s forwards}
+.iga-s8-sub{font-size:14px;color:rgba(255,255,255,0.55);line-height:1.55;max-width:260px;margin-bottom:30px;opacity:0}
+.iga-on .iga-s8-sub{animation:igaWordIn 0.6s ease 1.4s forwards}
+.iga-swipe-up{position:absolute;bottom:36px;left:0;right:0;display:flex;flex-direction:column;align-items:center;gap:8px;opacity:0}
+.iga-on .iga-swipe-up{animation:igaWordIn 0.6s ease 2.0s forwards}
+.iga-swipe-chev{width:18px;height:18px;border-left:2px solid #fff;border-top:2px solid #fff;transform:rotate(45deg);animation:igaSwipeBounce 1.4s ease infinite}
+.iga-swipe-text{font-size:12px;font-weight:700;color:#fff;letter-spacing:1.5px;text-transform:uppercase}
+
+.iga-caption{margin-top:20px;font-size:13px;color:rgba(0,0,0,0.6);text-align:center;max-width:340px}
+.iga-controls{display:flex;gap:8px;margin-top:14px;flex-wrap:wrap;justify-content:center;max-width:340px}
+.iga-ctrl{background:rgba(0,0,0,0.06);border:0.5px solid rgba(0,0,0,0.1);color:rgba(0,0,0,0.7);font-size:12px;font-weight:600;padding:7px 14px;border-radius:20px;cursor:pointer;font-family:inherit}
+.iga-ctrl:hover{background:rgba(0,0,0,0.1)}
+
+@keyframes igaWordIn{from{opacity:0;transform:translateY(20px)}to{opacity:1;transform:translateY(0)}}
+@keyframes igaScaleIn{from{opacity:0;transform:scale(0.85)}to{opacity:1;transform:scale(1)}}
+@keyframes igaOrbIn{from{opacity:0;transform:translate(-50%,-50%) scale(0.6)}to{opacity:0.9;transform:translate(-50%,-50%) scale(1)}}
+@keyframes igaPhoneIn{from{opacity:0;transform:translateY(60px) scale(0.85)}to{opacity:1;transform:translateY(0) scale(1)}}
+@keyframes igaSlideX{from{opacity:0;transform:translateX(10px)}to{opacity:1;transform:translateX(0)}}
+@keyframes igaFadeIn{to{opacity:1}}
+@keyframes igaTap{0%{opacity:0;transform:scale(0.5)}25%{opacity:0.85;transform:scale(1)}100%{opacity:0;transform:scale(2)}}
+@keyframes igaTogOn{to{background:#4ade80}}
+@keyframes igaEmojiPick{to{opacity:1;transform:scale(1.15);background:rgba(201,168,76,0.2);border-color:rgba(201,168,76,0.4)}}
+@keyframes igaDrawLine{to{stroke-dashoffset:0}}
+@keyframes igaDotPop{0%{opacity:0;transform:scale(0)}80%{opacity:1;transform:scale(1.3)}100%{opacity:1;transform:scale(1)}}
+@keyframes igaCardPop{to{opacity:1;transform:scale(1) translateY(0)}}
+@keyframes igaShake{0%,100%{transform:rotate(0)}20%{transform:rotate(-12deg) scale(1.15)}40%{transform:rotate(10deg) scale(1.2)}60%{transform:rotate(-8deg) scale(1.1)}80%{transform:rotate(5deg) scale(1.05)}}
+@keyframes igaSwipeBounce{0%,100%{transform:rotate(45deg) translateY(0)}50%{transform:rotate(45deg) translateY(-6px)}}
+</style>
+
+<div class="iga-wrap">
+
+<div class="iga-frame" id="iga-frame">
+
+  <div class="iga-progress" id="iga-progress">
+    <div class="iga-progress-bar"><div class="iga-progress-fill"></div></div>
+    <div class="iga-progress-bar"><div class="iga-progress-fill"></div></div>
+    <div class="iga-progress-bar"><div class="iga-progress-fill"></div></div>
+    <div class="iga-progress-bar"><div class="iga-progress-fill"></div></div>
+    <div class="iga-progress-bar"><div class="iga-progress-fill"></div></div>
+    <div class="iga-progress-bar"><div class="iga-progress-fill"></div></div>
+    <div class="iga-progress-bar"><div class="iga-progress-fill"></div></div>
+    <div class="iga-progress-bar"><div class="iga-progress-fill"></div></div>
+  </div>
+
+  <div class="iga-header">
+    <div class="iga-avatar">CS</div>
+    <div>
+      <div class="iga-handle">coachsammy<span class="iga-time">à l'instant</span></div>
+      <div class="iga-sponsored">Sponsorisé</div>
+    </div>
+  </div>
+
+  <!-- SCENE 1: HOOK -->
+  <div class="iga-scene iga-on" data-scene="0">
+    <div class="iga-s1-line l1">Tu commences.</div>
+    <div class="iga-s1-line l2">Tu arrêtes.</div>
+    <div class="iga-s1-line l3">Tu recommences.</div>
+    <div class="iga-s1-final">Et si quelqu'un te suivait,<br><em>vraiment ?</em></div>
+  </div>
+
+  <!-- SCENE 2: BRAND -->
+  <div class="iga-scene" data-scene="1">
+    <div class="iga-s2-orb"></div>
+    <div class="iga-s2-eye">Coaching en ligne</div>
+    <div class="iga-s2-name">Coach<br>Sammy</div>
+    <div class="iga-s2-sub">Un plan fait pour toi. Un suivi qui ne s'arrête jamais.</div>
+  </div>
+
+  <!-- SCENE 3: TODAY SCREEN -->
+  <div class="iga-scene" data-scene="2">
+    <div class="iga-phone-stage s3-active">
+      <div class="iga-stage-eye">Ton accueil</div>
+      <div class="iga-stage-title">Tout, en <em>un coup d'œil.</em></div>
+      <div class="iga-phone-bezel">
+        <div class="iga-phone-screen">
+          <div class="iga-ph-hdr">Aujourd'hui</div>
+          <div class="iga-ph-name">Bonjour, <em>Akram.</em></div>
+          <div class="iga-ph-stats">
+            <div class="iga-ph-stat"><div class="iga-ph-sv gold">9</div><div class="iga-ph-sl">Série</div></div>
+            <div class="iga-ph-stat"><div class="iga-ph-sv">80.2</div><div class="iga-ph-sl">Poids</div></div>
+            <div class="iga-ph-stat"><div class="iga-ph-sv green">−3.8</div><div class="iga-ph-sl">Restant</div></div>
+          </div>
+          <div class="iga-ph-cal">
+            <div class="iga-ph-ceye">Objectif du jour</div>
+            <div class="iga-ph-cnum">2 200<span>kcal</span></div>
+            <div class="iga-ph-cmac">165g prot · 220g gluc · 65g lip</div>
+          </div>
+          <div class="iga-ph-cta">
+            <div>
+              <div class="iga-ph-ctal">Check-in du jour</div>
+              <div class="iga-ph-ctas">Pas encore enregistré</div>
+            </div>
+            <div class="iga-ph-ctaa">→</div>
+          </div>
+          <div class="iga-tap-pulse" style="bottom:38px;right:24px"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 4: JOURNAL CHECK-IN -->
+  <div class="iga-scene" data-scene="3">
+    <div class="iga-phone-stage s4-active">
+      <div class="iga-stage-eye">Ton check-in</div>
+      <div class="iga-stage-title">3 taps. <em>30 secondes.</em></div>
+      <div class="iga-phone-bezel">
+        <div class="iga-phone-screen">
+          <div class="iga-ph-hdr">Journal · Vendredi</div>
+          <div class="iga-ph-name" style="margin-bottom:10px">Ta <em>journée.</em></div>
+          <div class="iga-j-day">
+            <div class="iga-j-eye">Type de journée</div>
+            <div class="iga-j-pills">
+              <div class="iga-j-pill j-on">💪 Training</div>
+              <div class="iga-j-pill j-off">😴 Repos</div>
+            </div>
+          </div>
+          <div class="iga-j-tog-row r1">
+            <span class="iga-j-tog-lbl"><span>🍽</span> Menu respecté</span>
+            <div class="iga-j-tog anim1"></div>
+          </div>
+          <div class="iga-j-tog-row r2">
+            <span class="iga-j-tog-lbl"><span>💪</span> Entraînement fait</span>
+            <div class="iga-j-tog anim2"></div>
+          </div>
+          <div class="iga-j-tog-row r3" style="display:none"></div>
+          <div class="iga-j-mood">
+            <div class="iga-j-mood-lbl">Humeur</div>
+            <div class="iga-j-emojis">
+              <div class="iga-j-em">😴</div>
+              <div class="iga-j-em">😐</div>
+              <div class="iga-j-em">🙂</div>
+              <div class="iga-j-em iga-em-anim">💪</div>
+              <div class="iga-j-em">🔥</div>
+            </div>
+          </div>
+          <div class="iga-j-save">💾 Enregistré ✓</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 5: PROGRESS CHART -->
+  <div class="iga-scene" data-scene="4">
+    <div class="iga-phone-stage s5-active">
+      <div class="iga-stage-eye">Tes progrès</div>
+      <div class="iga-stage-title">Tu vois où tu en es. <em>Vraiment.</em></div>
+      <div class="iga-phone-bezel">
+        <div class="iga-phone-screen">
+          <div class="iga-ph-hdr">Progression</div>
+          <div class="iga-ph-name" style="margin-bottom:12px">Ta <em>courbe.</em></div>
+          <div class="iga-p-card">
+            <div class="iga-p-eye">Depuis le début</div>
+            <div class="iga-p-row">
+              <div>
+                <div class="iga-p-num">−3.8<span style="font-size:18px;color:rgba(255,255,255,0.4);margin-left:3px;font-family:inherit;font-style:normal">kg</span></div>
+                <div class="iga-p-num-sub">8 semaines</div>
+              </div>
+              <div class="iga-p-chip">↓ −0.4 cette sem.</div>
+            </div>
+            <svg class="iga-p-svg" viewBox="0 0 180 60" preserveAspectRatio="none">
+              <defs><linearGradient id="igaGradGrn" x1="0" x2="0" y1="0" y2="1"><stop offset="0%" stop-color="#4ade80" stop-opacity="0.3"/><stop offset="100%" stop-color="#4ade80" stop-opacity="0"/></linearGradient></defs>
+              <line class="iga-p-goal" x1="0" x2="180" y1="46" y2="46"/>
+              <path class="iga-p-fill" d="M0,42 C12,40 24,38 38,34 C52,30 64,32 78,28 C92,24 104,26 118,20 C132,14 148,17 162,11 C170,9 175,8 180,7 L180,60 L0,60 Z"/>
+              <path class="iga-p-line" d="M0,42 C12,40 24,38 38,34 C52,30 64,32 78,28 C92,24 104,26 118,20 C132,14 148,17 162,11 C170,9 175,8 180,7"/>
+              <circle class="iga-p-dot" cx="180" cy="7" r="9" fill="#4ade80" opacity="0.2"/>
+              <circle class="iga-p-dot" cx="180" cy="7" r="4" fill="#4ade80"/>
+              <text x="178" y="44" text-anchor="end" font-size="6" fill="rgba(255,255,255,0.4)" font-family="-apple-system,sans-serif" letter-spacing="0.5">OBJECTIF 77KG</text>
+            </svg>
+            <div class="iga-p-cap">À ce rythme, objectif atteint dans ~5 semaines</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 6: COACH CHECK-IN POPUP -->
+  <div class="iga-scene" data-scene="5">
+    <div class="iga-phone-stage s6-active" style="justify-content:flex-start">
+      <div class="iga-stage-eye">Ton coach veille</div>
+      <div class="iga-stage-title">Tu reçois ce <em>notification.</em></div>
+      <div class="iga-phone-bezel">
+        <div class="iga-phone-screen" style="padding:0">
+          <!-- Faded app bg -->
+          <div style="position:absolute;inset:0;padding:32px 14px 14px;opacity:0.25">
+            <div class="iga-ph-name">Bonjour, <em>Akram.</em></div>
+            <div class="iga-ph-stats">
+              <div class="iga-ph-stat" style="opacity:1"><div class="iga-ph-sv gold">9</div><div class="iga-ph-sl">Série</div></div>
+              <div class="iga-ph-stat" style="opacity:1"><div class="iga-ph-sv">80.2</div><div class="iga-ph-sl">Poids</div></div>
+              <div class="iga-ph-stat" style="opacity:1"><div class="iga-ph-sv green">−3.8</div><div class="iga-ph-sl">Restant</div></div>
+            </div>
+          </div>
+          <!-- Popup overlay -->
+          <div class="iga-cn-bg">
+            <div class="iga-cn-card">
+              <div class="iga-cn-burst"></div>
+              <div class="iga-cn-icon">💪</div>
+              <div class="iga-cn-eye">MESSAGE DE TON COACH</div>
+              <div class="iga-cn-from">Coach Sammy</div>
+              <div class="iga-cn-body">Bravo pour cette semaine. Tu es à 80kg, c'est exactement la trajectoire qu'on voulait. On garde le rythme !</div>
+              <div class="iga-cn-cta">J'ai compris ✓</div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- SCENE 7: STATS -->
+  <div class="iga-scene" data-scene="6">
+    <div class="iga-s7-eye">Ils avancent. Toi ?</div>
+    <div class="iga-stat-block s1">
+      <div class="iga-stat-num">59</div>
+      <div class="iga-stat-lbl">clients actifs</div>
+    </div>
+    <div class="iga-stat-block s2">
+      <div class="iga-stat-num">77<span>%</span></div>
+      <div class="iga-stat-lbl">compliance moyenne</div>
+    </div>
+    <div class="iga-stat-block s3">
+      <div class="iga-stat-num">−4<span>kg</span></div>
+      <div class="iga-stat-lbl">en 8 semaines en moyenne</div>
+    </div>
+  </div>
+
+  <!-- SCENE 8: CTA -->
+  <div class="iga-scene" data-scene="7">
+    <div class="iga-s8-orb"></div>
+    <div class="iga-s8-eye">Ton tour</div>
+    <div class="iga-s8-h">Arrête de faire ça<br><em>tout seul.</em></div>
+    <div class="iga-s8-sub">Rejoins les clients qui avancent avec un vrai coach derrière eux.</div>
+    <div class="iga-swipe-up">
+      <div class="iga-swipe-chev"></div>
+      <div class="iga-swipe-text">Voir plus</div>
+    </div>
+  </div>
+
+</div>
+
+<div class="iga-caption">Aperçu story Instagram · 8 séquences · ~38 secondes · tap gauche/droite pour naviguer · centre pour pauser</div>
+<div class="iga-controls">
+  <button class="iga-ctrl" id="iga-restart">↻ Rejouer</button>
+  <button class="iga-ctrl" id="iga-prev">← Précédent</button>
+  <button class="iga-ctrl" id="iga-next">Suivant →</button>
+  <button class="iga-ctrl" id="iga-pause">⏸ Pause</button>
+</div>
+
+</div>
+
+<script>
+(function(){
+  const scenes=document.querySelectorAll('.iga-scene');
+  const bars=document.querySelectorAll('.iga-progress-bar');
+  const fills=document.querySelectorAll('.iga-progress-fill');
+  const DURATIONS=[4500,3500,5000,5500,5500,4800,4500,4500];
+  let cur=0,startTs=0,paused=false,raf=null,elapsedAtPause=0;
+
+  function showScene(i){
+    scenes.forEach((s,j)=>s.classList.toggle('iga-on',j===i));
+    bars.forEach((b,j)=>b.classList.toggle('iga-done',j<i));
+    fills.forEach((f,j)=>{if(j<i)f.style.width='100%';else if(j>i)f.style.width='0';});
+  }
+
+  function tick(ts){
+    if(paused)return;
+    if(!startTs)startTs=ts;
+    const elapsed=ts-startTs+elapsedAtPause;
+    const dur=DURATIONS[cur];
+    const pct=Math.min(elapsed/dur,1)*100;
+    if(fills[cur])fills[cur].style.width=pct+'%';
+    if(elapsed>=dur){
+      cur++;
+      if(cur>=scenes.length){cur=0;}
+      startTs=ts;elapsedAtPause=0;
+      showScene(cur);
+    }
+    raf=requestAnimationFrame(tick);
+  }
+
+  function start(){
+    showScene(cur);
+    startTs=0;elapsedAtPause=0;
+    if(raf)cancelAnimationFrame(raf);
+    raf=requestAnimationFrame(tick);
+  }
+
+  function goTo(i){
+    if(i<0)i=scenes.length-1;
+    if(i>=scenes.length)i=0;
+    cur=i;startTs=0;elapsedAtPause=0;
+    showScene(cur);
+    if(!paused){if(raf)cancelAnimationFrame(raf);raf=requestAnimationFrame(tick);}
+  }
+
+  document.getElementById('iga-frame').addEventListener('click',e=>{
+    const rect=e.currentTarget.getBoundingClientRect();
+    const x=e.clientX-rect.left;
+    if(x<rect.width/3)goTo(cur-1);
+    else if(x>rect.width*2/3)goTo(cur+1);
+  });
+  document.getElementById('iga-restart').addEventListener('click',e=>{e.stopPropagation();cur=0;paused=false;document.getElementById('iga-pause').textContent='⏸ Pause';start();});
+  document.getElementById('iga-prev').addEventListener('click',e=>{e.stopPropagation();goTo(cur-1);});
+  document.getElementById('iga-next').addEventListener('click',e=>{e.stopPropagation();goTo(cur+1);});
+  document.getElementById('iga-pause').addEventListener('click',e=>{
+    e.stopPropagation();
+    paused=!paused;
+    e.target.textContent=paused?'▶ Play':'⏸ Pause';
+    if(!paused){startTs=0;raf=requestAnimationFrame(tick);}
+    else cancelAnimationFrame(raf);
+  });
+
+  start();
+})();
+</script>

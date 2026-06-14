@@ -1,0 +1,145 @@
+<!DOCTYPE html><html lang="ar" dir="rtl"><head><meta charset="UTF-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<link href="https://fonts.googleapis.com/css2?family=Reem+Kufi:wght@400;500;600;700&family=Tajawal:wght@300;400;500;700;800;900&family=Inter:wght@500;700;900&display=swap" rel="stylesheet">
+<style>
+*{box-sizing:border-box;margin:0;padding:0;}
+body{background:#000;display:flex;align-items:center;justify-content:center;min-height:100vh;font-family:'Tajawal','Inter',sans-serif;direction:rtl;}
+.story{width:390px;height:844px;background:#000;position:relative;overflow:hidden;cursor:pointer;direction:rtl;}
+.disp{font-family:'Reem Kufi','Tajawal',sans-serif;}
+.pbar{position:absolute;top:0;left:0;right:0;z-index:200;display:flex;gap:3px;padding:14px 12px 0;direction:ltr;}
+.seg{flex:1;height:1.5px;background:rgba(255,255,255,0.12);border-radius:100px;overflow:hidden;}
+.sf{height:100%;background:rgba(255,255,255,0.95);border-radius:100px;width:0%;transition:width linear;}
+.sc{position:absolute;inset:0;opacity:0;transition:opacity 0.5s ease;}.sc.on{opacity:1;}
+.gr{position:absolute;inset:0;z-index:30;pointer-events:none;opacity:0.05;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");background-size:200px;mix-blend-mode:overlay;}
+.vig{position:absolute;inset:0;z-index:25;pointer-events:none;background:radial-gradient(ellipse at center,transparent 40%,rgba(0,0,0,0.45) 100%);}
+.wm{position:absolute;top:48px;right:24px;z-index:50;font-size:10px;font-weight:700;letter-spacing:2px;color:rgba(201,168,76,0.55);font-family:'Tajawal';}
+.wm-l{position:absolute;top:48px;left:24px;z-index:50;font-size:10px;font-weight:500;letter-spacing:2px;color:rgba(255,255,255,0.25);font-family:'Tajawal';}
+.fade{opacity:0;transition:opacity 1s cubic-bezier(0.22,1,0.36,1),transform 1s cubic-bezier(0.22,1,0.36,1);}
+.fade.show{opacity:1;}
+.up{transform:translateY(24px);}.up.show{transform:translateY(0);}
+.rt{transform:translateX(32px);}.rt.show{transform:translateX(0);}
+.scale{transform:scale(0.92);}.scale.show{transform:scale(1);}
+.gold{color:#c9a84c;}
+
+.s1{background:#000;}
+.s1-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 50% at 50% 30%,rgba(201,168,76,0.08) 0%,transparent 65%);}
+.s1-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 40px;}
+.s1-rule-h{width:0;height:1px;background:linear-gradient(to right,transparent,rgba(201,168,76,0.6),transparent);transition:width 1.4s cubic-bezier(0.22,1,0.36,1);margin-bottom:28px;}
+.s1-rule-h.show{width:200px;}
+.s1-mark{font-size:18px;font-weight:700;letter-spacing:4px;color:#c9a84c;text-align:center;font-family:'Reem Kufi';}
+.s1-tag{font-family:'Tajawal',sans-serif;font-weight:300;font-size:14px;color:rgba(255,255,255,0.5);text-align:center;margin-top:14px;letter-spacing:1px;}
+.s1-est{position:absolute;bottom:60px;left:0;right:0;text-align:center;font-size:10px;font-weight:500;letter-spacing:3px;color:rgba(255,255,255,0.18);font-family:'Tajawal';}
+
+.s2{background:#000;}
+.s2-c{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 36px;}
+.s2-pre{font-size:11px;font-weight:500;letter-spacing:3px;color:rgba(255,255,255,0.4);margin-bottom:32px;}
+.s2-q{font-family:'Reem Kufi',sans-serif;font-weight:700;font-size:46px;color:#fff;line-height:1.25;margin-bottom:24px;}
+.s2-q em{color:#c9a84c;font-style:normal;}
+.s2-after{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:400;color:rgba(255,255,255,0.5);line-height:1.9;}
+
+.s3{background:#000;}
+.s3-glow{position:absolute;inset:0;background:radial-gradient(ellipse 70% 50% at 30% 70%,rgba(201,168,76,0.06) 0%,transparent 60%);}
+.s3-c{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 36px;}
+.s3-pre{font-size:11px;font-weight:500;letter-spacing:3px;color:rgba(201,168,76,0.6);margin-bottom:32px;}
+.s3-row{display:flex;align-items:baseline;gap:0;margin-bottom:12px;}
+.s3-num{font-family:'Reem Kufi',sans-serif;font-size:172px;font-weight:700;color:#c9a84c;line-height:0.85;letter-spacing:-4px;font-feature-settings:"tnum" 1;}
+.s3-side{margin-right:24px;display:flex;flex-direction:column;gap:6px;padding-bottom:18px;}
+.s3-side-l{font-size:14px;font-weight:700;letter-spacing:2px;color:rgba(255,255,255,0.7);font-family:'Reem Kufi';}
+.s3-side-s{font-size:13px;font-weight:400;color:rgba(255,255,255,0.4);max-width:150px;line-height:1.7;font-family:'Tajawal';}
+.s3-rule{width:0;height:1px;background:rgba(201,168,76,0.4);transition:width 1s 0.6s;margin:32px 0 20px;}
+.s3-rule.show{width:120px;}
+.s3-foot{font-family:'Tajawal',sans-serif;font-size:18px;color:rgba(255,255,255,0.7);font-weight:500;line-height:1.7;}
+.s3-foot em{color:#c9a84c;font-style:normal;font-weight:700;}
+
+.s4{background:#000;}
+.s4-glow{position:absolute;inset:0;background:radial-gradient(ellipse 50% 40% at 70% 50%,rgba(201,168,76,0.05) 0%,transparent 60%);}
+.s4-c{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 36px;}
+.s4-q{font-family:'Reem Kufi',sans-serif;font-size:48px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:32px;}
+.s4-q em{color:#c9a84c;font-style:normal;}
+.s4-rule{width:0;height:1px;background:rgba(201,168,76,0.5);transition:width 1s 0.7s;margin-bottom:24px;}
+.s4-rule.show{width:80px;}
+.s4-body{font-family:'Tajawal',sans-serif;font-size:15px;font-weight:400;color:rgba(255,255,255,0.5);line-height:1.9;max-width:330px;}
+
+.s5{background:#000;}
+.s5-glow{position:absolute;inset:0;background:radial-gradient(ellipse 80% 60% at 50% 100%,rgba(201,168,76,0.1) 0%,transparent 60%);}
+.s5-top{position:absolute;top:90px;left:0;right:0;padding:0 36px;text-align:right;}
+.s5-pre{font-size:11px;font-weight:500;letter-spacing:3px;color:rgba(201,168,76,0.6);margin-bottom:14px;}
+.s5-h{font-family:'Reem Kufi',sans-serif;font-size:36px;font-weight:700;color:#fff;line-height:1.2;}
+.s5-h em{color:#c9a84c;font-style:normal;}
+.s5-device{position:absolute;bottom:-30px;left:50%;transform:translateX(-50%);width:280px;height:540px;background:linear-gradient(180deg,#161616 0%,#0a0a0a 100%);border-radius:36px 36px 0 0;border:1.5px solid rgba(201,168,76,0.15);border-bottom:none;overflow:hidden;box-shadow:0 -30px 80px rgba(201,168,76,0.12),inset 0 1px 0 rgba(255,255,255,0.03);}
+.s5-notch{position:absolute;top:0;left:50%;transform:translateX(-50%);width:90px;height:24px;background:#000;border-radius:0 0 16px 16px;z-index:5;}
+.dev-content{padding:38px 18px 0;}
+.dev-greet{font-size:14px;font-weight:700;color:#fff;font-family:'Reem Kufi';}
+.dev-date{font-family:'Tajawal',sans-serif;font-size:11px;color:rgba(201,168,76,0.7);margin-top:2px;font-weight:400;}
+.dev-divider{height:1px;background:rgba(201,168,76,0.08);margin:14px 0;}
+.dev-row{display:flex;justify-content:space-between;align-items:center;padding:9px 0;border-bottom:1px solid rgba(255,255,255,0.04);}
+.dev-l{font-size:11px;color:rgba(255,255,255,0.4);font-weight:500;font-family:'Tajawal';}
+.dev-v{font-family:'Reem Kufi',sans-serif;font-size:18px;font-weight:700;color:#fff;font-feature-settings:"tnum" 1;direction:ltr;}
+.dev-v em{color:#c9a84c;font-style:normal;}
+.dev-v span{font-size:9px;color:rgba(255,255,255,0.3);font-family:'Tajawal';font-weight:500;margin-left:2px;}
+.dev-bar-w{margin-top:14px;}
+.dev-bl{font-size:10px;letter-spacing:1px;color:rgba(255,255,255,0.3);margin-bottom:6px;font-weight:500;font-family:'Tajawal';}
+.dev-bg{height:3px;background:rgba(255,255,255,0.06);border-radius:100px;overflow:hidden;}
+.dev-bf{height:100%;background:#c9a84c;border-radius:100px;width:0%;transition:width 1.8s 0.5s cubic-bezier(0.22,1,0.36,1);}
+.dev-bf.fill{width:74%;}
+.dev-pct{font-family:'Reem Kufi',sans-serif;font-size:32px;font-weight:700;color:#c9a84c;text-align:left;margin-top:8px;font-feature-settings:"tnum" 1;direction:ltr;}
+
+.s6{background:#000;}
+.s6-glow{position:absolute;inset:0;background:radial-gradient(ellipse 60% 60% at 50% 50%,rgba(201,168,76,0.04) 0%,transparent 65%);}
+.s6-c{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:center;padding:0 36px;}
+.s6-pre{font-size:11px;font-weight:500;letter-spacing:3px;color:rgba(201,168,76,0.6);margin-bottom:24px;}
+.s6-h{font-family:'Reem Kufi',sans-serif;font-size:42px;font-weight:700;color:#fff;line-height:1.2;margin-bottom:48px;}
+.s6-h em{color:#c9a84c;font-style:normal;}
+.s6-list{display:flex;flex-direction:column;}
+.s6-r{display:flex;align-items:baseline;justify-content:space-between;padding:18px 0;border-top:1px solid rgba(255,255,255,0.06);}
+.s6-r:last-child{border-bottom:1px solid rgba(255,255,255,0.06);}
+.s6-rname{font-family:'Reem Kufi',sans-serif;font-size:16px;font-weight:700;color:#fff;letter-spacing:0.5px;}
+.s6-rdetail{font-family:'Tajawal',sans-serif;font-size:12px;color:rgba(255,255,255,0.4);margin-top:3px;font-weight:400;}
+.s6-rkg{font-family:'Reem Kufi',sans-serif;font-size:42px;font-weight:700;color:#c9a84c;font-feature-settings:"tnum" 1;direction:ltr;}
+
+.s7{background:#000;}
+.s7-glow{position:absolute;inset:0;background:radial-gradient(ellipse 80% 70% at 50% 50%,rgba(201,168,76,0.09) 0%,transparent 65%);}
+.s7-c{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 36px;}
+.s7-mark{font-size:18px;font-weight:700;letter-spacing:4px;color:#c9a84c;margin-bottom:8px;font-family:'Reem Kufi';}
+.s7-tag{font-family:'Tajawal',sans-serif;font-size:12px;color:rgba(255,255,255,0.35);letter-spacing:1px;margin-bottom:48px;font-weight:400;}
+.s7-rule-top{width:0;height:1px;background:rgba(201,168,76,0.4);transition:width 1s 0.4s;margin-bottom:32px;}
+.s7-rule-top.show{width:60px;}
+.s7-h{font-family:'Reem Kufi',sans-serif;font-size:54px;font-weight:700;color:#fff;text-align:center;line-height:1.15;margin-bottom:18px;}
+.s7-h em{color:#c9a84c;font-style:normal;}
+.s7-sub{font-family:'Tajawal',sans-serif;font-size:14px;font-weight:400;color:rgba(255,255,255,0.45);text-align:center;line-height:1.9;margin-bottom:48px;max-width:300px;}
+.s7-num{font-family:'Reem Kufi',sans-serif;font-size:22px;font-weight:700;color:#c9a84c;letter-spacing:2px;font-feature-settings:"tnum" 1;margin-bottom:18px;border:1px solid rgba(201,168,76,0.25);padding:14px 32px;border-radius:100px;direction:ltr;}
+.s7-wa{background:#25d366;border-radius:100px;padding:16px 38px;font-family:'Tajawal',sans-serif;font-size:14px;font-weight:700;color:#fff;}
+.s7-fine{font-family:'Tajawal',sans-serif;font-size:11px;color:rgba(255,255,255,0.3);margin-top:14px;font-weight:400;}
+</style>
+</head>
+<body>
+<div class="story" id="story">
+  <div class="gr"></div><div class="vig"></div>
+  <div class="pbar"><div class="seg"><div class="sf" id="sf0"></div></div><div class="seg"><div class="sf" id="sf1"></div></div><div class="seg"><div class="sf" id="sf2"></div></div><div class="seg"><div class="sf" id="sf3"></div></div><div class="seg"><div class="sf" id="sf4"></div></div><div class="seg"><div class="sf" id="sf5"></div></div><div class="seg"><div class="sf" id="sf6"></div></div></div>
+
+  <div class="sc s1 on" id="sc0"><div class="s1-glow"></div><div class="s1-c"><div class="s1-rule-h" id="s1rh"></div><div class="s1-mark fade" id="s1mark">كوتش لعيد سامي</div><div class="s1-tag fade" id="s1tag">طريقة شخصية. نتائج حقيقية.</div></div><div class="s1-est fade" id="s1est">الجزائر — 2017</div></div>
+
+  <div class="sc s2" id="sc1"><div class="wm fade" id="s2wm">كوتش LS</div><div class="wm-l fade" id="s2wmr">الفصل الأول</div><div class="s2-c"><div class="s2-pre fade up" id="s2pre">— سؤال —</div><div class="s2-q fade up" id="s2q">شحال من مرة<br><em>بديت حاجة</em><br>و ما<br><em>كملتهاش ؟</em></div><div class="s2-after fade up" id="s2after">ماشي ذنبك.<br>غير ما كانش عندك الطريقة الصحيحة.</div></div></div>
+
+  <div class="sc s3" id="sc2"><div class="s3-glow"></div><div class="wm fade" id="s3wm">كوتش LS</div><div class="wm-l fade" id="s3wmr">الفصل الثاني</div><div class="s3-c"><div class="s3-pre fade" id="s3pre">— التجربة —</div><div class="s3-row"><div class="s3-num fade scale" id="s3num">9</div><div class="s3-side"><div class="s3-side-l fade" id="s3sl">سنين</div><div class="s3-side-s fade" id="s3ss">كوتشينغ،<br>تجربة، تعديل، إثبات.</div></div></div><div class="s3-rule" id="s3rule"></div><div class="s3-foot fade" id="s3foot"><em>"ما نبيعش الوعود.</em><br>نوصل النتائج."</div></div></div>
+
+  <div class="sc s4" id="sc3"><div class="s4-glow"></div><div class="wm fade" id="s4wm">كوتش LS</div><div class="wm-l fade" id="s4wmr">الفصل الثالث</div><div class="s4-c"><div class="s4-q fade up" id="s4q">ماشي برنامج<br>عام.<br><em>تاعك انت.</em></div><div class="s4-rule" id="s4rule"></div><div class="s4-body fade up" id="s4body">تغذية، تمارين، متابعة يومية.<br>مبني على حياتك — ماشي العكس.</div></div></div>
+
+  <div class="sc s5" id="sc4"><div class="s5-glow"></div><div class="wm fade" id="s5wm">كوتش LS</div><div class="wm-l fade" id="s5wmr">الفصل الرابع</div><div class="s5-top"><div class="s5-pre fade" id="s5pre">— الطريقة —</div><div class="s5-h fade up" id="s5h"><em>كل يوم</em><br>متابع.<br>والو ما<br>يفلت.</div></div><div class="s5-device fade up" id="s5dev"><div class="s5-notch"></div><div class="dev-content"><div style="display:flex;justify-content:space-between;align-items:flex-start;"><div><div class="dev-greet">سارة · الأسبوع 3</div><div class="dev-date">الجمعة، 1 ماي</div></div><div style="font-size:9px;letter-spacing:1px;color:rgba(201,168,76,0.5);font-weight:700;font-family:'Tajawal'">شيك-إن</div></div><div class="dev-divider"></div><div class="dev-row"><span class="dev-l">الوزن</span><span class="dev-v">60.2<span>kg</span></span></div><div class="dev-row"><span class="dev-l">السعرات</span><span class="dev-v">2,380<span>kcal</span></span></div><div class="dev-row"><span class="dev-l">البروتين</span><span class="dev-v">138<span>g</span></span></div><div class="dev-row"><span class="dev-l">الخطوات</span><span class="dev-v">9,200</span></div><div class="dev-bar-w"><div class="dev-bl">الالتزام</div><div class="dev-bg"><div class="dev-bf" id="devbf"></div></div><div class="dev-pct">74%</div></div></div></div></div>
+
+  <div class="sc s6" id="sc5"><div class="s6-glow"></div><div class="wm fade" id="s6wm">كوتش LS</div><div class="wm-l fade" id="s6wmr">الفصل الخامس</div><div class="s6-c"><div class="s6-pre fade" id="s6pre">— الأدلة —</div><div class="s6-h fade up" id="s6h">خسرو <em>الكيلوات.</em><br>ربحو <em>الحياة.</em></div><div class="s6-list"><div class="s6-r fade rt" id="s6r1"><div><div class="s6-rname">خروس</div><div class="s6-rdetail">3 شهور — كوتشينغ شهري</div></div><div class="s6-rkg">−12<span style="font-size:24px">kg</span></div></div><div class="s6-r fade rt" id="s6r2"><div><div class="s6-rname">سارة</div><div class="s6-rdetail">شهرين — برنامج</div></div><div class="s6-rkg">−8<span style="font-size:24px">kg</span></div></div><div class="s6-r fade rt" id="s6r3"><div><div class="s6-rname">عمازي</div><div class="s6-rdetail">4 شهور — متابعة كاملة</div></div><div class="s6-rkg">−15<span style="font-size:24px">kg</span></div></div></div></div></div>
+
+  <div class="sc s7" id="sc6"><div class="s7-glow"></div><div class="s7-c"><div class="s7-mark fade" id="s7mark">كوتش LS</div><div class="s7-tag fade" id="s7tag">تغذية · أداء</div><div class="s7-rule-top" id="s7rule"></div><div class="s7-h fade up" id="s7h"><em>نوبتك —</em><br>دروك.</div><div class="s7-sub fade" id="s7sub">اختار برنامجك.<br>ابدا هاد الأسبوع.</div><div class="s7-num fade scale" id="s7num" style="cursor:pointer;background:#c9a84c;color:#000;border-color:#c9a84c;font-size:18px;letter-spacing:1px;padding:18px 36px">←&nbsp;&nbsp;ابدا دروك</div><div class="s7-fine fade" id="s7fine">— 5 برامج متوفرة · الرسالة الأولى ببلاش —</div></div></div>
+</div>
+<script>
+const DURS=[3500,5500,5000,4500,5500,5500,6000];let cur=0,timer=null;
+const SCRIPTS={0:[[100,['s1rh']],[700,['s1mark']],[1100,['s1tag']],[1600,['s1est']]],1:[[100,['s2wm','s2wmr']],[300,['s2pre']],[600,['s2q']],[2200,['s2after']]],2:[[100,['s3wm','s3wmr']],[200,['s3pre']],[400,['s3num']],[1200,['s3sl','s3ss']],[1800,['s3rule']],[2200,['s3foot']]],3:[[100,['s4wm','s4wmr']],[300,['s4q']],[1400,['s4rule']],[1700,['s4body']]],4:[[100,['s5wm','s5wmr']],[200,['s5pre']],[500,['s5h']],[1400,['s5dev']],[2000,'fillBar']],5:[[100,['s6wm','s6wmr']],[200,['s6pre']],[500,['s6h']],[1400,['s6r1']],[1750,['s6r2']],[2100,['s6r3']]],6:[[100,['s7mark']],[400,['s7tag']],[800,['s7rule']],[1100,['s7h']],[2200,['s7sub']],[2600,['s7num']],[3000,['s7wa']],[3400,['s7fine']]]};
+function show(...ids){ids.forEach(id=>{const el=document.getElementById(id);if(el)el.classList.add('show');});}
+function resetAll(){document.querySelectorAll('.fade.show').forEach(el=>el.classList.remove('show'));document.querySelectorAll('.s1-rule-h.show,.s3-rule.show,.s4-rule.show,.s7-rule-top.show').forEach(el=>el.classList.remove('show'));document.getElementById('devbf')?.classList.remove('fill');}
+function fillPast(i){for(let j=0;j<i;j++){const sf=document.getElementById('sf'+j);if(sf){sf.style.transition='none';sf.style.width='100%';}}}
+function clearFill(i){const sf=document.getElementById('sf'+i);if(sf){sf.style.transition='none';sf.style.width='0%';}}
+function startFill(i,dur){const sf=document.getElementById('sf'+i);if(!sf)return;sf.style.transition='none';sf.style.width='0%';void sf.offsetWidth;sf.style.transition='width '+dur+'ms linear';sf.style.width='100%';}
+function goTo(i){document.querySelectorAll('.sc').forEach(s=>s.classList.remove('on'));const sc=document.getElementById('sc'+i);if(sc)sc.classList.add('on');resetAll();fillPast(i);startFill(i,DURS[i]);(SCRIPTS[i]||[]).forEach(([d,t])=>{setTimeout(()=>{if(t==='fillBar'){const b=document.getElementById('devbf');if(b)b.classList.add('fill');}else show(...t);},d);});clearTimeout(timer);if(i<6)timer=setTimeout(()=>{cur=i+1;goTo(cur);},DURS[i]);}
+goTo(0);
+document.getElementById('story').addEventListener('click',e=>{const r=e.currentTarget.getBoundingClientRect();clearTimeout(timer);if(e.clientX-r.left>r.width*0.72&&cur>0){clearFill(cur);cur--;goTo(cur);}else{cur=cur<6?cur+1:0;goTo(cur);}});
+</script>
+</body></html>

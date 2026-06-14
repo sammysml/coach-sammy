@@ -1,0 +1,333 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Coach Laid Sammy — Story Ad EN v2</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Fraunces:ital,opsz,wght@0,9..144,300;0,9..144,400;0,9..144,500;1,9..144,300;1,9..144,400;1,9..144,500&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<style>
+*{margin:0;padding:0;box-sizing:border-box}
+html,body{width:100%;height:100%;background:#000;overflow:hidden;font-family:'Inter',-apple-system,sans-serif;color:#fff}
+.story{position:fixed;inset:0;width:100vw;height:100vh;display:flex;align-items:center;justify-content:center;overflow:hidden;background:#000}
+.frame{position:relative;width:min(100vw,calc(100vh*9/16));height:min(100vh,calc(100vw*16/9));max-width:540px;background:#000;overflow:hidden}
+@media(min-aspect-ratio:9/16){.frame{aspect-ratio:9/16;height:100vh;width:auto}}
+@media(max-aspect-ratio:9/16){.frame{aspect-ratio:9/16;width:100vw;height:auto}}
+.progress{position:absolute;top:14px;left:14px;right:14px;display:flex;gap:4px;z-index:50}
+.bar{flex:1;height:2px;background:rgba(255,255,255,0.25);border-radius:1px;overflow:hidden}
+.bar-fill{height:100%;background:#fff;width:0;border-radius:1px}
+.brand{position:absolute;top:30px;left:18px;display:flex;align-items:center;gap:8px;z-index:40;opacity:0.85}
+.brand-mark{width:22px;height:22px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-size:10px;font-weight:800;color:#000;letter-spacing:0.5px}
+.brand-name{font-size:11px;font-weight:600;color:#fff;letter-spacing:1px;text-transform:uppercase}
+.slide{position:absolute;inset:0;display:flex;flex-direction:column;justify-content:flex-end;padding:60px 32px 80px;opacity:0;pointer-events:none;transition:opacity 0.5s ease}
+.slide.active{opacity:1}
+.bg{position:absolute;inset:0;pointer-events:none}
+.bg-1{background:radial-gradient(ellipse at 30% 70%,#1a0500 0%,#000 65%)}
+.bg-2{background:radial-gradient(ellipse at 50% 50%,#1a1400 0%,#000 60%)}
+.bg-3{background:radial-gradient(ellipse at 50% 30%,#0d1a0d 0%,#000 70%)}
+.bg-4{background:radial-gradient(ellipse at 50% 50%,#1a0d00 0%,#000 65%)}
+.bg-5{background:radial-gradient(ellipse at 50% 50%,#1a1400 0%,#000 55%)}
+.vignette{position:absolute;inset:0;background:linear-gradient(to top,rgba(0,0,0,0.95) 0%,rgba(0,0,0,0.2) 50%,rgba(0,0,0,0.5) 100%);pointer-events:none}
+.grain{position:absolute;inset:0;opacity:0.06;pointer-events:none;background-image:url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E");mix-blend-mode:overlay}
+.particles{position:absolute;inset:0;pointer-events:none;overflow:hidden}
+.particle{position:absolute;width:2px;height:2px;border-radius:50%;background:#C9A84C;opacity:0}
+.slide.active .particle{animation:float 8s linear infinite}
+@keyframes float{0%{opacity:0;transform:translateY(20px)}10%{opacity:0.6}90%{opacity:0.4}100%{opacity:0;transform:translateY(-100vh)}}
+.eyebrow{font-size:10px;font-weight:600;color:rgba(201,168,76,0.8);letter-spacing:4px;text-transform:uppercase;margin-bottom:18px;opacity:0;transform:translateY(10px)}
+.slide.active .eyebrow{animation:fadeUp 0.7s ease 0.1s forwards}
+.headline{font-family:'Fraunces',serif;font-weight:300;font-style:italic;font-size:54px;line-height:1.05;letter-spacing:-0.02em;color:#fff;margin-bottom:18px;opacity:0;transform:translateY(20px)}
+.headline em{font-style:italic;color:#C9A84C;font-weight:400}
+.slide.active .headline{animation:fadeUp 0.9s cubic-bezier(0.4,0,0.2,1) 0.25s forwards}
+.sub{font-size:15px;color:rgba(255,255,255,0.65);line-height:1.55;font-weight:400;max-width:380px;opacity:0;transform:translateY(15px)}
+.slide.active .sub{animation:fadeUp 0.7s ease 0.5s forwards}
+@keyframes fadeUp{to{opacity:1;transform:translateY(0)}}
+.s1-questions{display:flex;flex-direction:column;gap:14px;margin-bottom:24px}
+.s1-q{font-family:'Fraunces',serif;font-style:italic;font-size:22px;line-height:1.2;color:rgba(255,255,255,0.55);font-weight:300;opacity:0;transform:translateX(-15px)}
+.slide.active .s1-q:nth-of-type(1){animation:slideQuestion 0.6s ease 0.3s forwards}
+.slide.active .s1-q:nth-of-type(2){animation:slideQuestion 0.6s ease 0.7s forwards}
+.slide.active .s1-q:nth-of-type(3){animation:slideQuestion 0.6s ease 1.1s forwards}
+.slide.active .s1-q:nth-of-type(4){animation:slideQuestion 0.6s ease 1.5s forwards}
+@keyframes slideQuestion{to{opacity:1;transform:translateX(0)}}
+.s1-q-icon{display:inline-block;width:14px;height:14px;border-radius:50%;border:0.5px solid rgba(255,255,255,0.2);margin-right:10px;vertical-align:middle;text-align:center;line-height:13px;font-size:9px;color:rgba(255,255,255,0.4);font-style:normal}
+.s2-phone-wrap{display:flex;justify-content:center;margin-bottom:30px;perspective:800px}
+.s2-phone{width:240px;background:#050505;border-radius:32px;border:1.5px solid rgba(255,255,255,0.1);padding:16px;box-shadow:0 30px 80px rgba(0,0,0,0.7),0 0 100px rgba(201,168,76,0.15);opacity:0;transform:rotateY(15deg) translateY(40px) scale(0.85)}
+.slide.active .s2-phone{animation:phoneReveal 1s cubic-bezier(0.4,0,0.2,1) 0.4s forwards}
+@keyframes phoneReveal{to{opacity:1;transform:rotateY(0deg) translateY(0) scale(1)}}
+.mock-screen-big{background:#0a0a0a;border-radius:22px;padding:18px 14px;min-height:340px;position:relative;overflow:hidden}
+.mock-glow{position:absolute;top:0;left:50%;transform:translateX(-50%);width:80px;height:1px;background:linear-gradient(90deg,transparent,#C9A84C,transparent)}
+.mock-greet-big{font-family:'Fraunces',serif;font-style:italic;font-size:20px;font-weight:300;color:#fff;margin-top:18px;margin-bottom:2px}
+.mock-greet-big em{color:#C9A84C}
+.mock-date-big{font-size:10px;color:rgba(255,255,255,0.35);margin-bottom:16px}
+.mock-card-big{background:rgba(201,168,76,0.04);border:0.5px solid rgba(201,168,76,0.2);border-radius:12px;padding:14px;margin-bottom:10px;position:relative;overflow:hidden}
+.mock-card-big::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(201,168,76,0.3),transparent)}
+.mock-eyebrow-big{font-size:8px;color:rgba(255,255,255,0.4);letter-spacing:1.5px;text-transform:uppercase;margin-bottom:6px}
+.mock-num-big{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:42px;color:#fff;line-height:1}
+.mock-num-big span{font-size:13px;color:rgba(255,255,255,0.4);margin-left:3px}
+.mock-meta-big{font-size:10px;color:rgba(255,255,255,0.4);margin-top:6px}
+.mock-tap-big{background:rgba(255,255,255,0.03);border:0.5px solid rgba(255,255,255,0.07);border-radius:10px;padding:10px 12px;display:flex;justify-content:space-between;align-items:center;font-size:11px;color:rgba(255,255,255,0.7);margin-bottom:10px}
+.mock-tap-arr{color:#C9A84C;font-size:14px}
+.mock-meta-strip{display:flex;justify-content:space-between;font-size:9px;color:rgba(255,255,255,0.4);padding:4px 4px 0}
+.mock-meta-strip span{font-family:'Fraunces',serif;font-style:italic;color:rgba(255,255,255,0.7);font-size:13px;font-weight:300;margin-right:3px}
+.s3-timeline{display:flex;flex-direction:column;gap:0;margin-bottom:24px}
+.s3-step{display:flex;gap:14px;align-items:flex-start;padding:12px 0;border-bottom:0.5px solid rgba(255,255,255,0.06);opacity:0;transform:translateX(-20px)}
+.s3-step:last-child{border-bottom:none}
+.slide.active .s3-step:nth-of-type(1){animation:slideQuestion 0.5s ease 0.4s forwards}
+.slide.active .s3-step:nth-of-type(2){animation:slideQuestion 0.5s ease 0.7s forwards}
+.slide.active .s3-step:nth-of-type(3){animation:slideQuestion 0.5s ease 1.0s forwards}
+.slide.active .s3-step:nth-of-type(4){animation:slideQuestion 0.5s ease 1.3s forwards}
+.s3-time{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:24px;color:#C9A84C;line-height:1;min-width:80px;letter-spacing:-0.01em}
+.s3-action{flex:1}
+.s3-act-title{font-size:14px;color:#fff;font-weight:500;margin-bottom:3px}
+.s3-act-sub{font-size:12px;color:rgba(255,255,255,0.5);line-height:1.4}
+.s3-tap-pill{display:inline-block;font-size:9px;color:#C9A84C;background:rgba(201,168,76,0.08);border:0.5px solid rgba(201,168,76,0.25);padding:3px 8px;border-radius:10px;letter-spacing:0.5px;font-weight:600;margin-top:5px}
+.s4-results{display:flex;flex-direction:column;gap:0;margin-top:14px}
+.s4-result{display:flex;justify-content:space-between;align-items:baseline;padding:18px 0;border-bottom:0.5px solid rgba(255,255,255,0.08);opacity:0;transform:translateY(15px)}
+.s4-result:last-child{border-bottom:none}
+.slide.active .s4-result:nth-of-type(1){animation:fadeUp 0.6s ease 0.4s forwards}
+.slide.active .s4-result:nth-of-type(2){animation:fadeUp 0.6s ease 0.75s forwards}
+.slide.active .s4-result:nth-of-type(3){animation:fadeUp 0.6s ease 1.1s forwards}
+.s4-r-num{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:48px;color:#C9A84C;line-height:1;letter-spacing:-0.02em}
+.s4-r-info{text-align:right;flex:1;padding-left:20px}
+.s4-r-name{font-size:14px;font-weight:500;color:#fff;margin-bottom:2px}
+.s4-r-detail{font-size:11px;color:rgba(255,255,255,0.45);letter-spacing:0.3px}
+.cta-wrap{text-align:center;display:flex;flex-direction:column;align-items:center;gap:14px}
+.cta-mark{width:54px;height:54px;border-radius:50%;background:#C9A84C;display:flex;align-items:center;justify-content:center;font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:26px;color:#000;margin-bottom:8px;box-shadow:0 0 50px rgba(201,168,76,0.5);opacity:0;transform:scale(0.7)}
+.slide.active .cta-mark{animation:popIn 0.7s cubic-bezier(0.34,1.56,0.64,1) 0.2s forwards}
+@keyframes popIn{to{opacity:1;transform:scale(1)}}
+.cta-stats{display:flex;gap:18px;align-items:baseline;margin-bottom:20px;justify-content:center}
+.cta-stat-num{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:28px;color:#C9A84C;line-height:1}
+.cta-stat-lbl{font-size:10px;color:rgba(255,255,255,0.45);letter-spacing:1px;text-transform:uppercase;margin-left:4px}
+.cta-divider{width:1px;height:24px;background:rgba(255,255,255,0.15)}
+.cta-headline{font-family:'Fraunces',serif;font-style:italic;font-weight:300;font-size:48px;line-height:1.1;letter-spacing:-0.02em;color:#fff;margin-bottom:10px}
+.cta-headline em{color:#C9A84C}
+.cta-url{font-size:13px;color:rgba(201,168,76,0.85);letter-spacing:1.5px;font-weight:500;margin-top:18px;padding:11px 22px;border:0.5px solid rgba(201,168,76,0.4);border-radius:30px;background:rgba(201,168,76,0.04)}
+.cta-sub{font-size:13px;color:rgba(255,255,255,0.55);line-height:1.5;margin-bottom:8px;max-width:340px}
+.hint{position:absolute;bottom:20px;right:20px;font-size:9px;color:rgba(255,255,255,0.3);letter-spacing:2px;text-transform:uppercase;z-index:60;display:flex;align-items:center;gap:5px}
+.hint-dot{width:5px;height:5px;border-radius:50%;background:rgba(255,255,255,0.4);animation:pulse 1.4s ease-in-out infinite}
+@keyframes pulse{0%,100%{opacity:0.3;transform:scale(0.8)}50%{opacity:1;transform:scale(1.2)}}
+.replay{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.6);backdrop-filter:blur(10px);z-index:100;opacity:0;pointer-events:none;transition:opacity 0.3s}
+.replay.show{opacity:1;pointer-events:all}
+.replay-btn{background:#C9A84C;border:none;color:#000;padding:14px 28px;border-radius:30px;font-size:13px;font-weight:700;cursor:pointer;letter-spacing:0.5px}
+@media(max-height:700px){.headline,.cta-headline{font-size:42px}.s1-q{font-size:18px}.s4-r-num{font-size:38px}.s2-phone{width:200px}.mock-screen-big{min-height:280px;padding:14px 12px}}
+</style>
+</head>
+<body>
+<div class="story">
+<div class="frame" id="frame">
+  <div class="progress">
+    <div class="bar"><div class="bar-fill" id="b1"></div></div>
+    <div class="bar"><div class="bar-fill" id="b2"></div></div>
+    <div class="bar"><div class="bar-fill" id="b3"></div></div>
+    <div class="bar"><div class="bar-fill" id="b4"></div></div>
+    <div class="bar"><div class="bar-fill" id="b5"></div></div>
+  </div>
+  <div class="brand">
+    <div class="brand-mark">LS</div>
+    <div class="brand-name">Coach Laid Sammy</div>
+  </div>
+
+  <div class="slide" id="s1">
+    <div class="bg bg-1"></div><div class="grain"></div><div class="vignette"></div>
+    <div style="position:relative;z-index:2">
+      <div class="eyebrow">Monday morning. Again.</div>
+      <div class="s1-questions">
+        <div class="s1-q"><span class="s1-q-icon">?</span>How many calories today</div>
+        <div class="s1-q"><span class="s1-q-icon">?</span>Which exercises, how many sets</div>
+        <div class="s1-q"><span class="s1-q-icon">?</span>Am I actually progressing</div>
+        <div class="s1-q"><span class="s1-q-icon">?</span>Will I quit again like last time</div>
+      </div>
+      <h1 class="headline" style="font-size:36px">Enough.<br><em>You deserve better.</em></h1>
+    </div>
+  </div>
+
+  <div class="slide" id="s2">
+    <div class="bg bg-2"></div><div class="grain"></div><div class="vignette"></div>
+    <div class="particles">
+      <div class="particle" style="left:15%;animation-delay:0.3s"></div>
+      <div class="particle" style="left:50%;animation-delay:1.5s"></div>
+      <div class="particle" style="left:85%;animation-delay:2.2s"></div>
+    </div>
+    <div style="position:relative;z-index:2;height:100%;display:flex;flex-direction:column;justify-content:center;align-items:center;text-align:center">
+      <div class="eyebrow" style="text-align:center">Now — Imagine</div>
+      <h2 class="headline" style="font-size:36px;text-align:center;margin-bottom:24px">You open your phone.<br><em>Everything's ready.</em></h2>
+      <div class="s2-phone-wrap">
+        <div class="s2-phone">
+          <div class="mock-screen-big">
+            <div class="mock-glow"></div>
+            <div class="mock-greet-big">Hello, <em>Yasmine.</em></div>
+            <div class="mock-date-big">Friday May 2</div>
+            <div class="mock-card-big">
+              <div class="mock-eyebrow-big">Daily calories</div>
+              <div class="mock-num-big">2200<span>kcal</span></div>
+              <div class="mock-meta-big">125g protein · 180g carbs · 60g fat</div>
+            </div>
+            <div class="mock-tap-big">
+              <div>
+                <div style="font-weight:500">View meals</div>
+                <div style="color:rgba(255,255,255,0.4);font-size:9px;margin-top:1px">3 meals planned</div>
+              </div>
+              <div class="mock-tap-arr">→</div>
+            </div>
+            <div class="mock-meta-strip">
+              <span><span>7</span>d streak</span>
+              <span><span>82</span>kg</span>
+              <span><span>−4</span> to go</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s3">
+    <div class="bg bg-3"></div><div class="grain"></div><div class="vignette"></div>
+    <div style="position:relative;z-index:2">
+      <div class="eyebrow">Your day — simplified</div>
+      <h2 class="headline" style="font-size:36px;margin-bottom:18px">5 minutes.<br><em>That's it.</em></h2>
+      <div class="s3-timeline">
+        <div class="s3-step">
+          <div class="s3-time">7am</div>
+          <div class="s3-action">
+            <div class="s3-act-title">Morning check-in</div>
+            <div class="s3-act-sub">Weight, energy, sleep. <span class="s3-tap-pill">1 tap</span></div>
+          </div>
+        </div>
+        <div class="s3-step">
+          <div class="s3-time">12pm</div>
+          <div class="s3-action">
+            <div class="s3-act-title">Today's meals</div>
+            <div class="s3-act-sub">Already prepared. Just follow.</div>
+          </div>
+        </div>
+        <div class="s3-step">
+          <div class="s3-time">6pm</div>
+          <div class="s3-action">
+            <div class="s3-act-title">Training session</div>
+            <div class="s3-act-sub">Exercises, sets, weights. <span class="s3-tap-pill">All listed</span></div>
+          </div>
+        </div>
+        <div class="s3-step">
+          <div class="s3-time">9pm</div>
+          <div class="s3-action">
+            <div class="s3-act-title">Coach replies</div>
+            <div class="s3-act-sub">Question, doubt, adjustment.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s4">
+    <div class="bg bg-4"></div><div class="grain"></div><div class="vignette"></div>
+    <div class="particles">
+      <div class="particle" style="left:20%;animation-delay:0.4s"></div>
+      <div class="particle" style="left:65%;animation-delay:1.7s"></div>
+    </div>
+    <div style="position:relative;z-index:2">
+      <div class="eyebrow">What actually changes</div>
+      <h2 class="headline" style="font-size:38px;margin-bottom:14px">Real results.<br><em>Not promises.</em></h2>
+      <div class="s4-results">
+        <div class="s4-result">
+          <div class="s4-r-num">−12kg</div>
+          <div class="s4-r-info">
+            <div class="s4-r-name">Yasmine</div>
+            <div class="s4-r-detail">3 months · weight loss</div>
+          </div>
+        </div>
+        <div class="s4-result">
+          <div class="s4-r-num">+5kg</div>
+          <div class="s4-r-info">
+            <div class="s4-r-name">Karim</div>
+            <div class="s4-r-detail">4 months · muscle gain</div>
+          </div>
+        </div>
+        <div class="s4-result">
+          <div class="s4-r-num">−8kg</div>
+          <div class="s4-r-info">
+            <div class="s4-r-name">Rania</div>
+            <div class="s4-r-detail">6 weeks · full recomp</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="slide" id="s5">
+    <div class="bg bg-5"></div><div class="grain"></div><div class="vignette"></div>
+    <div class="particles">
+      <div class="particle" style="left:5%;animation-delay:0s"></div>
+      <div class="particle" style="left:30%;animation-delay:1.2s"></div>
+      <div class="particle" style="left:55%;animation-delay:0.5s"></div>
+      <div class="particle" style="left:80%;animation-delay:1.8s"></div>
+      <div class="particle" style="left:95%;animation-delay:2.4s"></div>
+    </div>
+    <div style="position:relative;z-index:2;display:flex;flex-direction:column;align-items:center;text-align:center;padding-bottom:40px;height:100%;justify-content:center">
+      <div class="cta-wrap">
+        <div class="cta-mark">LS</div>
+        <div class="cta-stats">
+          <span><span class="cta-stat-num">9</span><span class="cta-stat-lbl">years</span></span>
+          <div class="cta-divider"></div>
+          <span><span class="cta-stat-num">1200+</span><span class="cta-stat-lbl">coached</span></span>
+        </div>
+        <h2 class="cta-headline">Your turn.<br><em>Now.</em></h2>
+        <p class="cta-sub">Pick your program. Start this week.</p>
+        <div class="cta-url">coachsammyapp.tiiny.site</div>
+      </div>
+    </div>
+  </div>
+
+  <div class="hint">
+    <div class="hint-dot"></div>
+    <span>Tap to advance</span>
+  </div>
+
+  <div class="replay" id="replay">
+    <button class="replay-btn" onclick="startStory()">↻ Replay</button>
+  </div>
+</div>
+</div>
+
+<script>
+const SLIDE_DURATION=5000;
+let currentSlide=0,timer=null,progress=null,startTime=0;
+function startStory(){
+  document.getElementById('replay').classList.remove('show');
+  for(let i=1;i<=5;i++){
+    document.getElementById('b'+i).style.width='0';
+    document.getElementById('s'+i).classList.remove('active');
+  }
+  currentSlide=0;showSlide(0);
+}
+function showSlide(idx){
+  if(timer)clearTimeout(timer);
+  if(progress)cancelAnimationFrame(progress);
+  for(let i=0;i<idx;i++){
+    document.getElementById('b'+(i+1)).style.width='100%';
+    document.getElementById('s'+(i+1)).classList.remove('active');
+  }
+  const slideEl=document.getElementById('s'+(idx+1));
+  if(slideEl)slideEl.classList.add('active');
+  startTime=Date.now();
+  const fillEl=document.getElementById('b'+(idx+1));
+  function tick(){
+    const elapsed=Date.now()-startTime;
+    const pct=Math.min(100,(elapsed/SLIDE_DURATION)*100);
+    fillEl.style.width=pct+'%';
+    if(pct<100)progress=requestAnimationFrame(tick);
+  }
+  tick();
+  timer=setTimeout(()=>{
+    if(idx<4){currentSlide=idx+1;showSlide(currentSlide);}
+    else{document.getElementById('replay').classList.add('show');}
+  },SLIDE_DURATION);
+}
+document.getElementById('frame').addEventListener('click',(e)=>{
+  if(e.target.closest('.replay-btn'))return;
+  if(currentSlide<4){currentSlide++;showSlide(currentSlide);}
+  else{document.getElementById('replay').classList.add('show');}
+});
+startStory();
+</script>
+</body>
+</html>

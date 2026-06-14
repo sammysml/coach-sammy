@@ -1,0 +1,18 @@
+# Client data is PII — never commit
+client-data/**
+!client-data/.gitkeep
+!client-data/INDEX.md
+!client-data/SCHEMA.md
+
+# Local agent scratch
+.scratch/
+*.local.md
+
+# OS noise
+.DS_Store
+Thumbs.db
+
+# Secrets
+.env
+.env.local
+*.key
