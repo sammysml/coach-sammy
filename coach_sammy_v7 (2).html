@@ -14328,6 +14328,39 @@ function _tabFocusCheckin(){
 }
 
 // MARKER: UNDEFINED_QUERY_GUARD_V1
+/* SESSION_REMINDER_V1 — client sees coach sessions tagged to them on Today */
+async function _loadTodaySessionReminder(){
+  const el=document.getElementById('today-session-reminder');
+  if(!el || !CC || !CC.id) return;
+  try{
+    const todayISO=(function(){const d=new Date();return d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');})();
+    const {data}=await sb.from('coach_events')
+      .select('title,event_date,start_time,kind,client_id')
+      .eq('kind','coaching').eq('client_id',CC.id)
+      .gte('event_date',todayISO)
+      .order('event_date').order('start_time').limit(1);
+    const ev=data&&data[0];
+    if(!ev){ el.style.display='none'; return; }
+    const coach=(typeof COACH_NAME==='function'?COACH_NAME():'ton coach')||'ton coach';
+    const D=new Date(ev.event_date+'T00:00:00');
+    const days=['dimanche','lundi','mardi','mercredi','jeudi','vendredi','samedi'];
+    const isToday=ev.event_date===todayISO;
+    const whenWord=isToday?"aujourd'hui":days[D.getDay()];
+    const timeStr=ev.start_time?(' · '+ev.start_time):'';
+    el.style.display='block';
+    el.innerHTML=`<div style="position:relative;overflow:hidden;background:linear-gradient(135deg,rgba(78,168,222,.16),rgba(78,168,222,.05));border:1px solid rgba(78,168,222,.35);border-radius:16px;padding:16px 18px;display:flex;align-items:center;gap:14px;animation:cardEntrance .5s cubic-bezier(.16,1,.3,1) both">
+        <div style="width:46px;height:46px;border-radius:13px;background:rgba(78,168,222,.16);border:0.5px solid rgba(78,168,222,.3);display:flex;align-items:center;justify-content:center;font-size:22px;flex-shrink:0">📅</div>
+        <div style="flex:1;min-width:0">
+          <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#4EA8DE;font-weight:700;margin-bottom:3px">Séance avec ${_agEscR(coach)}</div>
+          <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:19px;color:#fff;line-height:1.15">${isToday?"Aujourd'hui":_capR(whenWord)}${timeStr}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:3px">N'oublie pas ! ${_agEscR(ev.title||'')}</div>
+        </div>
+      </div>`;
+  }catch(_e){ el.style.display='none'; }
+}
+function _agEscR(x){ return String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function _capR(w){ return w?w.charAt(0).toUpperCase()+w.slice(1):w; }
+
 async function rToday(){
   if(typeof CC==='undefined'||!CC||!CC.id){ return ''; }  // no client → skip
   const todayISO=toISO();
@@ -14659,6 +14692,8 @@ async function rToday(){
       <div id="qml-status" style="text-align:center;font-size:12px;margin-top:8px;min-height:14px"></div>
     </div>
 
+    <!-- SESSION_REMINDER_V1 -->
+    <div id="today-session-reminder" style="margin:0 24px 16px;display:none"></div>
     <div id="today-xp-card" style="margin:0 24px 20px;display:none"></div>
 
     ${!logged?`
@@ -14863,6 +14898,8 @@ async function loadTodayExtras(){
     if(heroNum&&nums.cals!=null)animateCount(heroNum,nums.cals,1200,n=>Math.round(n).toLocaleString());
   },80);
 
+  // ── SESSION_REMINDER_V1: show coach session tagged to this client ──
+  try{ _loadTodaySessionReminder(); }catch(_){}
   // ── Phase 3: XP card paints from pre-fetched data ──
   try{
     window._todayXP=xpData;
@@ -26000,7 +26037,9 @@ function _agOpenModal(ev){
   m=document.createElement('div');
   m.id='ag-modal';
   m.style.cssText='position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center';
-  const clientOpts=(window.coachClients||[]).map(c=>`<option value="${c.id}" ${String(ev.client_id)===String(c.id)?'selected':''}>${_agEsc(c.name||'Client')}</option>`).join('');
+  /* AGENDA_CLIENT_FIX_V1 — read in-scope roster (coachClients is a top-level let, not on window) */
+  const _agRoster=(typeof coachClients!=='undefined'&&coachClients&&coachClients.length)?coachClients:(window.coachClients||[]);
+  const clientOpts=_agRoster.map(c=>{const nm=c.name||[c.first_name,c.last_name].filter(Boolean).join(' ')||'Client';return `<option value="${c.id}" ${String(ev.client_id)===String(c.id)?'selected':''}>${_agEsc(nm)}</option>`;}).join('');
   m.innerHTML=`<div style="width:100%;max-width:480px;background:linear-gradient(160deg,rgba(26,30,34,.98),rgba(14,16,18,.99));border:0.5px solid rgba(255,255,255,.1);border-radius:24px 24px 0 0;padding:22px 20px 28px;box-shadow:0 -20px 60px rgba(0,0,0,.6)">
       <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
         <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:22px;color:#F0EDE8">${isNew?'Nouvel évènement':'Modifier'}</div>
