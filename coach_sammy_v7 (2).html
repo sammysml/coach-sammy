@@ -797,6 +797,23 @@ h3{font-family:var(--font-sans);font-weight:600}
 .ck-fly-badge-sub{font-family:var(--font-sans,'Inter',-apple-system,sans-serif);font-size:12px;font-weight:600;opacity:0.7;letter-spacing:0.02em}
 @keyframes ckFlyBadge{0%{transform:translate(-50%,calc(-50% + 80px)) scale(0.5);opacity:0}15%{transform:translate(-50%,-50%) scale(1.05);opacity:1}25%{transform:translate(-50%,-50%) scale(1)}75%{transform:translate(-50%,-50%) scale(1);opacity:1}100%{transform:translate(-50%,calc(-50% - 100px)) scale(0.7);opacity:0}}
 @keyframes jrCircleFlash{0%{box-shadow:0 0 0 0 rgba(78,168,222,0.6)}100%{box-shadow:0 0 0 20px rgba(78,168,222,0)}}
+/* BTN_ANIM_V1 — premium animated buttons */
+@keyframes baShimmer{0%{transform:translateX(-120%)}60%,100%{transform:translateX(240%)}}
+@keyframes baFloatIn{0%{opacity:0;transform:translateY(14px)}100%{opacity:1;transform:translateY(0)}}
+@keyframes baPulseGlow{0%,100%{box-shadow:0 12px 30px rgba(78,168,222,.32)}50%{box-shadow:0 12px 42px rgba(78,168,222,.55)}}
+.ba-food{position:relative;overflow:hidden;animation:baFloatIn .6s cubic-bezier(.16,1,.3,1) both,baPulseGlow 3.6s ease-in-out infinite 1.2s !important;transition:transform .18s cubic-bezier(.16,1,.3,1) !important}
+.ba-food:active{transform:scale(.96) !important}
+.ba-food .ba-shine{position:absolute;top:0;left:0;width:38%;height:100%;background:linear-gradient(90deg,transparent,rgba(255,255,255,.38),transparent);transform:translateX(-120%);animation:baShimmer 4.2s ease-in-out infinite 1.6s;pointer-events:none}
+.ba-food .ba-ico{transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.ba-food:active .ba-ico{transform:rotate(-8deg) scale(1.08)}
+.tab-actions .tab-act-btn{animation:baFloatIn .55s cubic-bezier(.16,1,.3,1) both}
+.tab-actions .tab-act-btn:nth-child(1){animation-delay:.05s}
+.tab-actions .tab-act-btn:nth-child(2){animation-delay:.13s}
+.tab-actions .tab-act-btn:nth-child(3){animation-delay:.21s}
+.tab-actions .tab-act-btn:nth-child(4){animation-delay:.29s}
+.tab-act-btn:active{transform:scale(.94) !important}
+.tab-act-ico{transition:transform .3s cubic-bezier(.16,1,.3,1)}
+.tab-act-btn:hover .tab-act-ico{transform:translateY(-3px) scale(1.12)}
 .jr-circle.flash{animation:jrCircleFlash 1s ease-out}
 
 /* ═══ NUTRITION TAB — MEAL ENTRIES LIST ═══ */
