@@ -25945,6 +25945,7 @@ async function renderAgendaWeek(){
     const {data}=await sb.from('coach_events').select('*').gte('event_date',fromISO).lte('event_date',toISO);
     events=data||[];
   }catch(_e){ events=[]; }
+  window._agCache=events;
   const todayISO=_agISO(new Date());
   const kindStyle={coaching:['rgba(78,168,222,.16)','#4EA8DE','#cfe6f7'],work:['rgba(167,139,250,.16)','#a78bfa','#ddd2fb'],perso:['rgba(74,222,128,.14)','#4ade80','#cdf3d8']};
   function evBlock(e){
@@ -25983,9 +25984,92 @@ async function renderAgendaWeek(){
 }
 function _agSlotMatch(t,lo,hi){ if(!t)return lo<=12&&12<hi; const h=parseInt(String(t).split(':')[0],10)||0; return h>=lo&&h<hi; }
 function _agEsc(x){ return String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function agAddEvent(dateISO,slot){ if(typeof showMbToast==='function')showMbToast('Ajout d\'évènement — étape 3'); }
-function agEditEvent(id){ if(typeof showMbToast==='function')showMbToast('Éditer — étape 3'); }
+/* AGENDA_MODAL_V3 — add/edit/delete event with client picker */
+var _agEditing=null;
+function agAddEvent(dateISO,slot){ _agOpenModal({event_date:dateISO,kind:'coaching',start_time:_agSlotDefault(slot)}); }
+function agEditEvent(id){
+  let ev=null; try{ ev=(window._agCache||[]).find(e=>String(e.id)===String(id)); }catch(_){}
+  if(ev)_agOpenModal(ev); else _agOpenModal({event_date:_agISO(new Date()),kind:'coaching'});
+}
+function _agSlotDefault(slot){ return slot==='Matin'?'09:00':slot==='Midi'?'13:00':'18:00'; }
+function _agOpenModal(ev){
+  _agEditing=ev&&ev.id?ev:null;
+  const isNew=!_agEditing;
+  let m=document.getElementById('ag-modal');
+  if(m)m.remove();
+  m=document.createElement('div');
+  m.id='ag-modal';
+  m.style.cssText='position:fixed;inset:0;z-index:10001;background:rgba(0,0,0,.6);-webkit-backdrop-filter:blur(6px);backdrop-filter:blur(6px);display:flex;align-items:flex-end;justify-content:center';
+  const clientOpts=(window.coachClients||[]).map(c=>`<option value="${c.id}" ${String(ev.client_id)===String(c.id)?'selected':''}>${_agEsc(c.name||'Client')}</option>`).join('');
+  m.innerHTML=`<div style="width:100%;max-width:480px;background:linear-gradient(160deg,rgba(26,30,34,.98),rgba(14,16,18,.99));border:0.5px solid rgba(255,255,255,.1);border-radius:24px 24px 0 0;padding:22px 20px 28px;box-shadow:0 -20px 60px rgba(0,0,0,.6)">
+      <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:18px">
+        <div style="font-family:'Fraunces',Georgia,serif;font-style:italic;font-weight:300;font-size:22px;color:#F0EDE8">${isNew?'Nouvel évènement':'Modifier'}</div>
+        <button onclick="document.getElementById('ag-modal').remove()" style="width:34px;height:34px;border-radius:50%;background:rgba(255,255,255,.06);border:0.5px solid rgba(255,255,255,.12);color:#fff;font-size:16px;cursor:pointer">✕</button>
+      </div>
+      <div style="display:flex;gap:8px;margin-bottom:16px">
+        <button type="button" class="ag-kind" data-k="coaching" onclick="_agSetKind('coaching')" style="flex:1;padding:11px;border-radius:11px;border:1px solid ${ev.kind==='coaching'?'#4EA8DE':'rgba(255,255,255,.1)'};background:${ev.kind==='coaching'?'rgba(78,168,222,.15)':'transparent'};color:${ev.kind==='coaching'?'#4EA8DE':'rgba(255,255,255,.6)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">💪 Coaching</button>
+        <button type="button" class="ag-kind" data-k="work" onclick="_agSetKind('work')" style="flex:1;padding:11px;border-radius:11px;border:1px solid ${ev.kind==='work'?'#a78bfa':'rgba(255,255,255,.1)'};background:${ev.kind==='work'?'rgba(167,139,250,.15)':'transparent'};color:${ev.kind==='work'?'#a78bfa':'rgba(255,255,255,.6)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">💼 Travail</button>
+        <button type="button" class="ag-kind" data-k="perso" onclick="_agSetKind('perso')" style="flex:1;padding:11px;border-radius:11px;border:1px solid ${ev.kind==='perso'?'#4ade80':'rgba(255,255,255,.1)'};background:${ev.kind==='perso'?'rgba(74,222,128,.15)':'transparent'};color:${ev.kind==='perso'?'#4ade80':'rgba(255,255,255,.6)'};font-size:12px;font-weight:700;cursor:pointer;font-family:inherit">🌿 Perso</button>
+      </div>
+      <div id="ag-client-wrap" style="margin-bottom:14px;${ev.kind==='coaching'?'':'display:none'}">
+        <label style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:6px">Client</label>
+        <select id="ag-client" onchange="_agClientName(this)" style="width:100%;padding:12px;border-radius:11px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.12);color:#fff;font-size:14px;font-family:inherit"><option value="">— Choisir —</option>${clientOpts}</select>
+      </div>
+      <div style="margin-bottom:14px">
+        <label style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:6px">Titre</label>
+        <input id="ag-title" value="${_agEsc(ev.title||'')}" placeholder="${ev.kind==='coaching'?'Séance / nom':'Ex: Tournage reels'}" style="width:100%;padding:12px;border-radius:11px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.12);color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box">
+      </div>
+      <div style="display:flex;gap:10px;margin-bottom:14px">
+        <div style="flex:1"><label style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:6px">Date</label>
+          <input id="ag-date" type="date" value="${ev.event_date||''}" style="width:100%;padding:12px;border-radius:11px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.12);color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box"></div>
+        <div style="width:120px"><label style="font-size:11px;color:rgba(255,255,255,.5);letter-spacing:.08em;text-transform:uppercase;font-weight:700;display:block;margin-bottom:6px">Heure</label>
+          <input id="ag-time" type="time" value="${ev.start_time||''}" style="width:100%;padding:12px;border-radius:11px;background:rgba(255,255,255,.04);border:0.5px solid rgba(255,255,255,.12);color:#fff;font-size:14px;font-family:inherit;box-sizing:border-box"></div>
+      </div>
+      <button onclick="_agSaveEvent()" style="width:100%;padding:15px;border-radius:99px;background:linear-gradient(135deg,#4EA8DE,#7FC4ED);border:none;color:#04121c;font-size:15px;font-weight:800;cursor:pointer;font-family:inherit;box-shadow:0 10px 28px rgba(78,168,222,.32)">${isNew?'Ajouter':'Enregistrer'}</button>
+      ${isNew?'':'<button onclick="_agDeleteEvent()" style="width:100%;padding:13px;margin-top:10px;border-radius:99px;background:transparent;border:0.5px solid rgba(251,113,133,.4);color:#fb7185;font-size:13px;font-weight:600;cursor:pointer;font-family:inherit">Supprimer</button>'}`;
+  document.body.appendChild(m);
+  m.addEventListener('click',e=>{ if(e.target===m)m.remove(); });
+  window._agDraft={kind:ev.kind||'coaching',client_id:ev.client_id||null,client_name:ev.title||null};
+}
+function _agSetKind(k){
+  window._agDraft=window._agDraft||{}; window._agDraft.kind=k;
+  document.querySelectorAll('.ag-kind').forEach(b=>{
+    const on=b.dataset.k===k;
+    const c=b.dataset.k==='coaching'?'#4EA8DE':b.dataset.k==='work'?'#a78bfa':'#4ade80';
+    b.style.border='1px solid '+(on?c:'rgba(255,255,255,.1)');
+    b.style.background=on?(b.dataset.k==='coaching'?'rgba(78,168,222,.15)':b.dataset.k==='work'?'rgba(167,139,250,.15)':'rgba(74,222,128,.15)'):'transparent';
+    b.style.color=on?c:'rgba(255,255,255,.6)';
+  });
+  const cw=document.getElementById('ag-client-wrap'); if(cw)cw.style.display=k==='coaching'?'':'none';
+}
+function _agClientName(sel){ const o=sel.options[sel.selectedIndex]; window._agDraft=window._agDraft||{}; window._agDraft.client_id=sel.value||null; window._agDraft.client_name=o?o.text:null; const t=document.getElementById('ag-title'); if(t&&!t.value&&o&&sel.value)t.value=o.text; }
+async function _agSaveEvent(){
+  const d=window._agDraft||{kind:'coaching'};
+  const title=(document.getElementById('ag-title')||{}).value||'';
+  const date=(document.getElementById('ag-date')||{}).value||'';
+  const time=(document.getElementById('ag-time')||{}).value||'';
+  if(!date){ if(typeof showMbToast==='function')showMbToast('Choisis une date'); return; }
+  let finalTitle=title.trim();
+  if(d.kind==='coaching' && !finalTitle && d.client_name) finalTitle=d.client_name;
+  if(!finalTitle){ if(typeof showMbToast==='function')showMbToast('Ajoute un titre'); return; }
+  const row={ title:finalTitle, kind:d.kind||'coaching', event_date:date, start_time:time||null, client_id:(d.kind==='coaching'?(d.client_id||null):null) };
+  try{
+    if(_agEditing&&_agEditing.id){ await sb.from('coach_events').update(row).eq('id',_agEditing.id); }
+    else{ await sb.from('coach_events').insert(row); }
+    const m=document.getElementById('ag-modal'); if(m)m.remove();
+    if(typeof showMbToast==='function')showMbToast('Enregistré ✓');
+    renderAgendaWeek();
+  }catch(e){ if(typeof showMbToast==='function')showMbToast('Erreur — réessaie'); }
+}
+async function _agDeleteEvent(){
+  if(!_agEditing||!_agEditing.id)return;
+  try{ await sb.from('coach_events').delete().eq('id',_agEditing.id); }catch(_){}
+  const m=document.getElementById('ag-modal'); if(m)m.remove();
+  if(typeof showMbToast==='function')showMbToast('Supprimé');
+  renderAgendaWeek();
+}
 window.renderAgendaWeek=renderAgendaWeek; window.agAddEvent=agAddEvent; window.agEditEvent=agEditEvent;
+window._agSetKind=_agSetKind; window._agClientName=_agClientName; window._agSaveEvent=_agSaveEvent; window._agDeleteEvent=_agDeleteEvent;
 
 async function renderMonBureau(){
   const root=document.getElementById('mb-root');if(!root)return;
