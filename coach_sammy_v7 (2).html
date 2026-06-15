@@ -5534,13 +5534,14 @@ body > [id^="m-"] > *{
       <span class="pm-nav-lbl">Mon Plan</span>
     </button>
 
-    <button class="nav-item" data-tab="9" data-pos="3" onclick="switchTab(9)" id="nav-9" aria-label="Kitchen">
+    <button class="nav-item" data-tab="9" data-pos="3" onclick="switchTab(9)" id="nav-9" aria-label="Mes Repas">
+      <!-- FOOD_FINDABILITY_V1 -->
       <div class="nav-icon-wrap">
         <span class="pm-nav-icon">
-          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" width="22" height="22"><path d="M6 17v4M18 17v4M9 11a3 3 0 0 0 6 0c0-3-1-5-3-5s-3 2-3 5zM5 11a4 4 0 0 1 7-3M19 11a4 4 0 0 0-7-3M5 17h14v-6"/></svg>
+          <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" width="22" height="22"><path d="M5 3v8a2 2 0 0 0 2 2h0a2 2 0 0 0 2-2V3M7 13v8M15 3c-1.5 0-2.5 1.5-2.5 4s1 4 2.5 4M15 3v18"/></svg>
         </span>
       </div>
-      <span class="pm-nav-lbl">Kitchen</span>
+      <span class="pm-nav-lbl">Mes Repas</span>
     </button>
 
     <button class="nav-item" data-tab="7" data-pos="4" onclick="switchTab(7)" id="nav-7" aria-label="Messages">
@@ -14676,6 +14677,15 @@ async function rToday(){
         <div class="tab-act-sub">${logged?'Validé ✓':'À faire'}</div>
       </button>
     </div>
+    <!-- FOOD_FINDABILITY_V1 — the ONE obvious daily food action -->
+    <button onclick="openQuickAdd()" style="width:calc(100% - 48px);margin:0 24px 18px;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#4EA8DE,#7FC4ED);border:none;border-radius:18px;padding:18px 20px;cursor:pointer;font-family:inherit;box-shadow:0 12px 30px rgba(78,168,222,.32);touch-action:manipulation;transition:transform .15s" ontouchstart="this.style.transform='scale(.98)'" ontouchend="this.style.transform='scale(1)'">
+      <div style="width:48px;height:48px;border-radius:14px;background:rgba(255,255,255,.22);display:flex;align-items:center;justify-content:center;flex-shrink:0"><svg viewBox="0 0 24 24" fill="none" stroke="#04121c" stroke-width="2.2" width="26" height="26"><path d="M12 5v14M5 12h14"/></svg></div>
+      <div style="text-align:left;flex:1">
+        <div style="font-size:17px;font-weight:800;color:#04121c;line-height:1.1">Logger mon repas</div>
+        <div style="font-size:13px;color:rgba(4,18,28,.7);margin-top:2px;font-weight:600">Ajoute ce que tu as mangé</div>
+      </div>
+      <svg viewBox="0 0 24 24" fill="none" stroke="#04121c" stroke-width="2.4" width="20" height="20" style="opacity:.6"><path d="M9 6l6 6-6 6"/></svg>
+    </button>
     <!-- MARKER: MENU_OF_DAY_V1 -->
     <div id="today-menu-card" style="margin:0 24px 18px;display:none"></div>
     <!-- MARKER: QUICK_MACRO_LOG_V1 -->
