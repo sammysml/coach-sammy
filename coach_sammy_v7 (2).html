@@ -25988,7 +25988,7 @@ async function renderAgendaWeek(){
   function evBlock(e){
     const st=kindStyle[e.kind]||kindStyle.coaching;
     const time=e.start_time?`<s style="text-decoration:none;opacity:.7;font-size:9px;display:block">${e.start_time}${e.end_time?'–'+e.end_time:''}</s>`:'';
-    return `<div onclick="agEditEvent('${e.id}')" style="background:${st[0]};border-left:2px solid ${st[1]};color:${st[2]};border-radius:7px;padding:5px 7px;margin-bottom:3px;font-size:10px;line-height:1.25;cursor:pointer;overflow:hidden"><b style="display:block;font-weight:700;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_agEsc(e.title||'')}</b>${time}</div>`;
+    return `<div onclick="event.stopPropagation();agEditEvent('${e.id}')" style="background:${st[0]};border-left:2px solid ${st[1]};color:${st[2]};border-radius:7px;padding:5px 7px;margin-bottom:3px;font-size:10px;line-height:1.25;cursor:pointer;overflow:hidden"><b style="display:block;font-weight:700;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_agEsc(e.title||'')}</b>${time}</div>`;
   }
   let head='<div style="display:grid;grid-template-columns:40px repeat(7,1fr);gap:0;position:sticky;top:0;background:#0A0A0C;z-index:2"><div></div>';
   days.forEach(d=>{ const isT=_agISO(d)===todayISO; head+=`<div style="text-align:center;padding:8px 2px;border-bottom:0.5px solid rgba(255,255,255,.08);${isT?'background:rgba(78,168,222,.07)':''}"><div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.4);text-transform:uppercase">${_AG_DOW[(d.getDay()+6)%7]}</div><div style="font-size:14px;font-weight:700;color:${isT?'#4EA8DE':'#fff'};margin-top:2px">${d.getDate()}</div></div>`; });
