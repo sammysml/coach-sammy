@@ -14670,13 +14670,7 @@ async function rToday(){
         </button>
       `}
 
-      <button class="tab-act-btn" onclick="openQuickAdd()">
-        <div>
-          <div class="tab-act-ico">+</div>
-          <div class="tab-act-title">Logger un repas</div>
-        </div>
-        <div class="tab-act-sub">${Math.max(0,(goalCals||0)-(cals||0))} kcal restant${Math.max(0,(goalCals||0)-(cals||0))!==1?'s':''}</div>
-      </button>
+      <!-- DECLUTTER_V1: duplicate food button removed — big ba-food button above covers this -->
 
       <button class="tab-act-btn" onclick="openWeightQuickModal()">
         <div>
@@ -14875,11 +14869,34 @@ async function loadTodayMenuCard(){
     const badge=isRest
       ? '<span style="background:rgba(167,139,250,.18);color:#a78bfa;border:1px solid rgba(167,139,250,.4);padding:3px 9px;border-radius:99px;font-size:10px;font-weight:800">😴 REPOS</span>'
       : '<span style="background:rgba(78,168,222,.18);color:#4EA8DE;border:1px solid rgba(78,168,222,.4);padding:3px 9px;border-radius:99px;font-size:10px;font-weight:800">💪 ENTRAÎNEMENT</span>';
-    const mealList=meals.map(m=>{
+    /* MENU_TAP_LOG_V1 — full menu, each food tappable → logs via openLogConfirm (same as Mes Repas) */
+    const _esc=(x)=>String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;');
+    const mealList=meals.map((m,mi)=>{
       const c=(m.foods||[]).reduce((x,f)=>x+(Number(f.calories)||0),0);
-      return `<div style="display:flex;justify-content:space-between;padding:8px 0;border-top:1px solid rgba(255,255,255,.06)">
-        <div style="font-size:13px;color:#fff;font-weight:600">${(m.title||m.name||'Repas')}</div>
-        <div style="font-size:12px;color:rgba(255,255,255,.45)">${Math.round(c)} kcal</div>
+      const foods=(m.foods||[]).map((fd,fi)=>{
+        const key=`tmc-${mi}-${fi}-${(fd.name||'').replace(/\W/g,'').slice(0,30)}`;
+        const foodJson=encodeURIComponent(JSON.stringify({
+          name:fd.name||'', quantity:fd.quantity||'',
+          calories:+fd.calories||0, protein:+fd.protein||0,
+          carbs:+fd.carbs||0, fat:+fd.fat||0, key:key, meal_name:m.name||m.title||''
+        }));
+        return `<div onclick="event.stopPropagation();openLogConfirm('${foodJson}')" style="display:flex;justify-content:space-between;align-items:center;gap:10px;padding:8px 10px;margin:3px 0;border-radius:10px;background:rgba(78,168,222,.05);border:0.5px solid rgba(78,168,222,.12);cursor:pointer;transition:background .15s" ontouchstart="this.style.background='rgba(78,168,222,.14)'" ontouchend="this.style.background='rgba(78,168,222,.05)'">
+          <div style="min-width:0;flex:1">
+            <span style="font-size:13px;color:rgba(255,255,255,.92);font-weight:600">${_esc(fd.name||'')}</span>
+            ${fd.quantity?`<span style="font-size:11px;color:rgba(255,255,255,.4);margin-left:6px">${_esc(fd.quantity)}</span>`:''}
+          </div>
+          <div style="display:flex;align-items:center;gap:8px;flex-shrink:0">
+            <span style="font-size:11px;color:rgba(255,255,255,.5);font-weight:700">${Math.round(Number(fd.calories)||0)}</span>
+            <span style="width:26px;height:26px;border-radius:8px;background:rgba(78,168,222,.15);border:1px solid rgba(78,168,222,.35);color:#4EA8DE;display:flex;align-items:center;justify-content:center;font-size:16px;font-weight:300">+</span>
+          </div>
+        </div>`;
+      }).join('');
+      return `<div style="padding:10px 0;border-top:1px solid rgba(255,255,255,.06)">
+        <div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:4px">
+          <div style="font-size:13px;color:#fff;font-weight:800;letter-spacing:.02em">${_esc(m.title||m.name||'Repas')}</div>
+          <div style="font-size:12px;color:rgba(255,255,255,.5);font-weight:700">${Math.round(c)} kcal</div>
+        </div>
+        ${foods||'<div style="font-size:11px;color:rgba(255,255,255,.3);padding-left:10px">—</div>'}
       </div>`;
     }).join('');
     card.style.display='block';
