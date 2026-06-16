@@ -14424,7 +14424,12 @@ async function rToday(){
     const _menus=(_pd&&_pd.days)?_pd.days:(_pd?[_pd]:[]);
     const _todaySched=_sched?_sched[_DOWK[new Date().getDay()]]:null;
     if(_todaySched && _menus.length){
-      const _menu=_menus[_todaySched.menu||0]||_menus[0];
+      /* TODAY_MENU_DAYTYPE_MATCH_V1 — pick menu by today's day-type, not Semaine assignment */
+      const _isRepos=(s)=>/repos/i.test(String(s||''));
+      const _isTrain=(s)=>/entra[iî]n/i.test(String(s||''));
+      let _menu=isRestDay
+        ? (_menus.find(m=>_isRepos(m&&m.day)) || _menus[_todaySched.menu||0] || _menus[0])
+        : (_menus.find(m=>_isTrain(m&&m.day)) || _menus.find(m=>!_isRepos(m&&m.day)) || _menus[_todaySched.menu||0] || _menus[0]);
       const _meals=(_menu&&_menu.meals)||[];
       if(_meals.length){
         let _mc=0,_mp2=0,_mg=0,_ml=0;
@@ -14589,7 +14594,7 @@ async function rToday(){
           : '<span style="display:inline-block;background:#378ADD;color:#fff;font-size:10px;font-weight:500;letter-spacing:.06em;padding:4px 11px;border-radius:99px;margin-bottom:10px">JOUR ENTRAÎNEMENT</span>';
         const sub=rest?'Repos · récupère bien':((_todaySession&&_todaySession.name)?_todaySession.name:'Entraînement du jour');
         const workoutRow=(!rest && _todaySession && _todaySession.name)?`
-          <div onclick="event.stopPropagation();switchTab(3)" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:11px;margin-top:8px;cursor:pointer">
+          <div onclick="event.stopPropagation();switchTab(2)" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:11px;margin-top:8px;cursor:pointer">
             <div style="width:34px;height:34px;border-radius:9px;background:#D85A30;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-barbell" style="color:#fff;font-size:18px"></i></div>
             <div style="min-width:0"><div style="font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(_todaySession.name||'').replace(/</g,'&lt;')}</div><div style="font-size:11px;color:rgba(255,255,255,.5)">Voir ma séance →</div></div>
           </div>`:'';
@@ -14597,7 +14602,7 @@ async function rToday(){
           ${badge}
           <div style="font-size:19px;font-weight:500;color:#fff;margin-bottom:2px">Ta journée</div>
           <div style="font-size:13px;color:#9FC0E8;margin-bottom:12px">${sub}</div>
-          <div onclick="switchTab(2)" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:11px;cursor:pointer">
+          <div onclick="switchTab(9)" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:11px;cursor:pointer">
             <div style="width:34px;height:34px;border-radius:9px;background:#378ADD;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-tools-kitchen-2" style="color:#fff;font-size:18px"></i></div>
             <div style="min-width:0"><div style="font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${menuName}</div><div style="font-size:11px;color:#9FC0E8">${menuCal} kcal${menuMeals?' · '+menuMeals+' repas':''}</div></div>
           </div>
