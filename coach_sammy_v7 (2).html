@@ -3455,6 +3455,11 @@ button.mb-hero{font-family:inherit;color:inherit;text-align:left;width:100%;-web
 .mp-meal-title{font-family:var(--font-serif);font-size:15px;color:#fff;font-weight:600;line-height:1.25}
 .mp-meal-cals{font-size:11px;color:rgba(255,255,255,0.5);margin-top:3px;font-weight:600;letter-spacing:0.04em}
 .mp-food{display:flex;align-items:center;gap:12px;padding:13px 18px;cursor:pointer;border-bottom:1px solid rgba(255,255,255,0.03);transition:background 0.15s;-webkit-tap-highlight-color:transparent}
+/* MEAL_COLLAPSE_V1 */
+.mp-meal-hdr-v2{cursor:pointer}
+.mp-meal-card.mp-collapsed .mp-meal-foods,.mp-meal-card.mp-collapsed .mp-instructions,.mp-meal-card.mp-collapsed .mp-meal-skipped-overlay{display:none!important}
+.mp-meal-card .mp-meal-hdr-v2::after{content:'▾';margin-left:8px;color:rgba(255,255,255,.35);font-size:12px;flex-shrink:0;transition:transform .15s}
+.mp-meal-card.mp-collapsed .mp-meal-hdr-v2::after{transform:rotate(-90deg)}
 .mp-food:last-child{border-bottom:none}
 .mp-food:hover,.mp-food:active{background:rgba(78,168,222,0.06)}
 .mp-food-body{flex:1;min-width:0}
@@ -14430,7 +14435,7 @@ async function rToday(){
         if(_mc>0){
           goalCals=Math.round(_mc);
           if(_mp2>0) goalProt=Math.round(_mp2);
-          window._todayMenuMacros={cal:Math.round(_mc),prot:Math.round(_mp2),carbs:Math.round(_mg),fat:Math.round(_ml)};
+          window._todayMenuMacros={cal:Math.round(_mc),prot:Math.round(_mp2),carbs:Math.round(_mg),fat:Math.round(_ml),name:(_menu&&_menu.day)||'Menu du jour',meals:_meals.length}; /* TODAY_MENU_NAME_CAPTURE_V1 */
         }
       }
     }
@@ -14572,6 +14577,33 @@ async function rToday(){
         <div class="tb-greet-date">${dateLabel}</div>
         <div class="tb-greet-name">${greeting}${firstName?', '+firstName:''}.</div>
       </div>
+
+      ${(()=>{ /* TODAY_HERO_PLAN_V1 — plan at a glance, bold dark */
+        const mm=window._todayMenuMacros||{};
+        const menuName=mm.name||'Menu du jour';
+        const menuCal=mm.cal||goalCals||0;
+        const menuMeals=mm.meals||0;
+        const rest=isRestDay;
+        const badge=rest
+          ? '<span style="display:inline-block;background:#7F77DD;color:#fff;font-size:10px;font-weight:500;letter-spacing:.06em;padding:4px 11px;border-radius:99px;margin-bottom:10px">JOUR REPOS</span>'
+          : '<span style="display:inline-block;background:#378ADD;color:#fff;font-size:10px;font-weight:500;letter-spacing:.06em;padding:4px 11px;border-radius:99px;margin-bottom:10px">JOUR ENTRAÎNEMENT</span>';
+        const sub=rest?'Repos · récupère bien':((_todaySession&&_todaySession.name)?_todaySession.name:'Entraînement du jour');
+        const workoutRow=(!rest && _todaySession && _todaySession.name)?`
+          <div onclick="event.stopPropagation();switchTab(3)" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:11px;margin-top:8px;cursor:pointer">
+            <div style="width:34px;height:34px;border-radius:9px;background:#D85A30;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-barbell" style="color:#fff;font-size:18px"></i></div>
+            <div style="min-width:0"><div style="font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${(_todaySession.name||'').replace(/</g,'&lt;')}</div><div style="font-size:11px;color:rgba(255,255,255,.5)">Voir ma séance →</div></div>
+          </div>`:'';
+        return `<div class="today-card-anim" style="margin:0 20px 6px;background:#17243a;border-radius:14px;padding:16px">
+          ${badge}
+          <div style="font-size:19px;font-weight:500;color:#fff;margin-bottom:2px">Ta journée</div>
+          <div style="font-size:13px;color:#9FC0E8;margin-bottom:12px">${sub}</div>
+          <div onclick="switchTab(2)" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:11px;cursor:pointer">
+            <div style="width:34px;height:34px;border-radius:9px;background:#378ADD;display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-tools-kitchen-2" style="color:#fff;font-size:18px"></i></div>
+            <div style="min-width:0"><div style="font-size:13px;color:#fff;font-weight:500;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${menuName}</div><div style="font-size:11px;color:#9FC0E8">${menuCal} kcal${menuMeals?' · '+menuMeals+' repas':''}</div></div>
+          </div>
+          ${workoutRow}
+        </div>`;
+      })()}
 
       <div class="tb-read">
         <div class="tb-read-ic"><i class="ti ti-bulb"></i></div>
@@ -18093,8 +18125,8 @@ async function renderMealPlan(){
         const plannedTotals={cal:mt.cal,p:mt.p,g:mt.g,l:mt.l};
         const status=isSkipped?'skipped':_mpMealCompliance(plannedTotals,eatenForMeal);
         const safeMealName=(meal.name||'').replace(/'/g,"\\'");
-        return `<div class="mp-meal-card">
-          <div class="mp-meal-hdr mp-meal-hdr-v2" data-status="${status}">
+        return `<div class="mp-meal-card${isSkipped?' mp-collapsed':''}">
+          <div class="mp-meal-hdr mp-meal-hdr-v2" data-status="${status}" onclick="if(event.target.closest('button')||event.target.closest('.mp-meal-title-link'))return;this.closest('.mp-meal-card').classList.toggle('mp-collapsed')">
             <div class="mp-meal-icon">${mealIcon(meal.name)}</div>
             <div class="mp-meal-info">
               <div class="mp-meal-name-row">
