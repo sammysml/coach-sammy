@@ -42335,6 +42335,8 @@ window.cpRenderToday = cpRenderToday;
 // Hooks the badge into the tab-content; runs after each rToday render.
 (function(){
   function mountDayBadge(){
+    /* HOME_KILL_OLD_DUPLICATE_BLOCKS_V1 — old badge+progression replaced by Ta journée hero; disabled */
+    return;
     if(typeof CC==='undefined' || !CC || !CC.id) return;
     if(typeof window.dayTypeBadgeRender !== 'function') return;
     const homeEl = document.getElementById('tab-home');
