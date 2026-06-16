@@ -1593,7 +1593,8 @@ select option{background:var(--s2)}
 .pm-nav-icon{display:flex;align-items:center;justify-content:center;transition:transform .2s cubic-bezier(.34,1.4,.64,1),opacity .2s}
 .nav-item.active .pm-nav-icon svg{stroke:#4EA8DE}
 .nav-item.active .pm-nav-icon{transform:scale(1.1)}
-.pm-nav-lbl{font-size:10px;font-weight:600;letter-spacing:.01em;line-height:1;max-height:0;overflow:hidden;opacity:0;transition:max-height .2s ease,opacity .2s ease,color .2s}
+/* NAV_LABELS_AND_FR_GREETING_V1 — always show nav labels */
+.pm-nav-lbl{font-size:10px;font-weight:600;letter-spacing:.01em;line-height:1;max-height:14px;overflow:hidden;opacity:1;transition:max-height .2s ease,opacity .2s ease,color .2s}
 .nav-item.active .pm-nav-lbl{max-height:14px;opacity:1;color:#4EA8DE}
 .nav-badge-count{position:absolute;top:-2px;right:-4px;background:#ef4444;color:#fff;font-size:9px;font-weight:900;border-radius:10px;padding:1px 5px;min-width:16px;text-align:center;border:1.5px solid #060606;display:none;line-height:1.4;pointer-events:none}
 
@@ -14580,7 +14581,7 @@ async function rToday(){
     <div class="today-bento">
       <div class="tb-greet">
         <div class="tb-greet-date">${dateLabel}</div>
-        <div class="tb-greet-name">${greeting}${firstName?', '+firstName:''}.</div>
+        <div class="tb-greet-name">${(hr<12?'Bonjour':hr<18?'Bon après-midi':'Bonsoir')}${firstName?', '+firstName:''}.</div>
       </div>
 
       ${(()=>{ /* TODAY_HERO_PLAN_V1 — plan at a glance, bold dark */
