@@ -26133,34 +26133,50 @@ async function renderAgendaWeek(){
     const time=e.start_time?`<s style="text-decoration:none;opacity:.7;font-size:9px;display:block">${e.start_time}${e.end_time?'–'+e.end_time:''}</s>`:'';
     return `<div onclick="event.stopPropagation();agEditEvent('${e.id}')" style="background:${st[0]};border-left:2px solid ${st[1]};color:${st[2]};border-radius:7px;padding:5px 7px;margin-bottom:3px;font-size:10px;line-height:1.25;cursor:pointer;overflow:hidden"><b style="display:block;font-weight:700;font-size:10.5px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis">${_agEsc(e.title||'')}</b>${time}</div>`;
   }
-  let head='<div style="display:grid;grid-template-columns:40px repeat(7,1fr);gap:0;position:sticky;top:0;background:#0A0A0C;z-index:2"><div></div>';
-  days.forEach(d=>{ const isT=_agISO(d)===todayISO; head+=`<div style="text-align:center;padding:8px 2px;border-bottom:0.5px solid rgba(255,255,255,.08);${isT?'background:rgba(78,168,222,.07)':''}"><div style="font-size:9px;font-weight:700;letter-spacing:.06em;color:rgba(255,255,255,.4);text-transform:uppercase">${_AG_DOW[(d.getDay()+6)%7]}</div><div style="font-size:14px;font-weight:700;color:${isT?'#4EA8DE':'#fff'};margin-top:2px">${d.getDate()}</div></div>`; });
-  head+='</div>';
-  let rows='';
-  _AG_SLOTS.forEach(slot=>{
-    rows+=`<div style="display:grid;grid-template-columns:40px repeat(7,1fr);gap:0;min-height:64px">`;
-    rows+=`<div style="font-size:9px;color:rgba(255,255,255,.3);text-align:right;padding:6px 5px 0 0;border-right:0.5px solid rgba(255,255,255,.06)">${slot[0]}</div>`;
-    days.forEach(d=>{
-      const dISO=_agISO(d);
-      const inSlot=events.filter(e=>e.event_date===dISO && _agSlotMatch(e.start_time,slot[1],slot[2]));
-      rows+=`<div onclick="agAddEvent('${dISO}','${slot[0]}')" style="border-right:0.5px solid rgba(255,255,255,.04);border-bottom:0.5px solid rgba(255,255,255,.04);padding:3px;cursor:pointer;min-height:64px">${inSlot.map(evBlock).join('')}</div>`;
-    });
-    rows+='</div>';
+  /* AGENDA_VERTICAL_REBUILD_V1 — vertical day-by-day agenda, real times, big cards */
+  const _agDefTime=(d)=>'09:00';
+  let daySections='';
+  days.forEach(d=>{
+    const dISO=_agISO(d);
+    const isT=dISO===todayISO;
+    const dayEvents=events.filter(e=>e.event_date===dISO)
+      .sort((a,b)=>String(a.start_time||'').localeCompare(String(b.start_time||'')));
+    const dow=_AG_DOW[(d.getDay()+6)%7];
+    const countTxt=dayEvents.length?`· ${dayEvents.length} ${dayEvents.length>1?'séances':'séance'}`:'· libre';
+    daySections+=`<div style="margin-bottom:6px;display:flex;align-items:baseline;gap:8px;${dayEvents.length?'':'opacity:.55'}">
+      <span style="font-size:15px;font-weight:800;color:${isT?'#4EA8DE':'#fff'}">${dow} ${d.getDate()}</span>
+      <span style="font-size:11px;color:rgba(255,255,255,.4)">${countTxt}</span>
+    </div>`;
+    if(dayEvents.length){
+      dayEvents.forEach(e=>{
+        const st=kindStyle[e.kind]||kindStyle.coaching;
+        const t=e.start_time||'';
+        daySections+=`<div style="display:flex;gap:10px;margin-bottom:8px">
+          <div style="min-width:46px;font-size:13px;font-weight:700;color:rgba(255,255,255,.6);padding-top:13px;text-align:right">${t||'—'}</div>
+          <div onclick="agEditEvent('${e.id}')" style="flex:1;background:${st[0]};border-left:3px solid ${st[1]};border-radius:11px;padding:12px 14px;cursor:pointer">
+            <div style="font-size:15px;font-weight:700;color:#fff;line-height:1.25">${_agEsc(e.title||'')}</div>
+            <div style="font-size:11px;color:${st[2]};margin-top:2px">${e.kind==='work'?'Travail':e.kind==='perso'?'Perso':'Coaching'}${e.end_time?' · '+t+'–'+e.end_time:''}</div>
+          </div>
+        </div>`;
+      });
+    } else {
+      daySections+=`<div onclick="agAddEvent('${dISO}','Matin')" style="border:1px dashed rgba(255,255,255,.12);border-radius:11px;padding:13px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);cursor:pointer;margin-bottom:8px">Rien de prévu — tape pour ajouter</div>`;
+    }
+    daySections+=`<div style="height:10px"></div>`;
   });
-  body.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:12px">
+  body.innerHTML=`<div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
       <div style="display:flex;gap:6px">
         <button onclick="agWeekShift(-1)" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);color:#fff;cursor:pointer">‹</button>
         <button onclick="agWeekShift(1)" style="width:34px;height:34px;border-radius:9px;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);color:#fff;cursor:pointer">›</button>
         <button onclick="_agWeekStart=_agMonday(new Date());renderAgendaWeek()" style="height:34px;padding:0 12px;border-radius:9px;background:rgba(255,255,255,.05);border:0.5px solid rgba(255,255,255,.1);color:rgba(255,255,255,.7);cursor:pointer;font-size:12px;font-family:inherit">Aujourd'hui</button>
       </div>
-      <div style="display:flex;gap:14px;font-size:11px;color:rgba(255,255,255,.5)">
+      <div style="display:flex;gap:12px;font-size:11px;color:rgba(255,255,255,.5)">
         <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#4EA8DE;vertical-align:middle"></span> Coaching</span>
         <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#a78bfa;vertical-align:middle"></span> Travail</span>
         <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#4ade80;vertical-align:middle"></span> Perso</span>
       </div>
     </div>
-    <div style="border:0.5px solid rgba(255,255,255,.08);border-radius:14px;overflow:hidden">${head}${rows}</div>
-    <div style="text-align:center;font-size:11px;color:rgba(255,255,255,.3);margin-top:12px">Tape une case pour ajouter un évènement</div>`;
+    ${daySections}`;
 }
 function _agSlotMatch(t,lo,hi){ if(!t)return lo<=12&&12<hi; const h=parseInt(String(t).split(':')[0],10)||0; return h>=lo&&h<hi; }
 function _agEsc(x){ return String(x||'').replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
