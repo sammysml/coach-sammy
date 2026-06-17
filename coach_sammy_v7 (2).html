@@ -20759,32 +20759,29 @@ async function rProgress(){
   const deltaColor=delta<0?'#4ade80':delta>0?'#f87171':'#4EA8DE';
 
   return `<div class="pm-screen"><div class="pm-glow-line"></div><div style="padding:16px 16px 8px">
-  <!-- STORY CARD -->
-  <div id="story-card" style="background:linear-gradient(135deg,rgba(78,168,222,.08),rgba(78,168,222,.03));border:0.5px solid rgba(78,168,222,.2);border-radius:12px;padding:18px 16px;margin-bottom:16px;position:relative;overflow:hidden">
-    <div style="position:absolute;top:-20px;right:-20px;font-size:80px;opacity:.06">📖</div>
-    <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(78,168,222,.6);font-weight:700;margin-bottom:6px">✦ TON HISTOIRE</div>
-    <div style="font-size:15px;color:rgba(255,255,255,.85);line-height:1.7;font-style:italic" id="story-text">Chargement…</div>
-  </div>
-
-  <!-- KEY STATS GRID -->
-  <div style="display:grid;grid-template-columns:1fr 1fr;gap:8px;margin-bottom:16px">
-    <div style="background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;text-align:center">
-      <div style="font-size:28px;font-weight:900;color:${deltaColor};font-family:Georgia,serif">${deltaLabel}</div>
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-top:4px">Depuis le début</div>
+  <!-- PROGRESS_HERO_NUMBER_V1 -->
+  ${(()=>{
+    const tgt=parseFloat(CC.target_weight||0);
+    const heroNum=delta!==0?`${delta>0?'+':'−'}${Math.abs(delta)}`:'0';
+    const pct=(tgt&&startW)?Math.min(100,Math.max(0,Math.round(Math.abs(currW-startW)/Math.abs(tgt-startW||1)*100))):0;
+    const heroSub=(startW&&currW)?`${startW} → ${currW} kg${tgt?' · objectif '+tgt:''}`:'Logge ton poids pour suivre ta progression';
+    return `<div style="text-align:center;padding:18px 0 8px;margin-bottom:14px">
+      <div style="font-size:9px;letter-spacing:.16em;text-transform:uppercase;color:${delta<0?'rgba(74,222,128,.7)':'rgba(78,168,222,.7)'};font-weight:700;margin-bottom:4px">Depuis le début</div>
+      <div style="font-size:46px;font-weight:900;color:${deltaColor};font-family:Georgia,serif;line-height:1">${heroNum}<span style="font-size:20px">kg</span></div>
+      <div style="font-size:12px;color:rgba(255,255,255,.5);margin-top:4px">${heroSub}</div>
+      ${tgt?`<div style="height:6px;background:rgba(255,255,255,.08);border-radius:99px;margin:14px 24px 0;overflow:hidden"><div style="height:100%;width:${pct}%;background:linear-gradient(90deg,#4EA8DE,#4ade80);transition:width 1s ease"></div></div>
+      <div style="font-size:10px;color:rgba(255,255,255,.35);margin-top:5px">${pct}% du chemin</div>`:''}
     </div>
-    <div style="background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;text-align:center">
-      <div style="font-size:28px;font-weight:900;color:#4EA8DE;font-family:Georgia,serif">${streak.current}</div>
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-top:4px">Jours de suite</div>
+    <div style="display:flex;gap:6px;margin-bottom:16px">
+      <div style="flex:1;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:9px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:#4EA8DE;font-family:Georgia,serif">${streak.current}</div><div style="font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-top:2px">Jours de suite</div></div>
+      <div style="flex:1;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:9px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:#fff;font-family:Georgia,serif">${compliance}%</div><div style="font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-top:2px">Compliance</div></div>
+      <div style="flex:1;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:9px;padding:11px;text-align:center"><div style="font-size:18px;font-weight:800;color:#fff;font-family:Georgia,serif">${trainDays}</div><div style="font-size:8px;text-transform:uppercase;letter-spacing:.08em;color:rgba(255,255,255,.3);margin-top:2px">Séances / 30j</div></div>
     </div>
-    <div style="background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;text-align:center">
-      <div style="font-size:28px;font-weight:900;color:#fff;font-family:Georgia,serif">${compliance}%</div>
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-top:4px">Compliance</div>
-    </div>
-    <div style="background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:10px;padding:14px;text-align:center">
-      <div style="font-size:28px;font-weight:900;color:#fff;font-family:Georgia,serif">${trainDays}</div>
-      <div style="font-size:10px;text-transform:uppercase;letter-spacing:.1em;color:rgba(255,255,255,.3);margin-top:4px">Séances / 30j</div>
-    </div>
-  </div>
+    <div id="story-card" style="background:linear-gradient(135deg,rgba(78,168,222,.08),rgba(78,168,222,.03));border:0.5px solid rgba(78,168,222,.2);border-radius:12px;padding:14px 16px;margin-bottom:16px;position:relative;overflow:hidden">
+      <div style="font-size:9px;letter-spacing:.2em;text-transform:uppercase;color:rgba(78,168,222,.6);font-weight:700;margin-bottom:6px">✦ TON HISTOIRE</div>
+      <div style="font-size:14px;color:rgba(255,255,255,.85);line-height:1.6;font-style:italic" id="story-text">Chargement…</div>
+    </div>`;
+  })()}
 
   <!-- WEIGHT CHART -->
   ${wLogs.length>=2?(()=>{
