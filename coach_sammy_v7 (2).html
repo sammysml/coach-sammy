@@ -15824,6 +15824,22 @@ async function renderCheckin(overrideDate){
     const dg=CC.demoProfile.goals;
     targets={calories:dg.calorie_target||0,protein:dg.protein_target||0,carbs:dg.carbs_target||0,fat:dg.fats_target||0};
   }
+  /* JOURNAL_REST_DAY_TARGETS_V1 — match Accueil: scale to rest-day targets on rest days */
+  let _ckIsRest=false;
+  try{
+    if(dateISO===toISO()){ const _s=await _tabFindTodaySession(); _ckIsRest=_s?.mode==='rest'; }
+  }catch(e){}
+  if(_ckIsRest && targets.calories>0){
+    const _trainCal=(CC.kcal_training||targets.calories);
+    const _restCal=CC.kcal_rest||CC.calories_rest||Math.round(_trainCal*0.85);
+    const _ratio=_trainCal>0?(_restCal/_trainCal):0.85;
+    targets={
+      calories:_restCal,
+      protein:Math.round(targets.protein),
+      carbs:Math.round(targets.carbs*_ratio),
+      fat:Math.round(targets.fat*_ratio)
+    };
+  }
 
   // Fetch today's data (or selected day): daily_logs row + meal_entries list + recent logs for the day picker
   let log=null,meals=[],logDates=new Set();
@@ -16945,6 +16961,18 @@ function parseUniversalProgram(text){
         mistake:fields.mistake||null,
         is_finisher:isFinisher
       });
+      continue;
+    }
+
+    // PARSER_CARDIO_FIN_SEANCE_V1 — standalone "CARDIO FIN SÉANCE" block → attach to current session
+    if(currentSession && /^cardio\s+fin\s+s[eé]ance/i.test(fl)){
+      const cardioLines=block.split('\n').map(l=>l.trim()).filter(Boolean).slice(1);
+      const cardioTxt=cardioLines.filter(l=>!/^[—–-]$/.test(l)).join(' · ').trim();
+      if(cardioTxt){
+        currentSession.cardio_text=currentSession.cardio_text
+          ? (currentSession.cardio_text+' · '+cardioTxt)
+          : cardioTxt;
+      }
       continue;
     }
 
