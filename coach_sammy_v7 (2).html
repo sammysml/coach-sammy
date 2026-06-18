@@ -26142,7 +26142,7 @@ async function renderAgendaWeek(){
     const dayEvents=events.filter(e=>e.event_date===dISO)
       .sort((a,b)=>String(a.start_time||'').localeCompare(String(b.start_time||'')));
     const dow=_AG_DOW[(d.getDay()+6)%7];
-    const countTxt=dayEvents.length?`· ${dayEvents.length} ${dayEvents.length>1?'séances':'séance'}`:'· libre';
+    const countTxt=dayEvents.length?`· ${dayEvents.length} ${dayEvents.length>1?'sessions':'session'}`:'· free';
     daySections+=`<div style="margin-bottom:6px;display:flex;align-items:baseline;gap:8px;${dayEvents.length?'':'opacity:.55'}">
       <span style="font-size:15px;font-weight:800;color:${isT?'#4EA8DE':'#fff'}">${dow} ${d.getDate()}</span>
       <span style="font-size:11px;color:rgba(255,255,255,.4)">${countTxt}</span>
@@ -26155,12 +26155,12 @@ async function renderAgendaWeek(){
           <div style="min-width:46px;font-size:13px;font-weight:700;color:rgba(255,255,255,.6);padding-top:13px;text-align:right">${t||'—'}</div>
           <div onclick="agEditEvent('${e.id}')" style="flex:1;background:${st[0]};border-left:3px solid ${st[1]};border-radius:11px;padding:12px 14px;cursor:pointer">
             <div style="font-size:15px;font-weight:700;color:#fff;line-height:1.25">${_agEsc(e.title||'')}</div>
-            <div style="font-size:11px;color:${st[2]};margin-top:2px">${e.kind==='work'?'Travail':e.kind==='perso'?'Perso':'Coaching'}${e.end_time?' · '+t+'–'+e.end_time:''}</div>
+            <div style="font-size:11px;color:${st[2]};margin-top:2px">${e.kind==='work'?'Work':e.kind==='perso'?'Personal':'Coaching'}${e.end_time?' · '+t+'–'+e.end_time:''}</div>
           </div>
         </div>`;
       });
     } else {
-      daySections+=`<div onclick="agAddEvent('${dISO}','Matin')" style="border:1px dashed rgba(255,255,255,.12);border-radius:11px;padding:13px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);cursor:pointer;margin-bottom:8px">Rien de prévu — tape pour ajouter</div>`;
+      daySections+=`<div onclick="agAddEvent('${dISO}','Matin')" style="border:1px dashed rgba(255,255,255,.12);border-radius:11px;padding:13px;text-align:center;font-size:12px;color:rgba(255,255,255,.3);cursor:pointer;margin-bottom:8px">Nothing planned — tap to add</div>`;
     }
     daySections+=`<div style="height:10px"></div>`;
   });
@@ -26172,8 +26172,8 @@ async function renderAgendaWeek(){
       </div>
       <div style="display:flex;gap:12px;font-size:11px;color:rgba(255,255,255,.5)">
         <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#4EA8DE;vertical-align:middle"></span> Coaching</span>
-        <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#a78bfa;vertical-align:middle"></span> Travail</span>
-        <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#4ade80;vertical-align:middle"></span> Perso</span>
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#a78bfa;vertical-align:middle"></span> Work</span>
+        <span><span style="display:inline-block;width:9px;height:9px;border-radius:3px;background:#4ade80;vertical-align:middle"></span> Personal</span>
       </div>
     </div>
     ${daySections}`;
