@@ -48,6 +48,35 @@
 }
 
 /* ═══════════════════════════════════════════════════════
+   THEME_SYSTEM_PHASE1_V1 — Apple-vivid accent palette (additive, used by later phases)
+   Default theme unchanged. Light theme activates only via <html data-theme="light"> or <body data-theme="light">.
+═══════════════════════════════════════════════════════ */
+:root{
+  /* Apple system vivid accents — available in BOTH themes */
+  --ap-red:#FF3B30; --ap-orange:#FF9500; --ap-yellow:#FFCC00;
+  --ap-green:#30D158; --ap-teal:#40C8E0; --ap-blue:#0A84FF;
+  --ap-indigo:#5E5CE6; --ap-pink:#FF2D55;
+}
+[data-theme="light"]{
+  /* base surfaces */
+  --bk:#F2F2F7; --s1:#FFFFFF; --s2:#FFFFFF; --s3:#F2F2F7; --s4:#E5E5EA;
+  --bg-base:#F2F2F7; --bg-elevated:#FFFFFF; --bg-card:#FFFFFF; --bg-hover:#F2F2F7;
+  /* text */
+  --tx:#1D1D1F; --ts:#3A3A3C; --tm:#86868B;
+  --text:#1D1D1F; --text-secondary:#3A3A3C; --text-tertiary:#86868B;
+  --txt-faint:rgba(0,0,0,0.35); --txt-mute:rgba(0,0,0,0.5); --txt-soft:rgba(0,0,0,0.7);
+  /* borders / hairlines */
+  --border-subtle:rgba(0,0,0,0.06); --border-default:rgba(0,0,0,0.10); --border-strong:rgba(0,0,0,0.16);
+  --hairline:rgba(0,0,0,0.08); --hairline-strong:rgba(0,0,0,0.14);
+  /* brand stays blue but tuned for light */
+  --gold:#0A84FF; --gold-light:#409CFF; --g:#0A84FF; --gl:#409CFF; --gd:#0066CC;
+  --gold-soft:rgba(10,132,255,0.10); --gold-subtle:rgba(10,132,255,0.06);
+  --gold-border:rgba(10,132,255,0.25); --ga:rgba(10,132,255,0.10);
+  /* semantic — Apple vivid */
+  --success:#30D158; --danger:#FF3B30; --red:#FF3B30; --grn:#30D158; --org:#FF9500;
+}
+
+/* ═══════════════════════════════════════════════════════
    DESIGN SYSTEM — PHASE 1 TOKENS (additive, do not edit existing tokens above)
 ═══════════════════════════════════════════════════════ */
 :root {
@@ -390,15 +419,20 @@ h3{font-family:var(--font-sans);font-weight:600}
 .tb-tile-eye{font-size:10px;letter-spacing:.1em;text-transform:uppercase;color:var(--text-tertiary);margin-bottom:4px}
 .tb-tile-hero{display:flex;align-items:center;gap:18px;background:linear-gradient(135deg,var(--bg-card,#121212),var(--bg-elevated,#1a1a1a))}
 .tb-hero-ring{position:relative;flex-shrink:0;width:92px;height:92px;display:flex;align-items:center;justify-content:center}
+/* HOME_POP_RING_CALBAR_V1 — Apple-style ring glow */
 .tb-hero-ring svg{position:absolute;inset:0}
+.tb-hero-ring svg circle:last-child{filter:drop-shadow(0 0 5px currentColor)}
+.tb-hero-ring-num{text-shadow:0 0 12px rgba(255,255,255,.15)}
 .tb-hero-ring-num{font-family:var(--font-display,'Sora',sans-serif);font-size:24px;font-weight:800;color:#fff}
 .tb-hero-ring-num i{font-size:13px;color:var(--text-tertiary);font-style:normal}
 .tb-hero-status{font-size:15px;color:#fff;font-weight:600;line-height:1.3}
 .tb-cal-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:10px}
 .tb-cal-count{font-size:12px;color:var(--text-tertiary)}
 .tb-cal-count #hero-big-num{color:#fff;font-weight:700}
-.tb-cal-bar{height:8px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden}
-.tb-cal-fill{height:100%;background:var(--gold-gradient);border-radius:99px;transition:width 1s var(--ease-out,cubic-bezier(.16,1,.3,1))}
+.tb-cal-bar{height:10px;background:rgba(255,255,255,.06);border-radius:99px;overflow:hidden;box-shadow:inset 0 1px 2px rgba(0,0,0,.3)}
+/* HOME_POP_RING_CALBAR_V1 — vivid Apple-style calorie fill with glow + shimmer */
+.tb-cal-fill{height:100%;background:linear-gradient(90deg,var(--ap-blue,#0A84FF),var(--ap-teal,#40C8E0) 50%,var(--ap-green,#30D158));background-size:200% 100%;border-radius:99px;box-shadow:0 0 10px rgba(48,209,88,.5),0 0 4px rgba(10,132,255,.4);transition:width 1s var(--ease-out,cubic-bezier(.16,1,.3,1));animation:calShimmer 3s ease-in-out infinite}
+@keyframes calShimmer{0%,100%{background-position:0% 50%}50%{background-position:100% 50%}}
 .tb-cal-macros{display:flex;gap:14px;margin-top:12px}
 .tb-cal-macros span{font-size:11px;color:var(--text-tertiary)}
 .tb-cal-macros b{color:#fff;font-weight:700}
@@ -3448,6 +3482,11 @@ button.mb-hero{font-family:inherit;color:inherit;text-align:left;width:100%;-web
 .mp-macro-val.g{color:#5FB0E0}
 .mp-macro-val.l{color:#2D7FB8}
 .mp-meal-card{background:rgba(255,255,255,0.025);border:1px solid rgba(255,255,255,0.06);border-radius:12px;padding:0;margin-bottom:14px;overflow:hidden;transition:border-color 0.2s}
+/* MEAL_CARD_STATES_V1 */
+.mp-meal-card.mp-card-done{background:rgba(74,222,128,0.05);border-color:rgba(74,222,128,0.22)}
+.mp-meal-card.mp-card-next{background:#11233b;border-color:#378ADD;box-shadow:0 0 0 1px rgba(55,138,221,.3)}
+.mp-meal-card.mp-card-pending{opacity:.72}
+.mp-meal-card.mp-card-next .mp-meal-name{color:#fff}
 .mp-meal-card:hover{border-color:rgba(78,168,222,0.2)}
 .mp-meal-hdr{display:flex;align-items:center;justify-content:space-between;padding:16px 18px;border-bottom:1px solid rgba(255,255,255,0.05);background:rgba(255,255,255,0.015)}
 .mp-meal-icon{width:34px;height:34px;border-radius:10px;background:rgba(78,168,222,0.12);border:1px solid rgba(78,168,222,0.25);display:flex;align-items:center;justify-content:center;font-size:16px;flex-shrink:0}
@@ -3825,6 +3864,10 @@ button.mb-hero{font-family:inherit;color:inherit;text-align:left;width:100%;-web
 .ck-hero-logo span{color:#4EA8DE;}
 .ck-hero-search{width:38px;height:38px;border-radius:50%;background:rgba(255,255,255,0.1);backdrop-filter:blur(10px);border:1px solid rgba(255,255,255,0.15);display:flex;align-items:center;justify-content:center;color:#fff;font-size:16px;cursor:pointer;}
 .ck-searchbar-prominent{display:flex;align-items:center;gap:10px;margin:16px 16px 4px;padding:14px 18px;border-radius:16px;background:linear-gradient(135deg,rgba(78,168,222,.16),rgba(78,168,222,.06));border:1px solid rgba(78,168,222,.4);cursor:pointer;box-shadow:0 0 0 1px rgba(78,168,222,.1) inset,0 4px 16px rgba(0,0,0,.2);transition:all .15s}
+/* MES_REPAS_SUBTABS_V1 */
+.mr-subtabs{display:flex;gap:6px;background:rgba(255,255,255,.04);border-radius:14px;padding:4px;margin:12px 16px 16px}
+.mr-subtab{flex:1;padding:11px;border:none;border-radius:11px;background:transparent;color:rgba(255,255,255,.5);font-size:14px;font-weight:600;cursor:pointer;font-family:inherit;transition:all .15s}
+.mr-subtab.active{background:#378ADD;color:#fff}
 .ck-searchbar-prominent:hover{background:linear-gradient(135deg,rgba(78,168,222,.24),rgba(78,168,222,.1));border-color:rgba(78,168,222,.6)}
 .ck-searchbar-prominent i{font-size:18px;color:#4EA8DE}
 .ck-searchbar-prominent span{color:rgba(255,255,255,.55);font-weight:500;font-size:14px}
@@ -5425,8 +5468,9 @@ body > [id^="m-"] > *{
     </div>
     <div class="app-hdr-right" style="gap:8px">
       <span class="app-hdr-client" id="c-hdr-name" onclick="showAccountMenu(this)" style="font-family:var(--font-display);font-style:italic;font-weight:400;font-size:14px;color:var(--txt-soft);letter-spacing:0;cursor:pointer"></span>
-      <button class="pm-icon-btn" id="lang-hdr-btn" onclick="cycleLang()" aria-label="Language" style="color:rgba(255,255,255,.5);touch-action:manipulation;font-size:12px;font-weight:700;font-family:inherit;min-width:32px">
-        <span id="lang-hdr-label">FR</span>
+      <button id="lang-hdr-btn" onclick="cycleLang()" aria-label="Language" style="touch-action:manipulation;display:flex;align-items:center;gap:5px;background:rgba(78,168,222,.15);border:1px solid rgba(78,168,222,.35);border-radius:99px;padding:5px 11px;cursor:pointer;font-family:inherit"> <!-- TOPBAR_SIMPLIFY_V1 -->
+        <svg viewBox="0 0 24 24" width="13" height="13" fill="none" stroke="#4EA8DE" stroke-width="2" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><path d="M2 12h20"/><path d="M12 2a15 15 0 0 1 0 20M12 2a15 15 0 0 0 0 20"/></svg>
+        <span id="lang-hdr-label" style="font-size:12px;font-weight:700;color:#4EA8DE">FR</span>
       </button>
       <button class="pm-icon-btn" id="cm-help-btn" onclick="try{startTour();}catch(_){}" aria-label="Revoir le guide" title="Revoir le guide" style="touch-action:manipulation"><i class="ti ti-help-circle" style="font-size:18px"></i></button>
       <button class="pm-icon-btn" id="header-chat-btn" onclick="openClientChat()" aria-label="Messages" style="position:relative;touch-action:manipulation">
@@ -5442,9 +5486,7 @@ body > [id^="m-"] > *{
       <button class="pm-icon-btn" style="display:none" aria-label="" title=""><!-- HARDEN_V2 retired: single help button now -->
         <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><circle cx="12" cy="12" r="10"/><path d="M9.09 9a3 3 0 0 1 5.83 1c0 2-3 3-3 3"/><line x1="12" y1="17" x2="12.01" y2="17"/></svg>
       </button>
-      <button class="pm-icon-btn" onclick="logoutClient()" aria-label="Déconnexion" title="Déconnexion">
-        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" width="16" height="16"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
-      </button>
+      <!-- TOPBAR_SIMPLIFY_V1 — logout moved to name menu (showAccountMenu) -->
     </div>
   </header>
 
@@ -8278,6 +8320,8 @@ const COOKBOOK_TABLE='cookbook_recipes';
 let COOKBOOK_RECIPES = [];
 let COOKBOOK_FAVORITES = [];
 let _ckView = 'home'; // home | category | detail | search | favorites
+let _ckTab = 'menu'; // MES_REPAS_SUBTABS_V1 — 'menu' | 'cookbook'
+function ckSetTab(t){ _ckTab=t; if(typeof renderKitchen==='function')renderKitchen(); }
 let _ckCategory = null;
 let _ckRecipeId = null;
 let _ckCraving = null;
@@ -10168,6 +10212,20 @@ const UI_TR={
 // Post-render text replacement. French is the source; en/ar pairs swap matched substrings.
 const TRANSLATE_MAP={
   en:{
+    /* I18N_HOME_BATCH_V1 — home screen strings */
+    'Ta journée':'Your day','Entraînement du jour':'Today\'s workout','Menu du jour':'Today\'s menu',
+    'Ton parcours du jour':'Your path today','Voici ce que tu dois faire':'Here\'s what to do',
+    'Étape par étape, on y va ensemble':'Step by step, together','Journée complète — bravo':'Day complete — well done',
+    'Tu as tout coché aujourd\'hui':'You\'ve checked everything off today','Terminé':'Done',
+    'Fais ton check-in':'Do your check-in','Dis à ton coach comment tu te sens':'Tell your coach how you feel',
+    'Commencer':'Start','Fais ta séance':'Do your workout','Ta séance du jour':'Today\'s session',
+    'Démarrer':'Start','Logge tes repas':'Log your meals','Suis ton menu du jour':'Follow today\'s menu','Logger':'Log',
+    'Le mot du coach':'Coach\'s note','Compliance du jour':'Today\'s compliance','Série':'Streak',
+    'En attente du check-in':'Waiting for check-in','Belle journée en cours':'Great day in progress',
+    'Belle journée en cours. Reste concentré sur tes objectifs.':'Great day in progress. Stay focused on your goals.',
+    'Journée parfaite':'Perfect day','Repos · objectifs atteints':'Rest · goals met','Repos · récupère bien':'Rest · recover well',
+    'Lance ton check-in pour démarrer la journée du bon pied.':'Start your check-in to begin the day right.',
+    'Stable':'Stable',
     'Bonjour':'Good morning','Bon après-midi':'Good afternoon','Bonsoir':'Good evening',
     'KCAL AUJOURD\'HUI':'KCAL TODAY','Objectif calories atteint':'Calorie goal reached',
     'Encore':'Still','kcal pour l\'objectif du jour':'kcal to hit today\'s goal',
@@ -10239,6 +10297,20 @@ const TRANSLATE_MAP={
     'Se déconnecter':'Sign out','Langue':'Language'
   },
   ar:{
+    /* I18N_HOME_BATCH_V1 — home screen strings */
+    'Ta journée':'يومك','Entraînement du jour':'تمرين اليوم','Menu du jour':'قائمة اليوم',
+    'Ton parcours du jour':'مسارك اليوم','Voici ce que tu dois faire':'إليك ما عليك فعله',
+    'Étape par étape, on y va ensemble':'خطوة بخطوة، معًا','Journée complète — bravo':'يوم مكتمل — أحسنت',
+    'Tu as tout coché aujourd\'hui':'أنجزت كل شيء اليوم','Terminé':'تم',
+    'Fais ton check-in':'سجّل حضورك','Dis à ton coach comment tu te sens':'أخبر مدربك بشعورك',
+    'Commencer':'ابدأ','Fais ta séance':'قم بتمرينك','Ta séance du jour':'حصتك اليوم',
+    'Démarrer':'ابدأ','Logge tes repas':'سجّل وجباتك','Suis ton menu du jour':'اتبع قائمة اليوم','Logger':'تسجيل',
+    'Le mot du coach':'كلمة المدرب','Compliance du jour':'التزام اليوم','Série':'السلسلة',
+    'En attente du check-in':'في انتظار التسجيل','Belle journée en cours':'يوم رائع جارٍ',
+    'Belle journée en cours. Reste concentré sur tes objectifs.':'يوم رائع جارٍ. ابقَ مركزًا على أهدافك.',
+    'Journée parfaite':'يوم مثالي','Repos · objectifs atteints':'راحة · تحققت الأهداف','Repos · récupère bien':'راحة · تعافَ جيدًا',
+    'Lance ton check-in pour démarrer la journée du bon pied.':'سجّل حضورك لتبدأ يومك بنشاط.',
+    'Stable':'مستقر',
     'Bonjour':'صباح الخير','Bon après-midi':'مساء الخير','Bonsoir':'مساء النور',
     'KCAL AUJOURD\'HUI':'سعرات اليوم','Objectif calories atteint':'تم تحقيق الهدف',
     'Série en cours':'السلسلة الحالية','Record':'رقم قياسي',
@@ -12630,11 +12702,19 @@ function _ckRenderHome(){
   const socialCount = ckGetSocialProof(featured||{title:'x'});
 
   root.innerHTML = `
-    <div id="ck-progress-host" data-macro-progress data-client-id="${CC?.id||''}" style="margin:0 0 16px 0"></div>
-    <div id="ck-coach-menu-host" style="margin:0 0 16px 0"></div>
-    <div style="display:flex;gap:10px;margin:12px 0 20px">
-      <button onclick="openQuickAdd()" style="flex:1;padding:14px;background:var(--bg-card);border:1px dashed var(--gold-border);color:var(--gold);border-radius:14px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit">+ Ajouter au journal alimentaire</button>
+    <!-- MES_REPAS_SUBTABS_V1 -->
+    <div class="mr-subtabs">
+      <button class="mr-subtab ${(_ckTab!=='cookbook')?'active':''}" onclick="ckSetTab('menu')">Mon menu</button>
+      <button class="mr-subtab ${(_ckTab==='cookbook')?'active':''}" onclick="ckSetTab('cookbook')">Cookbook</button>
     </div>
+    <div class="mr-pane" style="${(_ckTab==='cookbook')?'display:none':''}">
+      <div id="ck-progress-host" data-macro-progress data-client-id="${CC?.id||''}" style="margin:0 0 16px 0"></div>
+      <div id="ck-coach-menu-host" style="margin:0 0 16px 0"></div>
+      <div style="display:flex;gap:10px;margin:12px 0 20px">
+        <button onclick="openQuickAdd()" style="flex:1;padding:14px;background:var(--bg-card);border:1px dashed var(--gold-border);color:var(--gold);border-radius:14px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit">+ Logger autre chose</button>
+      </div>
+    </div>
+    <div class="mr-pane" style="${(_ckTab==='cookbook')?'':'display:none'}">
     <div class="ck-cuisine-bar">
       <div class="ck-cuisine-inner">
         ${cuisineChips.map(c=>`<div class="ck-cuisine-chip ${cuisine===c.key?'active':''}" onclick="ckSetCuisine('${c.key}')">${c.ico?`<span class="ico">${c.ico}</span>`:''}${c.label}</div>`).join('')}
@@ -12727,6 +12807,7 @@ function _ckRenderHome(){
         <div style="display:inline-block;padding:10px 22px;border-radius:99px;background:linear-gradient(135deg,#4EA8DE,#7FC4ED);color:#000;font-size:13px;font-weight:700">Passe Premium →</div>
       </div>
     ` : ''}
+    </div>
   `;
 
   // Phase 7.5 — mount today's macro progress card at the top of Kitchen
@@ -14590,9 +14671,11 @@ async function rToday(){
         const menuCal=mm.cal||goalCals||0;
         const menuMeals=mm.meals||0;
         const rest=isRestDay;
+        /* DAYTYPE_TOGGLE_HOME_V1 — tappable badge to override rest/training */
+        const _newType=rest?'training':'rest';
         const badge=rest
-          ? '<span style="display:inline-block;background:#7F77DD;color:#fff;font-size:10px;font-weight:500;letter-spacing:.06em;padding:4px 11px;border-radius:99px;margin-bottom:10px">JOUR REPOS</span>'
-          : '<span style="display:inline-block;background:#378ADD;color:#fff;font-size:10px;font-weight:500;letter-spacing:.06em;padding:4px 11px;border-radius:99px;margin-bottom:10px">JOUR ENTRAÎNEMENT</span>';
+          ? `<span onclick="event.stopPropagation();dtClientToggle('${_newType}')" style="display:inline-flex;align-items:center;gap:5px;background:#7F77DD;color:#fff;font-size:10px;font-weight:600;letter-spacing:.06em;padding:5px 12px;border-radius:99px;margin-bottom:10px;cursor:pointer">JOUR REPOS <i class="ti ti-switch-horizontal" style="font-size:12px;opacity:.8"></i></span>`
+          : `<span onclick="event.stopPropagation();dtClientToggle('${_newType}')" style="display:inline-flex;align-items:center;gap:5px;background:#378ADD;color:#fff;font-size:10px;font-weight:600;letter-spacing:.06em;padding:5px 12px;border-radius:99px;margin-bottom:10px;cursor:pointer">JOUR ENTRAÎNEMENT <i class="ti ti-switch-horizontal" style="font-size:12px;opacity:.8"></i></span>`;
         const sub=rest?'Repos · récupère bien':((_todaySession&&_todaySession.name)?_todaySession.name:'Entraînement du jour');
         const workoutRow=(!rest && _todaySession && _todaySession.name)?`
           <div onclick="event.stopPropagation();switchTab(2)" style="display:flex;align-items:center;gap:10px;background:rgba(255,255,255,.08);border-radius:10px;padding:11px;margin-top:8px;cursor:pointer">
@@ -14611,13 +14694,50 @@ async function rToday(){
         </div>`;
       })()}
 
-      <div class="tb-read">
-        <div class="tb-read-ic"><i class="ti ti-bulb"></i></div>
-        <div>
-          <div class="tb-read-eye">Le mot du coach</div>
-          <div class="tb-read-msg">${coachRead}</div>
+      ${(()=>{
+        /* HOME_TODAY_PATH_V1 — one clear "do this next" sequence */
+        const ckDone=logged;
+        const seanceDone=isRestDay?true:trained;
+        const mealsDone=(cals>0)||menuOk;
+        // active = first incomplete step
+        let active = !ckDone?1 : !seanceDone?2 : !mealsDone?3 : 0;
+        const stepCard=(n,icon,title,sub,actLabel,onclick,done)=>{
+          if(done){
+            return `<div onclick="${onclick}" style="display:flex;align-items:center;gap:12px;background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.22);border-radius:16px;padding:13px 14px;margin:0 20px 8px;cursor:pointer">
+              <div style="width:28px;height:28px;border-radius:50%;background:rgba(74,222,128,.18);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-circle-check-filled" style="color:#4ade80;font-size:18px"></i></div>
+              <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700;color:#fff">${title}</div><div style="font-size:11px;color:rgba(74,222,128,.8)">Fait ✓</div></div>
+            </div>`;
+          }
+          if(n===active){
+            return `<div style="background:linear-gradient(135deg,#1d3a5f,#16243a);border:1.5px solid #4EA8DE;border-radius:18px;padding:16px;margin:0 20px 10px;box-shadow:0 8px 28px rgba(78,168,222,.28)">
+              <div style="display:flex;align-items:center;gap:9px;margin-bottom:9px">
+                <div style="width:26px;height:26px;border-radius:50%;background:#4EA8DE;color:#04121c;display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px">${n}</div>
+                <div style="font-size:11px;letter-spacing:.12em;color:#9FC0E8;font-weight:700">MAINTENANT</div>
+              </div>
+              <div style="font-size:18px;font-weight:800;color:#fff;margin-bottom:2px">${title}</div>
+              <div style="font-size:12px;color:rgba(255,255,255,.6);margin-bottom:13px">${sub}</div>
+              <button onclick="${onclick}" style="width:100%;background:#4EA8DE;color:#04121c;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:14px;font-family:inherit;cursor:pointer;display:flex;align-items:center;justify-content:center;gap:6px">${actLabel} <i class="ti ti-chevron-right" style="font-size:16px"></i></button>
+            </div>`;
+          }
+          // future / quiet
+          return `<div style="display:flex;align-items:center;gap:12px;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.07);border-radius:16px;padding:13px 14px;margin:0 20px 8px;opacity:.7">
+            <div style="width:28px;height:28px;border-radius:50%;background:rgba(255,255,255,.08);color:rgba(255,255,255,.5);display:flex;align-items:center;justify-content:center;font-weight:800;font-size:13px;flex-shrink:0">${n}</div>
+            <div style="flex:1;min-width:0"><div style="font-size:15px;font-weight:700;color:#fff">${title}</div><div style="font-size:11px;color:rgba(255,255,255,.4)">${sub}</div></div>
+            <i class="${icon}" style="color:rgba(255,255,255,.35);font-size:20px"></i>
+          </div>`;
+        };
+        const allDone = active===0;
+        return `
+        <div style="margin:18px 20px 14px;text-align:center"> <!-- HOME_PATH_HEADER_POP_V1 -->
+          <div style="font-size:10px;letter-spacing:.2em;text-transform:uppercase;color:#4EA8DE;font-weight:800;margin-bottom:5px">${allDone?'Terminé':'Ton parcours du jour'}</div>
+          <div style="font-size:22px;font-weight:800;color:#fff;line-height:1.2">${allDone?'Journée complète — bravo':'Voici ce que tu dois faire'}</div>
+          <div style="font-size:13px;color:rgba(255,255,255,.5);margin-top:3px">${allDone?'Tu as tout coché aujourd\'hui':'Étape par étape, on y va ensemble'}</div>
         </div>
-      </div>
+        ${stepCard(1,'ti ti-clipboard-list','Fais ton check-in','Dis à ton coach comment tu te sens','Commencer','switchTab(1)',ckDone)}
+        ${isRestDay?'':stepCard(2,'ti ti-barbell','Fais ta séance',(_todaySession?.name||'Ta séance du jour'),'Démarrer','switchTab(2)',seanceDone)}
+        ${stepCard(3,'ti ti-salad','Logge tes repas','Suis ton menu du jour','Logger','switchTab(9)',mealsDone)}
+        <div style="font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.35);font-weight:700;margin:16px 20px 8px">TON SUIVI AUJOURD'HUI</div>`;
+      })()}
 
       <div class="tb-grid stagger-in">
         <div class="tb-tile tb-tile-full tb-tile-hero">
@@ -14629,19 +14749,6 @@ async function rToday(){
             <div class="tb-tile-eye">Compliance du jour</div>
             <div class="tb-hero-status">${logged?(compPct>=95?(isRestDay?'Repos · objectifs atteints':'Journée parfaite'):'Belle journée en cours'):'En attente du check-in'}</div>
           </div>
-        </div>
-
-        <div class="tb-tile">
-          <div class="tb-tile-hd"><i class="ti ti-flame"></i><span>Série</span></div>
-          <div class="tb-tile-num ${streakClass}"><span id="today-streak-num">0</span><i>j</i></div>
-          <div class="tb-tile-foot">Record ${streak.best}j</div>
-          ${streak.frozen?`<div style="font-size:11px;color:#4EA8DE;margin-top:4px">🛡️ Série gelée — un jour sauté, ta série tient bon.</div>`:''}
-        </div>
-
-        <div id="cm-log-weight" class="tb-tile" onclick="openWeightQuickModal()" style="cursor:pointer">
-          <div class="tb-tile-hd"><i class="ti ti-scale"></i><span>Poids</span></div>
-          <div class="tb-tile-num">${lw||'—'}<i>kg</i></div>
-          <div class="tb-tile-foot" style="color:${wDelta<0?'var(--success)':wDelta>0?'var(--danger)':'var(--text-tertiary)'}">${wDelta!==0&&!isNaN(wDelta)?(wDelta>0?'+':'')+wDelta+' kg':'Stable'}</div>
         </div>
 
         <div class="tb-tile tb-tile-full">
@@ -14656,6 +14763,28 @@ async function rToday(){
             <span>L <b>${Math.round(fat)}g</b></span>
           </div>
           <div class="today-smart-caption" id="today-smart-caption" style="display:none"></div>
+        </div>
+
+        <div class="tb-tile">
+          <div class="tb-tile-hd"><i class="ti ti-flame"></i><span>Série</span></div>
+          <div class="tb-tile-num ${streakClass}"><span id="today-streak-num">0</span><i>j</i></div>
+          <div class="tb-tile-foot">Record ${streak.best}j</div>
+          ${streak.frozen?`<div style="font-size:11px;color:#4EA8DE;margin-top:4px">🛡️ Série gelée — un jour sauté, ta série tient bon.</div>`:''}
+        </div>
+
+        <div id="cm-log-weight" class="tb-tile" onclick="openWeightQuickModal()" style="cursor:pointer">
+          <div class="tb-tile-hd"><i class="ti ti-scale"></i><span>Poids</span></div>
+          <div class="tb-tile-num">${lw||'—'}<i>kg</i></div>
+          <div class="tb-tile-foot" style="color:${wDelta<0?'var(--success)':wDelta>0?'var(--danger)':'var(--text-tertiary)'}">${wDelta!==0&&!isNaN(wDelta)?(wDelta>0?'+':'')+wDelta+' kg':'Stable'}</div>
+        </div>
+      </div>
+
+      <!-- HOME_REORDER_V1 — mot du coach moved below stats -->
+      <div class="tb-read">
+        <div class="tb-read-ic"><i class="ti ti-bulb"></i></div>
+        <div>
+          <div class="tb-read-eye">Le mot du coach</div>
+          <div class="tb-read-msg">${coachRead}</div>
         </div>
       </div>
     </div>
@@ -14726,6 +14855,9 @@ async function rToday(){
         <div class="tab-act-sub">${logged?'Validé ✓':'À faire'}</div>
       </button>
     </div>
+    <!-- HOME_MENU_PROMINENCE_V1 — menu card moved ABOVE logger, brightened -->
+    <!-- MARKER: MENU_OF_DAY_V1 -->
+    <div id="today-menu-card" style="margin:0 24px 14px;display:none"></div>
     <!-- FOOD_FINDABILITY_V1 — the ONE obvious daily food action -->
     <button onclick="openQuickAdd()" class="ba-food" style="width:calc(100% - 48px);margin:0 24px 18px;display:flex;align-items:center;gap:14px;background:linear-gradient(135deg,#4EA8DE,#7FC4ED);border:none;border-radius:18px;padding:18px 20px;cursor:pointer;font-family:inherit;box-shadow:0 12px 30px rgba(78,168,222,.32);touch-action:manipulation">
       <span class="ba-shine"></span>
@@ -14736,8 +14868,6 @@ async function rToday(){
       </div>
       <svg viewBox="0 0 24 24" fill="none" stroke="#04121c" stroke-width="2.4" width="20" height="20" style="opacity:.6"><path d="M9 6l6 6-6 6"/></svg>
     </button>
-    <!-- MARKER: MENU_OF_DAY_V1 -->
-    <div id="today-menu-card" style="margin:0 24px 18px;display:none"></div>
     <!-- MARKER: QUICK_MACRO_LOG_V1 -->
     <div id="qml-box" class="today-card-anim" style="margin:0 24px 18px;background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.08);border-radius:14px;padding:16px">
       <div style="font-size:11px;font-weight:700;letter-spacing:.1em;text-transform:uppercase;color:rgba(78,168,222,.9);margin-bottom:4px">Logger mes macros</div>
@@ -14938,7 +15068,7 @@ async function loadTodayMenuCard(){
       </div>`;
     }).join('');
     card.style.display='block';
-    card.innerHTML=`<div class="today-card-anim" style="background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.08);border-radius:14px;padding:16px;cursor:pointer" onclick="this.querySelector('.tmc-body').style.display=this.querySelector('.tmc-body').style.display==='none'?'block':'none';this.querySelector('.tmc-chev').textContent=this.querySelector('.tmc-body').style.display==='none'?'▾':'▴'">
+    card.innerHTML=`<div class="today-card-anim" style="background:linear-gradient(135deg,#17243a,#142033);border:1px solid rgba(78,168,222,.35);border-radius:16px;padding:18px;cursor:pointer;box-shadow:0 8px 24px rgba(78,168,222,.15)" onclick="this.querySelector('.tmc-body').style.display=this.querySelector('.tmc-body').style.display==='none'?'block':'none';this.querySelector('.tmc-chev').textContent=this.querySelector('.tmc-body').style.display==='none'?'▾':'▴'">
       <div style="display:flex;align-items:center;justify-content:space-between;gap:8px">
         <div style="display:flex;align-items:center;gap:8px;min-width:0">
           ${badge}
@@ -16048,7 +16178,13 @@ async function renderCheckin(overrideDate){
       <div class="ci-row-body" style="width:100%">
         <div class="ci-row-label">Comment tu te sens ?</div>
         <div class="ci-mood-picker" id="ci-mood-picker" style="display:flex;gap:6px;margin-top:8px">
-          ${['😞','😐','🙂','😊','🔥'].map((e,i)=>`<button class="ci-mood-btn" data-mood="${i+1}" onclick="ciPickMood(${i+1})" style="flex:1;padding:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;font-size:20px;cursor:pointer">${e}</button>`).join('')}
+          ${[
+            {ic:'ti-mood-sad',col:'#ff5b5b'},
+            {ic:'ti-mood-neutral',col:'#ffb340'},
+            {ic:'ti-mood-smile',col:'#ffd60a'},
+            {ic:'ti-mood-happy',col:'#4ade80'},
+            {ic:'ti-flame',col:'#ff8c42'}
+          ].map((m,i)=>`<button class="ci-mood-btn" data-mood="${i+1}" onclick="ciPickMood(${i+1})" style="flex:1;padding:11px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;cursor:pointer;display:flex;align-items:center;justify-content:center"><i class="ti ${m.ic}" style="font-size:22px;color:${m.col}"></i></button>`).join('')} <!-- JOURNAL_MOOD_ICONS_V1 -->
         </div>
         <textarea id="ci-note" placeholder="Note pour ton coach (optionnel)" rows="2" style="width:100%;margin-top:10px;background:rgba(255,255,255,.04);border:1px solid rgba(255,255,255,.08);border-radius:10px;padding:10px 14px;color:#fff;font-size:14px;font-family:inherit;resize:none"></textarea>
       </div>
@@ -16066,6 +16202,11 @@ async function renderCheckin(overrideDate){
     <div class="pm-day-strip">${dg}</div>
 
     <div style="margin:18px 0 6px"><div style="font-family:var(--font-display,Georgia,serif);font-style:italic;font-weight:300;font-size:22px;color:#fff;letter-spacing:-.01em">${dateHeader}</div><div style="font-size:11px;color:var(--text-muted);letter-spacing:.1em;text-transform:uppercase;font-weight:700;margin-top:2px">Semaine ${curWeek}</div></div>
+
+    <!-- JOURNAL_REORDER_V1 — check-in moved to top -->
+    ${checkinSection}
+
+    <div style="margin:20px 0 8px"><div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:rgba(255,255,255,.4);font-weight:700">Suivi du jour</div></div>
 
     <div style="display:flex;gap:8px;margin:14px 0 16px">
       ${pill('Prot','grammes',consumed.protein,targets.protein,'#60a5fa')}
@@ -16125,7 +16266,7 @@ async function renderCheckin(overrideDate){
       <button onclick="openQuickAdd()" style="width:100%;margin-top:12px;padding:12px;background:transparent;border:1px dashed var(--gold-border,rgba(78,168,222,.3));color:var(--gold);border-radius:12px;font-weight:600;font-size:13px;cursor:pointer;font-family:inherit">+ Ajouter un repas</button>
     </div>
 
-    ${checkinSection}`;
+    `; /* JOURNAL_REORDER_V1 — checkinSection moved to top */
   // After the HTML lands in DOM (caller assigns the return value), hydrate V2 check-in
   setTimeout(()=>{ try{ if(typeof ciV2Hydrate==='function')ciV2Hydrate(); }catch(_){} },0);
   return _rjHtml;
@@ -17094,11 +17235,18 @@ async function applyParsedProgram(){
     await sb.from('training_sessions').delete().eq('client_id',rawProgClientId);
     // 3. Insert any session that has at least one exercise (keeps "Repos actif"
     // days with real movement, drops only truly empty rest days).
+    /* SESSION_DEDUP_NAMES_V1 — disambiguate duplicate names so none collapse */
+    const _nameSeen={};
+    const _disambig=(nm)=>{
+      const base=(nm||'Séance').trim();
+      _nameSeen[base]=(_nameSeen[base]||0)+1;
+      return _nameSeen[base]===1?base:`${base} (${_nameSeen[base]})`;
+    };
     const rows=_parsedSessions
       .filter(s=>s.exercises.length>0)
       .map((s,idx)=>({
         client_id:rawProgClientId,
-        name:s.name,
+        name:_disambig(s.name),
         type:s.type,
         exercises:s.exercises,
         rest_time:s.exercises[0]?.rest||90,
@@ -17113,8 +17261,12 @@ async function applyParsedProgram(){
         coach_note:s.exercises.filter(e=>e.note).map(e=>`• ${e.name}: ${e.note}`).join('\n')||null
       }));
     if(rows.length){
-      const {error}=await sb.from('training_sessions').insert(rows);
+      const {data:_ins,error}=await sb.from('training_sessions').insert(rows).select('id');
       if(error)throw error;
+      const _saved=(_ins||[]).length;
+      if(_saved<rows.length){
+        alert('⚠️ '+_saved+' séances enregistrées sur '+rows.length+' — contacte le support.');
+      }
     }
     // 4. Notify client
     await sb.from('notifications').insert({
@@ -18105,6 +18257,16 @@ async function renderMealPlan(){
   </div>`;
 
   days.forEach((day,di)=>{
+    /* MEAL_CARD_STATES_V1 — find first un-logged, non-skipped meal = "next" */
+    let _nextMealIdx=-1;
+    (day.meals||[]).forEach((meal,mi)=>{
+      if(_nextMealIdx!==-1)return;
+      const _mk=`meal-${di}-${mi}-${(meal.name||'').replace(/\W/g,'').slice(0,30)}`;
+      if(todaySkips.has(_mk))return;
+      const _fk=(meal.foods||[]).map((food,fi)=>`mp-${di}-${mi}-${fi}-${(food.name||'').replace(/\W/g,'').slice(0,30)}`);
+      const _eat=todayEntries.filter(e=>_fk.includes(e.source_food_key)).reduce((a,e)=>a+(e.calories||0),0);
+      if(_eat===0)_nextMealIdx=mi;
+    });
     const dt=calcT((day.meals||[]).flatMap(m=>m.foods||[]));
     const displayCal=day.total_cal||Math.round(dt.cal);
     // Compliance rollup for this day
@@ -18159,7 +18321,10 @@ async function renderMealPlan(){
         const plannedTotals={cal:mt.cal,p:mt.p,g:mt.g,l:mt.l};
         const status=isSkipped?'skipped':_mpMealCompliance(plannedTotals,eatenForMeal);
         const safeMealName=(meal.name||'').replace(/'/g,"\\'");
-        return `<div class="mp-meal-card${isSkipped?' mp-collapsed':''}">
+        const _isNext=(mi===_nextMealIdx);
+        const _isDone=(status==='green'||status==='amber'||(eatenForMeal.cal>0));
+        const _stateClass=isSkipped?' mp-card-skipped':_isDone?' mp-card-done':_isNext?' mp-card-next':' mp-card-pending';
+        return `<div class="mp-meal-card${isSkipped?' mp-collapsed':''}${_stateClass}">
           <div class="mp-meal-hdr mp-meal-hdr-v2" data-status="${status}" onclick="if(event.target.closest('button')||event.target.closest('.mp-meal-title-link'))return;this.closest('.mp-meal-card').classList.toggle('mp-collapsed')">
             <div class="mp-meal-icon">${mealIcon(meal.name)}</div>
             <div class="mp-meal-info">
@@ -36634,6 +36799,74 @@ async function cpRenderProgression(pane){
 
     const recent=logs.slice(-14).reverse();
 
+    /* COACH_PROGRESSION_INSIGHTS_V1 — rule-based coaching insights from computed data */
+    const _insights=[];
+    let _nextMove='';
+    (function(){
+      // weight trend
+      let wTrend=null;
+      if(weights.length>=2){
+        const first=+weights[0].weight, last=+weights[weights.length-1].weight;
+        wTrend=last-first;
+      }
+      const goalDir=(g.goal_weight&&weights.length)?((+weights[weights.length-1].weight)-(+g.goal_weight)):null;
+      // compliance trend
+      if(tw.logged>0){
+        if(dComp.cls==='down'&&Math.abs(tw.compliance-lw.compliance)>=10){
+          _insights.push({t:'down',txt:`Compliance en baisse : ${lw.compliance}% → ${tw.compliance}% cette semaine.`});
+        } else if(dComp.cls==='up'&&Math.abs(tw.compliance-lw.compliance)>=10){
+          _insights.push({t:'up',txt:`Compliance en hausse : ${lw.compliance}% → ${tw.compliance}%. Momentum positif.`});
+        } else if(tw.compliance>=80){
+          _insights.push({t:'up',txt:`Compliance solide à ${tw.compliance}% — semaine maîtrisée.`});
+        }
+      }
+      // logging consistency
+      if(tw.logged>0&&tw.logged<4){
+        _insights.push({t:'warn',txt:`Seulement ${tw.logged}/7 jours loggés cette semaine — données incomplètes, relancer le client.`});
+      }
+      // weight movement
+      if(wTrend!==null){
+        if(Math.abs(wTrend)<0.3){
+          _insights.push({t:'warn',txt:`Poids stable (${wTrend>0?'+':''}${wTrend.toFixed(1)}kg sur la période) — plateau possible.`});
+        } else {
+          _insights.push({t:wTrend<0?'up':'flat',txt:`Poids : ${wTrend>0?'+':''}${wTrend.toFixed(1)}kg sur la période.`});
+        }
+      }
+      // training volume
+      if(tw.logged>=3&&g.weekly_training_target){
+        if(tw.training<g.weekly_training_target){
+          _insights.push({t:'warn',txt:`Training ${tw.training}/${g.weekly_training_target} cette semaine — sous l'objectif.`});
+        }
+      }
+      // best/worst day
+      if(worstDow>=0&&dowAvgs[worstDow]>0&&dowAvgs[worstDow]<60){
+        _insights.push({t:'warn',txt:`Jour le plus faible : ${dowNames[worstDow]} (${dowAvgs[worstDow]}% moy). Cibler ce jour.`});
+      }
+      // NEXT MOVE — single recommendation
+      if(wTrend!==null&&Math.abs(wTrend)<0.3&&tw.compliance>=75){
+        _nextMove='Poids stagne malgré une bonne compliance → ajuster les calories (−100 à −150 kcal) ou augmenter les pas.';
+      } else if(tw.compliance<60&&tw.logged>=3){
+        _nextMove='Compliance faible → simplifier le plan ou recadrer le client avant d\'ajuster les chiffres.';
+      } else if(tw.logged<4){
+        _nextMove='Données insuffisantes cette semaine → relancer le client pour qu\'il logge avant de décider.';
+      } else if(goalDir!==null&&Math.abs(goalDir)<=1){
+        _nextMove='Objectif quasi atteint → préparer la transition (maintien ou nouvel objectif).';
+      } else if(dComp.cls==='up'){
+        _nextMove='Bonne dynamique → maintenir le plan actuel, ne rien changer cette semaine.';
+      } else {
+        _nextMove='Continuer le plan actuel et réévaluer dans 7 jours.';
+      }
+    })();
+    const _insIcon={up:'<i class="ti ti-trending-up" style="color:#4ade80"></i>',down:'<i class="ti ti-trending-down" style="color:#ff4757"></i>',warn:'<i class="ti ti-alert-triangle" style="color:#fbbf24"></i>',flat:'<i class="ti ti-minus" style="color:#9aa"></i>'};
+    const _insightsHtml=`
+      <div style="background:linear-gradient(135deg,rgba(78,168,222,.08),rgba(78,168,222,.02));border:1px solid rgba(78,168,222,.25);border-radius:14px;padding:16px;margin-bottom:16px">
+        <div style="font-size:10px;letter-spacing:.16em;text-transform:uppercase;color:#4EA8DE;font-weight:700;margin-bottom:10px"><i class="ti ti-sparkles"></i> Analyse coach</div>
+        ${_insights.length?_insights.map(i=>`<div style="display:flex;gap:8px;align-items:flex-start;margin-bottom:7px;font-size:13px;color:rgba(255,255,255,.85);line-height:1.4">${_insIcon[i.t]||''}<span>${i.txt}</span></div>`).join(''):'<div style="font-size:13px;color:rgba(255,255,255,.5)">Pas encore assez de données pour analyser.</div>'}
+        <div style="margin-top:12px;padding-top:12px;border-top:1px solid rgba(255,255,255,.08)">
+          <div style="font-size:10px;letter-spacing:.14em;text-transform:uppercase;color:#fbbf24;font-weight:700;margin-bottom:5px"><i class="ti ti-arrow-right"></i> Prochaine action</div>
+          <div style="font-size:13px;color:#fff;font-weight:500;line-height:1.45">${_nextMove}</div>
+        </div>
+      </div>`;
     pane.innerHTML=`
       <div class="cpr-wrap">
         <div class="cpr-hero">
@@ -36641,6 +36874,7 @@ async function cpRenderProgression(pane){
           <div class="cpr-hero-title">${cpEscape(c.name||'—')}</div>
           <div class="cpr-hero-sub">${logs.length} jours suivis · ${weights.length} pesées</div>
         </div>
+        ${_insightsHtml}
 
         <div class="cpr-section">
           <div class="cpr-section-header">
@@ -40618,7 +40852,7 @@ function plRenderPlanContent(){
   const now=new Date();
   const todayLabel=PL_DAY_FULL[now.getDay()];
   const upcoming=[];
-  for(let i=1;i<Math.min(_plSessions.length,5);i++){
+  for(let i=1;i<_plSessions.length;i++){ /* PLAN_UPCOMING_CAP_FIX_V1 — was Math.min(len,5), capped 6-day programs at 5 */
     const s=_plSessions[(_plTodayIdx+i)%_plSessions.length];
     const d=new Date(now);d.setDate(d.getDate()+i);
     upcoming.push({sess:s,dayShort:PL_DAY_LABELS[d.getDay()]});
@@ -41993,6 +42227,21 @@ window.addEventListener('mealLogged', (e) => {
   // ═══════════════════════════════════════════════════════
   // CORE — manual override for today
   // ═══════════════════════════════════════════════════════
+  /* DAYTYPE_TOGGLE_HOME_V1 — client-facing wrapper: confirm, save, re-render everything */
+  window.dtClientToggle = async function(newType){
+    if(typeof CC==='undefined'||!CC?.id)return;
+    const label=newType==='rest'?'jour de repos':'jour d\'entraînement';
+    if(!confirm(`Passer en ${label} pour aujourd'hui ?\n\nTes objectifs caloriques, ton menu et ton suivi vont s'ajuster.`))return;
+    try{
+      const r=await toggleDayType(CC.id,newType);
+      if(r&&r.ok!==false){
+        if(typeof rToday==='function'){const el=document.getElementById('tab-home');if(el){const h=await rToday();el.innerHTML='<div class="tab-enter">'+h+'</div>';}}
+      }else{
+        alert('Impossible de changer le jour. Réessaie.');
+      }
+    }catch(e){ alert('Erreur — réessaie.'); }
+  };
+
   window.toggleDayType = async function(clientId, newType){
     const sb = _sb();
     if(!sb || !clientId) return {ok:false, error:'no_sb_or_client'};
