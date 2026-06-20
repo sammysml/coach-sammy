@@ -28446,6 +28446,54 @@ async function exportClientsExcel(){
 // ── AI CALLS — via Supabase Edge Function (fixes CORS) ─
 const EDGE_FN=SU+'/functions/v1/ai-coach';
 
+/* CLIENT_BRIEFING_L1_V1 — assemble full coaching briefing for one client (no AI, just data) */
+async function buildClientBriefing(clientId){
+  const today=new Date();
+  const iso=d=>d.toISOString().slice(0,10);
+  const ago=n=>{const d=new Date();d.setDate(d.getDate()-n);return iso(d);};
+  const [cli,goals,logs28,weights,checkins]=await Promise.all([
+    sb.from('clients').select('*').eq('id',clientId).single(),
+    sb.from('client_goals').select('*').eq('client_id',clientId).maybeSingle(),
+    sb.from('daily_logs').select('log_date,calories_eaten,protein_eaten,carbs_eaten,fat_eaten,training_done,menu_respected,steps,body_weight,day_type').eq('client_id',clientId).gte('log_date',ago(28)).order('log_date',{ascending:true}),
+    sb.from('weight_logs').select('weight,logged_at').eq('client_id',clientId).order('logged_at',{ascending:true}),
+    sb.from('coach_checkins').select('note,checked_at').eq('client_id',clientId).order('checked_at',{ascending:false}).limit(5)
+  ]);
+  const c=cli.data||{}, g=goals.data||{}, L=logs28.data||[], W=weights.data||[], CK=(checkins.data||[]);
+  // weight trend
+  const wFirst=W.length?+W[0].weight:null, wLast=W.length?+W[W.length-1].weight:null;
+  const wTrend=(wFirst!=null&&wLast!=null)?+(wLast-wFirst).toFixed(1):null;
+  // last 14d weight movement (plateau detection)
+  const recentW=W.filter(w=>w.logged_at>=ago(14)).map(w=>+w.weight);
+  const w14delta=recentW.length>=2?+(recentW[recentW.length-1]-recentW[0]).toFixed(1):null;
+  // compliance: this week vs last week
+  const wk=(start,end)=>L.filter(l=>l.log_date>=start&&l.log_date<end);
+  const thisWk=wk(ago(7),ago(0)), lastWk=wk(ago(14),ago(7));
+  const compOf=arr=>{if(!arr.length)return 0;const ok=arr.filter(l=>l.menu_respected).length;return Math.round(ok/arr.length*100);};
+  const avgMacro=(arr,k)=>{const v=arr.filter(l=>l[k]>0);return v.length?Math.round(v.reduce((a,l)=>a+l[k],0)/v.length):0;};
+  const briefing={
+    name:c.name||'—',
+    program_phase:c.program_phase||c.current_phase||c.goal||'—',
+    start_date:c.created_at?iso(new Date(c.created_at)):'—',
+    days_active:c.created_at?Math.round((today-new Date(c.created_at))/864e5):null,
+    goals:{calories:g.calorie_target||g.calories||null,protein:g.protein_target||null,weight_goal:g.goal_weight||g.target_weight||null,training_days:g.weekly_training_target||null},
+    weight:{start:wFirst,current:wLast,trend_total:wTrend,last_14d:w14delta,plateau:(w14delta!=null&&Math.abs(w14delta)<0.3),count:W.length},
+    compliance:{this_week:compOf(thisWk),last_week:compOf(lastWk),logged_days_this_week:thisWk.length},
+    training:{done_this_week:thisWk.filter(l=>l.training_done).length,target:g.weekly_training_target||null},
+    macros_avg_7d:{protein:avgMacro(thisWk,'protein_eaten'),carbs:avgMacro(thisWk,'carbs_eaten'),fat:avgMacro(thisWk,'fat_eaten'),calories:avgMacro(thisWk,'calories_eaten')},
+    recent_notes:CK.map(k=>({note:k.note,when:k.checked_at})).filter(n=>n.note)
+  };
+  return briefing;
+}
+
+/* preview helper — verify the data before we add AI */
+window.previewClientBriefing=async function(clientId){
+  try{
+    const b=await buildClientBriefing(clientId);
+    console.log('CLIENT BRIEFING:',b);
+    alert('BRIEFING — '+b.name+'\n\n'+JSON.stringify(b,null,2));
+  }catch(e){ alert('Briefing error: '+e.message); console.error(e); }
+};
+
 async function callEdge(action,payload){
   const r=await fetch(EDGE_FN,{
     method:'POST',
@@ -36723,6 +36771,16 @@ async function cpRenderProgression(pane){
   if(!pane||!_cpState)return;
   const c=_cpState.client||{};
   const clientId=c.id;
+  /* BRIEFING_PREVIEW_BTN_TEMP_V1 — temporary verify button */
+  setTimeout(()=>{
+    if(document.getElementById('tmp-briefing-btn'))return;
+    const b=document.createElement('button');
+    b.id='tmp-briefing-btn';
+    b.textContent='🔍 Preview AI briefing (test)';
+    b.style.cssText='position:fixed;top:120px;left:16px;z-index:99999;background:#ff3b30;color:#fff;border:none;border-radius:12px;padding:14px 18px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 8px 24px rgba(255,59,48,.5);font-family:inherit';
+    b.onclick=()=>{ if(typeof previewClientBriefing==='function'){previewClientBriefing(clientId);}else{alert('briefing fn missing');} };
+    document.body.appendChild(b);
+  },300);
   pane.innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--text-muted)">Chargement…</div>';
   try{
     const since=new Date();since.setDate(since.getDate()-90);
