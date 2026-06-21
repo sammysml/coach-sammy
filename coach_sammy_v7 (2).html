@@ -28480,10 +28480,78 @@ async function buildClientBriefing(clientId){
     compliance:{this_week:compOf(thisWk),last_week:compOf(lastWk),logged_days_this_week:thisWk.length},
     training:{done_this_week:thisWk.filter(l=>l.training_done).length,target:g.weekly_training_target||null},
     macros_avg_7d:{protein:avgMacro(thisWk,'protein_eaten'),carbs:avgMacro(thisWk,'carbs_eaten'),fat:avgMacro(thisWk,'fat_eaten'),calories:avgMacro(thisWk,'calories_eaten')},
+    /* BRIEFING_DEEP_DAILY_V1 — per-day breakdown for pattern + macro-distribution analysis */
+    daily_breakdown:(()=>{
+      const dow=['Sun','Mon','Tue','Wed','Thu','Fri','Sat'];
+      return L.filter(l=>l.log_date>=ago(14)).map(l=>{
+        const d=new Date(l.log_date+'T00:00:00');
+        const cal=Number(l.calories_eaten||0), p=Number(l.protein_eaten||0), cb=Number(l.carbs_eaten||0), f=Number(l.fat_eaten||0);
+        return {
+          date:l.log_date,
+          day:dow[d.getDay()],
+          weekend:(d.getDay()===0||d.getDay()===6),
+          day_type:l.day_type||null,
+          calories:cal, protein:p, carbs:cb, fat:f,
+          // macro distribution as % of calories (carb/protein/fat split)
+          carb_pct:cal>0?Math.round((cb*4/cal)*100):null,
+          protein_pct:cal>0?Math.round((p*4/cal)*100):null,
+          fat_pct:cal>0?Math.round((f*9/cal)*100):null,
+          trained:!!l.training_done, menu_ok:!!l.menu_respected
+        };
+      });
+    })(),
+    macro_targets:{calories:g.calorie_target||g.calories||null,protein:g.protein_target||null,carbs:g.carb_target||g.carbs_target||null,fat:g.fat_target||null},
     recent_notes:CK.map(k=>({note:k.note,when:k.checked_at})).filter(n=>n.note)
   };
   return briefing;
 }
+
+/* CLIENT_AI_READ_L2_V1 — feed briefing to AI, get coaching read + action + message */
+async function generateCoachRead(clientId){
+  const b=await buildClientBriefing(clientId);
+  /* COACH_READ_FIX_PAYLOAD_V1 — use working coach_message action with payload:{prompt} */
+  const prompt=`Tu es un coach sportif expert (physique, nutrition, comportement) qui passe en revue UN client pour le compte de Sammy, son coach. Sammy parle à ses clients en français algérien décontracté, chaleureux, motivant — tutoiement, direct, jamais corporate.
+
+Ton travail : lire les données comme un VRAI coach, pas résumer des chiffres. Distingue un problème de MOTIVATION d'un problème de VIE (voyage, stress, maladie) d'un problème de PROGRAMMATION (plateau physiologique, calories à ajuster). Donne UNE recommandation concrète et prioritaire.
+
+Réponds STRICTEMENT en JSON valide, sans aucun texte autour, format exact :
+{"read":"2-3 phrases : ce que tu vois vraiment, le diagnostic","action":"2-3 phrases : la chose précise à faire maintenant","message":"un message WhatsApp prêt à envoyer au client, voix de Sammy, court, chaleureux, en français"}
+
+Voici le bilan du client :
+${JSON.stringify(b,null,2)}`;
+  /* COACH_READ_USE_ACTION_V1 — use dedicated coach_read edge action */
+  const r=await fetch(EDGE_FN,{
+    method:'POST',
+    headers:{'content-type':'application/json','apikey':SK,'authorization':'Bearer '+SK},
+    body:JSON.stringify({action:'coach_read',payload:{briefing:b}})
+  });
+  if(!r.ok)throw new Error('Erreur serveur ('+r.status+')');
+  const d=await r.json();
+  const parsed={read:d.read||'',action:d.action||'',message:d.message||''};
+  return {briefing:b,...parsed}
+}
+
+window.showCoachRead=async function(clientId){
+  const host=document.getElementById('coach-read-host');
+  if(host)host.innerHTML='<div style="padding:30px;text-align:center;color:rgba(255,255,255,.5)">Analyse en cours…</div>';
+  try{
+    const r=await generateCoachRead(clientId);
+    if(host)host.innerHTML=`
+      <div style="background:linear-gradient(135deg,rgba(78,168,222,.08),transparent);border:1px solid rgba(78,168,222,.25);border-radius:14px;padding:14px;margin-bottom:10px">
+        <div style="font-size:10px;letter-spacing:.14em;color:#4EA8DE;font-weight:700;margin-bottom:8px">CE QUE JE VOIS</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.55">${r.read||'—'}</div>
+      </div>
+      <div style="background:rgba(74,222,128,.06);border:1px solid rgba(74,222,128,.22);border-radius:14px;padding:14px;margin-bottom:10px">
+        <div style="font-size:10px;letter-spacing:.14em;color:#4ade80;font-weight:700;margin-bottom:8px">CE QUE JE FERAIS</div>
+        <div style="font-size:13px;color:rgba(255,255,255,.9);line-height:1.55">${r.action||'—'}</div>
+      </div>
+      <div style="background:rgba(255,255,255,.03);border:0.5px solid rgba(255,255,255,.1);border-radius:14px;padding:14px;margin-bottom:12px">
+        <div style="font-size:10px;letter-spacing:.14em;color:rgba(255,255,255,.5);font-weight:700;margin-bottom:8px">MESSAGE PRÊT À ENVOYER</div>
+        <div id="coach-read-msg" style="font-size:13px;color:rgba(255,255,255,.85);line-height:1.5;font-style:italic">${r.message||'—'}</div>
+      </div>
+      <button onclick="(function(){const t=document.getElementById('coach-read-msg').textContent;window.open('https://wa.me/?text='+encodeURIComponent(t),'_blank');})()" style="width:100%;background:#25D366;color:#fff;border:none;border-radius:12px;padding:13px;font-weight:800;font-size:14px;cursor:pointer;font-family:inherit"><i class="ti ti-brand-whatsapp"></i> Envoyer sur WhatsApp</button>`;
+  }catch(e){ if(host)host.innerHTML='<div style="padding:20px;color:#ff6b6b">Erreur: '+e.message+'</div>'; }
+};
 
 /* preview helper — verify the data before we add AI */
 window.previewClientBriefing=async function(clientId){
@@ -36771,16 +36839,7 @@ async function cpRenderProgression(pane){
   if(!pane||!_cpState)return;
   const c=_cpState.client||{};
   const clientId=c.id;
-  /* BRIEFING_PREVIEW_BTN_TEMP_V1 — temporary verify button */
-  setTimeout(()=>{
-    if(document.getElementById('tmp-briefing-btn'))return;
-    const b=document.createElement('button');
-    b.id='tmp-briefing-btn';
-    b.textContent='🔍 Preview AI briefing (test)';
-    b.style.cssText='position:fixed;top:120px;left:16px;z-index:99999;background:#ff3b30;color:#fff;border:none;border-radius:12px;padding:14px 18px;font-weight:800;font-size:14px;cursor:pointer;box-shadow:0 8px 24px rgba(255,59,48,.5);font-family:inherit';
-    b.onclick=()=>{ if(typeof previewClientBriefing==='function'){previewClientBriefing(clientId);}else{alert('briefing fn missing');} };
-    document.body.appendChild(b);
-  },300);
+  /* CLIENT_AI_READ_L2_V1 — temp test button removed; AI read available via showCoachRead(clientId) */
   pane.innerHTML='<div style="padding:60px 20px;text-align:center;color:var(--text-muted)">Chargement…</div>';
   try{
     const since=new Date();since.setDate(since.getDate()-90);
@@ -36931,6 +36990,12 @@ async function cpRenderProgression(pane){
           <div class="cpr-hero-eyebrow">Progression complète</div>
           <div class="cpr-hero-title">${cpEscape(c.name||'—')}</div>
           <div class="cpr-hero-sub">${logs.length} jours suivis · ${weights.length} pesées</div>
+        </div>
+
+        <!-- COACH_READ_BUTTON_V1 — AI coaching read -->
+        <div style="margin:14px 0">
+          <button onclick="showCoachRead('${clientId}')" style="width:100%;background:linear-gradient(135deg,#4EA8DE,#7FC4ED);color:#04121c;border:none;border-radius:14px;padding:15px;font-weight:800;font-size:15px;cursor:pointer;font-family:inherit;display:flex;align-items:center;justify-content:center;gap:8px;box-shadow:0 8px 24px rgba(78,168,222,.35)"><i class="ti ti-sparkles"></i> Lecture coach (IA)</button>
+          <div id="coach-read-host" style="margin-top:12px"></div>
         </div>
         ${_insightsHtml}
 
@@ -42616,6 +42681,19 @@ async function cpRenderToday(pane){
 
   pane.innerHTML = `
     <div style="padding:20px;display:flex;flex-direction:column;gap:16px">
+      <!-- COACH_CLIENT_LANDING_V1 — fast access to the two destinations -->
+      <div style="display:flex;flex-direction:column;gap:10px">
+        <div onclick="cpSetTab('plan')" style="background:linear-gradient(135deg,#1d3a5f,#16243a);border:1px solid rgba(78,168,222,.35);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 6px 20px rgba(78,168,222,.15)">
+          <div style="width:40px;height:40px;border-radius:11px;background:rgba(78,168,222,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-clipboard-list" style="font-size:20px;color:#7FC4ED"></i></div>
+          <div style="flex:1"><div style="font-size:16px;font-weight:800;color:#fff">Plan & Menu</div><div style="font-size:11px;color:rgba(255,255,255,.55)">Training · food · macros</div></div>
+          <i class="ti ti-chevron-right" style="font-size:18px;color:rgba(255,255,255,.5)"></i>
+        </div>
+        <div onclick="cpSetTab('progress')" style="background:linear-gradient(135deg,rgba(74,222,128,.12),rgba(74,222,128,.03));border:1px solid rgba(74,222,128,.35);border-radius:16px;padding:16px;display:flex;align-items:center;gap:14px;cursor:pointer;box-shadow:0 6px 20px rgba(74,222,128,.1)">
+          <div style="width:40px;height:40px;border-radius:11px;background:rgba(74,222,128,.2);display:flex;align-items:center;justify-content:center;flex-shrink:0"><i class="ti ti-chart-bar" style="font-size:20px;color:#4ade80"></i></div>
+          <div style="flex:1"><div style="font-size:16px;font-weight:800;color:#fff">Progress & Check-ins</div><div style="font-size:11px;color:rgba(255,255,255,.55)">Weight · compliance · notes</div></div>
+          <i class="ti ti-chevron-right" style="font-size:18px;color:rgba(255,255,255,.5)"></i>
+        </div>
+      </div>
       <div id="ct-status-strip" style="background:var(--bg-card);border:1px solid var(--border-subtle);border-radius:10px;padding:14px 18px;display:flex;align-items:center;justify-content:space-between;gap:12px;flex-wrap:wrap"></div>
       <div id="ct-day-badge" data-day-badge="1" data-client-id="${clientId}"></div>
       <div id="ct-macro-progress" data-macro-progress data-client-id="${clientId}" data-coach-view="1"></div>
